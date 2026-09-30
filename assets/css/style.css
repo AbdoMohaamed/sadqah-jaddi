@@ -205,7 +205,7 @@ body {
    قسم البداية (Hero Section)
    ========================================================================== */
 .hero {
-  padding: 4.5rem 0 3.5rem;
+  padding: 0rem  3.5rem;
   position: relative;
   text-align: center;
 }
@@ -310,13 +310,12 @@ body {
    قسم سلايدر الأدعية (Swiper Section)
    ========================================================================== */
 .prayers-section {
-  padding: 4.5rem 0;
   position: relative;
 }
 
 .section-header {
   text-align: center;
-  margin-bottom: 3rem;
+  padding:25px 0;
 }
 
 .section-tag {
@@ -338,13 +337,12 @@ body {
 .section-desc {
   color: var(--text-secondary);
   font-size: 1.05rem;
-  max-width: 600px;
   margin: 0 auto;
 }
 
 .swiper-container-wrapper {
   position: relative;
-  padding: 1.5rem 0 .5rem;
+  padding: .2rem 0 .5rem;
 }
 
 .swiper-prayers {
@@ -516,14 +514,14 @@ body {
 .slider-bottom-actions {
   display: flex;
   justify-content: center;
-  margin-top: 1rem;
+  padding-bottom: 30px;
 }
 
 /* ==========================================================================
    قسم السبحة الإلكترونية (Tasbeeh Counter)
    ========================================================================== */
 .tasbeeh-section {
-  padding: 4.5rem 0;
+  padding: 25px 0;
   background: radial-gradient(circle at center, rgba(19, 35, 60, 0.6) 0%, rgba(7, 13, 24, 0.95) 70%);
   border-top: 1px solid rgba(212, 175, 55, 0.15);
   border-bottom: 1px solid rgba(212, 175, 55, 0.15);
@@ -533,7 +531,6 @@ body {
   display: grid;
   grid-template-columns: 1fr 1.3fr;
   gap: 2.5rem;
-  align-items: center;
 }
 
 /* قائمة الأذكار للاختيار */
@@ -748,7 +745,7 @@ body {
    قسم الأدعية المأثورة والقرآن
    ========================================================================== */
 .quran-section {
-  padding: 4.5rem 0;
+  padding:25px 0;
 }
 
 .verses-grid {
@@ -1004,16 +1001,19 @@ body {
   gap: 1rem;
   margin-bottom: 1.5rem;
 }
-
+.footer-author {
+    font-weight: bold;
+    color: var(--gold-300);
+}
 /* ==========================================================================
    قسم مصحف الصدقة الجارية (Quran Reader Section)
    ========================================================================== */
 .quran-reader-section {
-  padding: 4.5rem 0;
-  position: relative;
-  background: radial-gradient(circle at 50% 20%, rgba(16, 185, 129, 0.08) 0%, rgba(7, 13, 24, 0.98) 75%);
-  border-top: 1px solid var(--border-color);
-  border-bottom: 1px solid var(--border-color);
+    padding-bottom: 20px;
+    position: relative;
+    background: radial-gradient(circle at 50% 20%, rgba(16, 185, 129, 0.08) 0%, rgba(7, 13, 24, 0.98) 75%);
+    border-top: 1px solid var(--border-color);
+    border-bottom: 1px solid var(--border-color);
 }
 
 .surahs-controls-container {
@@ -1297,7 +1297,7 @@ body {
     gap: 2rem;
   }
   .hero-title {
-    font-size: 2.3rem;
+    font-size: 1.5rem;
   }
   .prayer-main-text {
     font-size: 1.5rem;
@@ -1338,7 +1338,7 @@ body {
     font-size: 0.85rem;
   }
   .hero {
-    padding: 2.5rem 0 1.8rem;
+    padding: 1.5rem 0 1.8rem;
   }
   .hero-badge {
     font-size: 0.8rem;
@@ -1384,7 +1384,7 @@ body {
   .prayers-section,
   .tasbeeh-section,
   .quran-section {
-    padding: 3rem 0;
+    padding:10px 0;
   }
 
   .section-title {
