@@ -238,21 +238,32 @@
                 </div>
             </div>
 
-            <!-- بطاقة صفحة المصحف الشريف الكبرى -->
-            <div class="quran-mushaf-card">
-                <!-- إطار ترويسة السورة -->
+            <!-- بطاقة صفحة المصحف الشريف الحقيقية الكبرى -->
+            <div class="quran-mushaf-card real-mushaf-card">
+                <!-- إطار ترويسة السورة والجزء -->
                 <div class="mushaf-header-frame">
                     <div class="mushaf-surah-title" id="quran-surah-title">سُورَةُ المُلْكِ</div>
-                    <div class="mushaf-verses-count" id="quran-verses-count">30 آية</div>
+                    <div class="mushaf-verses-count" id="quran-verses-count">الجزء ٢٩ • صفحة ٥٦٢ من ٦٠٤</div>
                 </div>
 
-                <!-- شريط تحكم القارئ -->
-                <div class="mushaf-toolbar">
-                    <div class="font-size-controls">
-                        <span style="font-size: 0.85rem; color: var(--text-gold);">حجم الخط:</span>
-                        <button type="button" class="btn-font-control" id="btn-font-increase" title="تكبير الخط">+</button>
-                        <button type="button" class="btn-font-control" id="btn-font-decrease" title="تصغير الخط">-</button>
-                        <span class="font-size-indicator" id="font-size-indicator">24px</span>
+                <!-- شريط تحكم وتصفح المصحف الحقيقي -->
+                <div class="mushaf-toolbar real-mushaf-toolbar">
+                    <div class="mushaf-nav-controls">
+                        <button type="button" class="btn btn-gold btn-page-nav" id="btn-mushaf-prev" title="الصفحة السابقة">
+                            <i class="fa-solid fa-angle-right"></i>
+                            <span>الصفحة السابقة</span>
+                        </button>
+
+                        <div class="page-jump-box">
+                            <label for="mushaf-page-input">صفحة:</label>
+                            <input type="number" id="mushaf-page-input" class="mushaf-page-input" min="1" max="604" value="562">
+                            <span>/ 604</span>
+                        </div>
+
+                        <button type="button" class="btn btn-gold btn-page-nav" id="btn-mushaf-next" title="الصفحة التالية">
+                            <span>الصفحة التالية</span>
+                            <i class="fa-solid fa-angle-left"></i>
+                        </button>
                     </div>
 
                     <div class="mushaf-audio-control">
@@ -263,12 +274,29 @@
                     </div>
                 </div>
 
-                <!-- نص الآيات الكريمة -->
-                <div class="quran-mushaf-text" id="quran-mushaf-text">
-                    <!-- يُملأ من js/quran.js -->
+                <!-- حاوية صفحة المصحف الشريف الحقيقية -->
+                <div class="mushaf-real-page-wrapper">
+                    <div id="mushaf-page-loader" class="mushaf-page-loader">
+                        <i class="fa-solid fa-spinner fa-spin"></i>
+                        <span>جاري فتح صفحة المصحف الشريف...</span>
+                    </div>
+                    <img id="mushaf-real-page-img" class="mushaf-real-page-img" src="https://cdn.quran.ws/svg/pages/v1.1.1/hafs-kfqc/562.svg" alt="صفحة المصحف الشريف" loading="eager">
                 </div>
 
-                <!-- زر إهداء ثواب القراءة -->
+                <!-- أزرار تقليب الصفحات السفلية السريعة -->
+                <div class="mushaf-bottom-page-controls">
+                    <button type="button" class="btn btn-outline btn-page-nav" onclick="document.getElementById('btn-mushaf-prev').click()">
+                        <i class="fa-solid fa-angle-right"></i>
+                        <span>السابق</span>
+                    </button>
+                    <span class="mushaf-hint-text"><i class="fa-solid fa-hand-pointer"></i> يمكنك أيضاً استخدام مفاتيح الأسهم (➔ / ⬅) لتقليب الصفحات</span>
+                    <button type="button" class="btn btn-outline btn-page-nav" onclick="document.getElementById('btn-mushaf-next').click()">
+                        <span>التالي</span>
+                        <i class="fa-solid fa-angle-left"></i>
+                    </button>
+                </div>
+
+                <!-- زر إهداء ثواب القراءة لروح الجد -->
                 <div class="mushaf-footer-actions">
                     <button type="button" class="btn-gift-reward" id="btn-gift-quran-reward">
                         <i class="fa-solid fa-gift"></i>
