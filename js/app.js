@@ -323,9 +323,19 @@ function incrementTasbeeh() {
     // فحص إتمام الهدف
     if (currentZkrCount >= zkr.target) {
         playCompletionChime();
-        showToast(`هنيئاً لك! أتممت ${zkr.target} تسبيحة، جعلها الله في ميزان حسنات فقيدنا 🌿`);
+        showToast(`هنيئاً لك! أتممت ${zkr.target} تسبيحة، وننتقل الآن للذكر التالي 🌿`);
         currentZkrCount = 0;
-        setTimeout(updateCounterDisplay, 700);
+        
+        // الانتقال التلقائي للذكر التالي في القائمة
+        const nextIndex = (activeZkrIndex + 1) % TASBEEH_ITEMS.length;
+        setTimeout(() => {
+            selectZkr(nextIndex);
+            // تحريك التمرير ليظهر الذكر النشط الجديد
+            const activeBtn = document.querySelectorAll(".zkr-btn")[nextIndex];
+            if (activeBtn) {
+                activeBtn.scrollIntoView({ behavior: "smooth", block: "nearest" });
+            }
+        }, 700);
     }
 }
 

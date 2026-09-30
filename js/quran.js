@@ -1,89 +1,143 @@
 ﻿/**
- * مصحف الصدقة الجارية - القارئ القرآني
+ * مصحف الصدقة الجارية - القارئ القرآني برسم المصحف الشريف
  */
 
-// قائمة السور الفاضلة المجهزة مسبقاً للقراءة الفورية
-const FEATURED_SURAHS = [
-    {
-        id: "surah-mulk",
-        number: 67,
-        name: "سورة الملك",
-        title: "سُورَةُ المُلْكِ (المَانِعَةُ مِن عَذَابِ القَبْرِ)",
-        versesCount: 30,
-        audioUrl: "https://server8.mp3quran.net/afs/067.mp3",
-        text: `بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ
-تَبَارَكَ الَّذِي بِيَدِهِ الْمُلْكُ وَهُوَ عَلَىٰ كُلِّ شَيْءٍ قَدِيرٌ ﴿١﴾ الَّذِي خَلَقَ الْمَوْتَ وَالْحَيَاةَ لِيَبْلُوَكُمْ أَيُّكُمْ أَحْسَنُ عَمَلًا ۚ وَهُوَ الْعَزِيزُ الْغَفُورُ ﴿٢﴾ الَّذِي خَلَقَ سَبْعَ سَمَاوَاتٍ طِبَاقًا ۖ مَّا تَرَىٰ فِي خَلْقِ الرَّحْمَٰنِ مِن تَفَاوُتٍ ۖ فَارْجِعِ الْبَصَرَ هَلْ تَرَىٰ مِن فُطُورٍ ﴿٣﴾ ثُمَّ ارْجِعِ الْبَصَرَ كَرَّتَيْنِ يَنقَلِبْ إِلَيْكَ الْبَصَرُ خَاسِئًا وَهُوَ حَسِيرٌ ﴿٤﴾ وَلَقَدْ زَيَّنَّا السَّمَاءَ الدُّنْيَا بِمَصَابِيحَ وَجَعَلْنَاهَا رُجُومًا لِّلشَّيَاطِينِ ۖ وَأَعْتَدْنَا لَهُمْ عَذَابَ السَّعِيرِ ﴿٥﴾ وَلِلَّذِينَ كَفَرُوا بِرَبِّهِمْ عَذَابُ جَهَنَّمَ ۖ وَبِئْسَ الْمَصِيرُ ﴿٦﴾ إِذَا أُلْقُوا فِيهَا سَمِعُوا لَهَا شَهِيقًا وَهِيَ تَفُورُ ﴿٧﴾ تَكَادُ تَمَيَّزُ مِنَ الْغَيْظِ ۖ كُلَّمَا أُلْقِيَ فِيهَا فَوْجٌ سَأَلَهُمْ خَزَنَتُهَا أَلَمْ يَأْتِكُمْ نَذِيرٌ ﴿٨﴾ قَالُوا بَلَىٰ قَدْ جَاءَنَا نَذِيرٌ فَكَذَّبْنَا وَقُلْنَا مَا نَزَّلَ اللَّهُ مِن شَيْءٍ إِنْ أَنتُمْ إِلَّا فِي ضَلَالٍ كَبِيرٍ ﴿٩﴾ وَقَالُوا لَوْ كُنَّا نَسْمَعُ أَوْ نَعْقِلُ مَا كُنَّا فِي أَصْحَابِ السَّعِيرِ ﴿١٠﴾ فَاعْتَرَفُوا بِذَنبِهِمْ فَسُحْقًا لِّأَصْحَابِ السَّعِيرِ ﴿١١﴾ إِنَّ الَّذِينَ يَخْشَوْنَ رَبَّهُم بِالْغَيْبِ لَهُم مَّغْفِرَةٌ وَأَجْرٌ كَبِيرٌ ﴿١٢﴾ وَأَسِرُّوا قَوْلَكُمْ أَوِ اجْهَرُوا بِهِ ۖ إِنَّهُ عَلِيمٌ بِذَاتِ الصُّدُورِ ﴿١٣﴾ أَلَا يَعْلَمُ مَنْ خَلَقَ وَهُوَ اللَّطِيفُ الْخَبِيرُ ﴿١٤﴾ هُوَ الَّذِي جَعَلَ لَكُمُ الْأَرْضَ ذَلُولًا فَامْشُوا فِي مَنَاكِبِهَا وَكُلُوا مِن رِّزْقِهِ ۖ وَإِلَيْهِ النُّشُورُ ﴿١٥﴾ أَأَمِنتُم مَّن فِي السَّمَاءِ أَن يَخْسِفَ بِكُمُ الْأَرْضَ فَإِذَا هِيَ تَمُورُ ﴿١٦﴾ أَمْ أَمِنتُم مَّن فِي السَّمَاءِ أَن يُرْسِلَ عَلَيْكُمْ حَاصِبًا ۖ فَسَتَعْلَمُونَ كَيْفَ نَذِيرِ ﴿١٧﴾ وَلَقَدْ كَذَّبَ الَّذِينَ مِن قَبْلِهِمْ فَكَيْفَ كَانَ نَكِيرِ ﴿١٨﴾ أَوَلَمْ يَرَوْا إِلَى الطَّيْرِ فَوْقَهُمْ صَافَّاتٍ وَيَقْبِضْنَ ۚ مَا يُمْسِكُهُنَّ إِلَّا الرَّحْمَٰنُ ۚ إِنَّهُ بِكُلِّ شَيْءٍ بَصِيرٌ ﴿١٩﴾ أَمَّنْ هَٰذَا الَّذِي هُوَ جُندٌ لَّكُمْ يَنصُرُكُم مِّن دُونِ الرَّحْمَٰنِ ۚ إِنِ الْكَافِرُونَ إِلَّا فِي غُرُورٍ ﴿٢٠﴾ أَمَّنْ هَٰذَا الَّذِي يَرْزُقُكُمْ إِنْ أَمْسَكَ رِزْقَهُ ۚ بَل لَّجُّوا فِي عُتُوٍّ وَنُفُورٍ ﴿٢١﴾ أَفَمَن يَمْشِي مُكِبًّا عَلَىٰ وَجْهِهِ أَهْدَىٰ أَمَّن يَمْشِي سَوِيًّا عَلَىٰ صِرَاطٍ مُّسْتَقِيمٍ ﴿٢٢﴾ قُلْ هُوَ الَّذِي أَنشَأَكُمْ وَجَعَلَ لَكُمُ السَّمْعَ وَالْأَبْصَارَ وَالْأَفْئِدَةَ ۖ قَلِيلًا مَّا تَشْكُرُونَ ﴿٢٣﴾ قُلْ هُوَ الَّذِي ذَرَأَكُمْ فِي الْأَرْضِ وَإِلَيْهِ تُحْشَرُونَ ﴿٢٤﴾ وَيَقُولُونَ مَتَىٰ هَٰذَا الْوَعْدُ إِن كُنتُمْ صَادِقِينَ ﴿٢٥﴾ قُلْ إِنَّمَا الْعِلْمُ عِندَ اللَّهِ وَإِنَّمَا أَنَا نَذِيرٌ مُّبِينٌ ﴿٢٦﴾ فَلَمَّا رَأَوْهُ زُلْفَةً سِيئَتْ وُجُوهُ الَّذِينَ كَفَرُوا وَقِيلَ هَٰذَا الَّذِي كُنتُم بِهِ تَدَّعُونَ ﴿٢٧﴾ قُلْ أَرَأَيْتُمْ إِنْ أَهْلَكَنِيَ اللَّهُ وَمَن مَّعِيَ أَوْ رَحِمَنَا فَمَن يُجِيرُ الْكَافِرِينَ مِنْ عَذَابٍ أَلِيمٍ ﴿٢٨﴾ قُلْ هُوَ الرَّحْمَٰنُ آمَنَّا بِهِ وَعَلَيْهِ تَوَكَّلْنَا ۖ فَسَتَعْلَمُونَ مَنْ هُوَ فِي ضَلَالٍ مُّبِينٍ ﴿٢٩﴾ قُلْ أَرَأَيْتُمْ إِنْ أَصْبَحَ مَاؤُكُمْ غَوْرًا فَمَن يَأْتِيكُم بِمَاءٍ مَّعِينٍ ﴿٣٠﴾`
-    },
-    {
-        id: "surah-fatihah",
-        number: 1,
-        name: "سورة الفاتحة",
-        title: "سُورَةُ الفَاتِحَةِ (أُمُّ الكِتَابِ وَالشَّافِيَةُ)",
-        versesCount: 7,
-        audioUrl: "https://server8.mp3quran.net/afs/001.mp3",
-        text: `بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ ﴿١﴾ الْحَمْدُ لِلَّهِ رَبِّ الْعَالَمِينَ ﴿٢﴾ الرَّحْمَٰنِ الرَّحِيمِ ﴿٣﴾ مَالِكِ يَوْمِ الدِّينِ ﴿٤﴾ إِيَّاكَ نَعْبُدُ وَإِيَّاكَ نَسْتَعِينُ ﴿٥﴾ اهْدِنَا الصِّرَاطَ الْمُسْتَقِيمَ ﴿٦﴾ صِرَاطَ الَّذِينَ أَنْعَمْتَ عَلَيْهِمْ غَيْرِ الْمَغْضُوبِ عَلَيْهِمْ وَلَا الضَّالِّينَ ﴿٧﴾`
-    },
-    {
-        id: "surah-yasin",
-        number: 36,
-        name: "سورة يس",
-        title: "سُورَةُ يس (قَلْبُ القُرْآنِ)",
-        versesCount: 83,
-        audioUrl: "https://server8.mp3quran.net/afs/036.mp3",
-        text: `بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ
-يس ﴿١﴾ وَالْقُرْآنِ الْحَكِيمِ ﴿٢﴾ إِنَّكَ لَمِنَ الْمُرْسَلِينَ ﴿٣﴾ عَلَىٰ صِرَاطٍ مُّسْتَقِيمٍ ﴿٤﴾ تَنزِيلَ الْعَزِيزِ الرَّحِيمِ ﴿٥﴾ لِتُنذِرَ قَوْمًا مَّا أُنذِرَ آبَاؤُهُمْ فَهُمْ غَافِلُونَ ﴿٦﴾ لَقَدْ حَقَّ الْقَوْلُ عَلَىٰ أَكْثَرِهِمْ فَهُمْ لَا يُؤْمِنُونَ ﴿٧﴾ إِنَّا جَعَلْنَا فِي أَعْنَاقِهِمْ أَغْلَالًا فَهِيَ إِلَى الْأَذْقَانِ فَهُم مُّقْمَحُونَ ﴿٨﴾ وَجَعَلْنَا مِن بَيْنِ أَيْدِيهِمْ سَدًّا وَمِنْ خَلْفِهِمْ سَدًّا فَأَغْشَيْنَاهُمْ فَهُمْ لَا يُبْصِرُونَ ﴿٩﴾ وَسَوَاءٌ عَلَيْهِمْ أَأَنذَرْتَهُمْ أَمْ لَمْ تُنذِرْهُمْ لَا يُؤْمِنُونَ ﴿١٠﴾ إِنَّمَا تُنذِرُ مَنِ اتَّبَعَ الذِّكْرَ وَخَشِيَ الرَّحْمَٰنَ بِالْغَيْبِ ۖ فَبَشِّرْهُ بِمَغْفِرَةٍ وَأَجْرٍ كَرِيمٍ ﴿١١﴾ إِنَّا نَحْنُ نُحْيِي الْمَوْتَىٰ وَنَكْتُبُ مَا قَدَّمُوا وَآثَارَهُمْ ۚ وَكُلَّ شَيْءٍ أَحْصَيْنَاهُ فِي إِمَامٍ مُّبِينٍ ﴿١٢﴾ وَاضْرِبْ لَهُم مَّثَلًا أَصْحَابَ الْقَرْيَةِ إِذْ جَاءَهَا الْمُرْسَلُونَ ﴿١٣﴾ إِذْ أَرْسَلْنَا إِلَيْهِمُ اثْنَيْنِ فَكَذَّبُوهُمَا فَعَزَّزْنَا بِثَالِثٍ فَقَالُوا إِنَّا إِلَيْكُم مُّرْسَلُونَ ﴿١٤﴾ قَالُوا مَا أَنتُمْ إِلَّا بَشَرٌ مِّثْلُنَا وَمَا أَنزَلَ الرَّحْمَٰنُ مِن شَيْءٍ إِنْ أَنتُمْ إِلَّا تَكْذِبُونَ ﴿١٥﴾ قَالُوا رَبُّنَا يَعْلَمُ إِنَّا إِلَيْكُمْ لَمُرْسَلُونَ ﴿١٦﴾ وَمَا عَلَيْنَا إِلَّا الْبَلَاغُ الْمُبِينُ ﴿١٧﴾ قَالُوا إِنَّا تَطَيَّرْنَا بِكُمْ ۖ لَئِن لَّمْ تَنتَهُوا لَنَرْجُمَنَّكُمْ وَلَيَمَسَّنَّكُم مِّنَّا عَذَابٌ أَلِيمٌ ﴿١٨﴾ قَالُوا طَائِرُكُم مَّعَكُمْ ۚ أَئِن ذُكِّرْتُم ۚ بَلْ أَنتُمْ قَوْمٌ مُّسْرِفُونَ ﴿١٩﴾ وَجَاءَ مِنْ أَقْصَى الْمَدِينَةِ رَجُلٌ يَسْعَىٰ قَالَ يَا قَوْمِ اتَّبِعُوا الْمُرْسَلِينَ ﴿٢٠﴾ اتَّبِعُوا مَن لَّا يَسْأَلُكُمْ أَجْرًا وَهُم مُّهْتَدُونَ ﴿٢١﴾ وَمَا لِيَ لَا أَعْبُدُ الَّذِي فَطَرَنِي وَإِلَيْهِ تُرْجَعُونَ ﴿٢٢﴾ أَأَتَّخِذُ مِن دُونِهِ آلِهَةً إِن يُرِدْنِ الرَّحْمَٰنُ بِضُرٍّ لَّا تُغْنِ عَنِّي شَفَاعَتُهُمْ شَيْئًا وَلَا يُنقِذُونِ ﴿٢٣﴾ إِنِّي إِذًا لَّفِي ضَلَالٍ مُّبِينٍ ﴿٢٤﴾ إِنِّي آمَنتُ بِرَبِّكُمْ فَاسْمَعُونِ ﴿٢٥﴾ قِيلَ ادْخُلِ الْجَنَّةَ ۖ قَالَ يَا لَيْتَ قَوْمِي يَعْلَمُونَ ﴿٢٦﴾ بِمَا غَفَرَ لِي رَبِّي وَجَعَلَنِي مِنَ الْمُكْرَمِينَ ﴿٢٧﴾... [وَاضْغَطْ عَلَى القَارِئ لِإِكْمَالِ بَاقِي السُّورَةِ كَامِلَةً]`
-    },
-    {
-        id: "surah-muawidhat",
-        number: 112,
-        name: "الإخلاص والمعوذتين",
-        title: "الإِخْلَاصُ وَالفَلَقُ وَالنَّاسُ",
-        versesCount: 15,
-        audioUrl: "https://server8.mp3quran.net/afs/112.mp3",
-        text: `بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ
-قُلْ هُوَ اللَّهُ أَحَدٌ ﴿١﴾ اللَّهُ الصَّمَدُ ﴿٢﴾ لَمْ يَلِدْ وَلَمْ يُولَدْ ﴿٣﴾ وَلَمْ يَكُن لَّهُ كُفُوًا أَحَدٌ ﴿٤﴾
-
-بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ
-قُلْ أَعُوذُ بِرَبِّ الْفَلَقِ ﴿١﴾ مِن شَرِّ مَا خَلَقَ ﴿٢﴾ وَمِن شَرِّ غَاسِقٍ إِذَا وَقَبَ ﴿٣﴾ وَمِن شَرِّ النَّفَّاثَاتِ فِي الْعُقَدِ ﴿٤﴾ وَمِن شَرِّ حَاسِدٍ إِذَا حَسَدَ ﴿٥﴾
-
-بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ
-قُلْ أَعُوذُ بِرَبِّ النَّاسِ ﴿١﴾ مَلِكِ النَّاسِ ﴿٢﴾ إِلَٰهِ النَّاسِ ﴿٣﴾ مِن شَرِّ الْوَسْوَاسِ الْخَنَّاسِ ﴿٤﴾ الَّذِي يُوَسْوِسُ فِي صُدُورِ النَّاسِ ﴿٥﴾ مِنَ الْجِنَّةِ وَالنَّاسِ ﴿٦﴾`
-    },
-    {
-        id: "ayat-kursi",
-        number: 2,
-        name: "آية الكرسي وخواتيم البقرة",
-        title: "آيَةُ الكُرْسِيِّ وَخَوَاتِيمُ سُورَةِ البَقَرَةِ",
-        versesCount: 3,
-        audioUrl: "https://server8.mp3quran.net/afs/002.mp3",
-        text: `بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ
-اللَّهُ لَا إِلَٰهَ إِلَّا هُوَ الْحَيُّ الْقَيُّومُ ۚ لَا تَأْخُذُهُ سِنَةٌ وَلَا نَوْمٌ ۚ لَّهُ مَا فِي السَّمَاوَاتِ وَمَا فِي الْأَرْضِ ۗ مَن ذَا الَّذِي يَشْفَعُ عِندَهُ إِلَّا بِإِذْنِهِ ۚ يَعْلَمُ مَا بَيْنَ أَيْدِيهِمْ وَمَا خَلْفَهُمْ ۖ وَلَا يُحِيطُونَ بِشَيْءٍ مِّنْ عِلْمِهِ إِلَّا بِمَا شَاءَ ۚ وَسِعَ كُرْسِيُّهُ السَّمَاوَاتِ وَالْأَرْضَ ۖ وَلَا يَئُودُهُ حِفْظُهُمَا ۚ وَهُوَ الْعَلِيُّ الْعَظِيمُ ﴿٢٥٥﴾
-
-آمَنَ الرَّسُولُ بِمَا أُنزِلَ إِلَيْهِ مِن رَّبِّهِ وَالْمُؤْمِنُونَ ۚ كُلٌّ آمَنَ بِاللَّهِ وَمَلَائِكَتِهِ وَكُتُبِهِ وَرُسُلِهِ لَا نُفَرِّقُ بَيْنَ أَحَدٍ مِّن رُّسُلِهِ ۚ وَقَالُوا سَمِعْنَا وَأَطَعْنَا ۖ غُفْرَانَكَ رَبَّنَا وَإِلَيْكَ الْمَصِيرُ ﴿٢٨٥﴾ لَا يُكَلِّفُ اللَّهُ نَفْسًا إِلَّا وُسْعَهَا ۚ لَهَا مَا كَسَبَتْ وَعَلَيْهَا مَا اكْتَسَبَتْ ۗ رَبَّنَا لَا تُؤَاخِذْنَا إِن نَّسِينَا أَوْ أَخْطَأْنَا ۚ رَبَّنَا وَلَا تَحْمِلْ عَلَيْنَا إِصْرًا كَمَا حَمَلْتَهُ عَلَى الَّذِينَ مِن قَبْلِنَا ۚ رَبَّنَا وَلَا تُحَمِّلْنَا مَا لَا طَاقَةَ لَنَا بِهِ ۖ وَاعْفُ عَنَّا وَاغْفِرْ لَنَا وَارْحَمْنَا ۚ أَنتَ مَوْلَانَا فَانصُرْنَا عَلَى الْقَوْمِ الْكَافِرِينَ ﴿٢٨٦﴾`
-    }
+// السور الفاضلة الأكثر قراءة وإهداءً للميت
+const QUICK_SURAHS = [
+    { id: 67, name: "سورة الملك", subtitle: "المانعة من عذاب القبر" },
+    { id: 36, name: "سورة يس", subtitle: "قلب القرآن" },
+    { id: 1, name: "سورة الفاتحة", subtitle: "أم الكتاب والشافية" },
+    { id: 56, name: "سورة الواقعة", subtitle: "سورة الغنى والبركة" },
+    { id: 55, name: "سورة الرحمن", subtitle: "عروس القرآن" },
+    { id: 18, name: "سورة الكهف", subtitle: "نور ما بين الجمعتين" },
+    { id: "muawidhat", name: "الإخلاص والمعوذتين", subtitle: "تعدل ثلث القرآن والمعوذات" },
+    { id: "ayat_kursi", name: "آية الكرسي وخواتيم البقرة", subtitle: "أعظم آية في كتاب الله" }
 ];
 
-// أسماء الـ 114 سورة كاملة للبحث والاختيار
-const ALL_SURAHS_NAMES = [
-    "الفاتحة","البقرة","آل عمران","النساء","المائدة","الأنعام","الأعراف","الأنفال","التوبة","يونس",
-    "هود","يوسف","الرعد","إبراهيم","الحجر","النحل","الإسراء","الكهف","مريم","طه",
-    "الأنبياء","الحج","المؤمنون","النور","الفرقان","الشعراء","النمل","القصص","العنكبوت","الروم",
-    "لقمان","السجدة","الأحزاب","سبأ","فاطر","يس","الصافات","ص","الزمر","غافر",
-    "فصلت","الشورى","الزخرف","الدخان","الجاثية","الأحقاف","محمد","الفتح","الحجرات","ق",
-    "الذاريات","الطور","النجم","القمر","الرحمن","الواقعة","الحديد","المجادلة","الحشر","الممتحنة",
-    "الصف","الجمعة","المنافقون","التغابن","الطلاق","التحريم","الملك","القلم","الحاقة","المعارج",
-    "نوح","الجن","المزمل","المدثر","القيامة","الإنسان","المرسلات","النبأ","النازعات","عبس",
-    "التكوير","الانفطار","المطففين","الانشقاق","البروج","الطارق","الأعلى","الغاشية","الفجر","البلد",
-    "الشمس","الليل","الضحى","الشرح","التين","العلق","القدر","البينة","الزلزلة","العاديات",
-    "القارعة","التكاثر","العصر","الهمزة","الفيل","قريش","الماعون","الكوثر","الكافرون","النصر",
-    "المسد","الإخلاص","الفلق","الناس"
+// قائمة الـ 114 سورة كاملة بالترتيب المصحفي
+const ALL_SURAHS_CATALOG = [
+    { number: 1, name: "الفاتحة", type: "مَكِّيَّةٌ", ayahs: 7 },
+    { number: 2, name: "البقرة", type: "مَدَنِيَّةٌ", ayahs: 286 },
+    { number: 3, name: "آل عمران", type: "مَدَنِيَّةٌ", ayahs: 200 },
+    { number: 4, name: "النساء", type: "مَدَنِيَّةٌ", ayahs: 176 },
+    { number: 5, name: "المائدة", type: "مَدَنِيَّةٌ", ayahs: 120 },
+    { number: 6, name: "الأنعام", type: "مَكِّيَّةٌ", ayahs: 165 },
+    { number: 7, name: "الأعراف", type: "مَكِّيَّةٌ", ayahs: 206 },
+    { number: 8, name: "الأنفال", type: "مَدَنِيَّةٌ", ayahs: 75 },
+    { number: 9, name: "التوبة", type: "مَدَنِيَّةٌ", ayahs: 129 },
+    { number: 10, name: "يونس", type: "مَكِّيَّةٌ", ayahs: 109 },
+    { number: 11, name: "هود", type: "مَكِّيَّةٌ", ayahs: 123 },
+    { number: 12, name: "يوسف", type: "مَكِّيَّةٌ", ayahs: 111 },
+    { number: 13, name: "الرعد", type: "مَدَنِيَّةٌ", ayahs: 43 },
+    { number: 14, name: "إبراهيم", type: "مَكِّيَّةٌ", ayahs: 52 },
+    { number: 15, name: "الحجر", type: "مَكِّيَّةٌ", ayahs: 99 },
+    { number: 16, name: "النحل", type: "مَكِّيَّةٌ", ayahs: 128 },
+    { number: 17, name: "الإسراء", type: "مَكِّيَّةٌ", ayahs: 111 },
+    { number: 18, name: "الكهف", type: "مَكِّيَّةٌ", ayahs: 110 },
+    { number: 19, name: "مريم", type: "مَكِّيَّةٌ", ayahs: 98 },
+    { number: 20, name: "طه", type: "مَكِّيَّةٌ", ayahs: 135 },
+    { number: 21, name: "الأنبياء", type: "مَكِّيَّةٌ", ayahs: 112 },
+    { number: 22, name: "الحج", type: "مَدَنِيَّةٌ", ayahs: 78 },
+    { number: 23, name: "المؤمنون", type: "مَكِّيَّةٌ", ayahs: 118 },
+    { number: 24, name: "النور", type: "مَدَنِيَّةٌ", ayahs: 64 },
+    { number: 25, name: "الفرقان", type: "مَكِّيَّةٌ", ayahs: 77 },
+    { number: 26, name: "الشعراء", type: "مَكِّيَّةٌ", ayahs: 227 },
+    { number: 27, name: "النمل", type: "مَكِّيَّةٌ", ayahs: 93 },
+    { number: 28, name: "القصص", type: "مَكِّيَّةٌ", ayahs: 88 },
+    { number: 29, name: "العنكبوت", type: "مَكِّيَّةٌ", ayahs: 69 },
+    { number: 30, name: "الروم", type: "مَكِّيَّةٌ", ayahs: 60 },
+    { number: 31, name: "لقمان", type: "مَكِّيَّةٌ", ayahs: 34 },
+    { number: 32, name: "السجدة", type: "مَكِّيَّةٌ", ayahs: 30 },
+    { number: 33, name: "الأحزاب", type: "مَدَنِيَّةٌ", ayahs: 73 },
+    { number: 34, name: "سبأ", type: "مَكِّيَّةٌ", ayahs: 54 },
+    { number: 35, name: "فاطر", type: "مَكِّيَّةٌ", ayahs: 45 },
+    { number: 36, name: "يس", type: "مَكِّيَّةٌ", ayahs: 83 },
+    { number: 37, name: "الصافات", type: "مَكِّيَّةٌ", ayahs: 182 },
+    { number: 38, name: "ص", type: "مَكِّيَّةٌ", ayahs: 88 },
+    { number: 39, name: "الزمر", type: "مَكِّيَّةٌ", ayahs: 75 },
+    { number: 40, name: "غافر", type: "مَكِّيَّةٌ", ayahs: 85 },
+    { number: 41, name: "فصلت", type: "مَكِّيَّةٌ", ayahs: 54 },
+    { number: 42, name: "الشورى", type: "مَكِّيَّةٌ", ayahs: 53 },
+    { number: 43, name: "الزخرف", type: "مَكِّيَّةٌ", ayahs: 89 },
+    { number: 44, name: "الدخان", type: "مَكِّيَّةٌ", ayahs: 59 },
+    { number: 45, name: "الجاثية", type: "مَكِّيَّةٌ", ayahs: 37 },
+    { number: 46, name: "الأحقاف", type: "مَكِّيَّةٌ", ayahs: 35 },
+    { number: 47, name: "محمد", type: "مَدَنِيَّةٌ", ayahs: 38 },
+    { number: 48, name: "الفتح", type: "مَدَنِيَّةٌ", ayahs: 29 },
+    { number: 49, name: "الحجرات", type: "مَدَنِيَّةٌ", ayahs: 18 },
+    { number: 50, name: "ق", type: "مَكِّيَّةٌ", ayahs: 45 },
+    { number: 51, name: "الذاريات", type: "مَكِّيَّةٌ", ayahs: 60 },
+    { number: 52, name: "الطور", type: "مَكِّيَّةٌ", ayahs: 49 },
+    { number: 53, name: "النجم", type: "مَكِّيَّةٌ", ayahs: 62 },
+    { number: 54, name: "القمر", type: "مَكِّيَّةٌ", ayahs: 55 },
+    { number: 55, name: "الرحمن", type: "مَدَنِيَّةٌ", ayahs: 78 },
+    { number: 56, name: "الواقعة", type: "مَكِّيَّةٌ", ayahs: 96 },
+    { number: 57, name: "الحديد", type: "مَدَنِيَّةٌ", ayahs: 29 },
+    { number: 58, name: "المجادلة", type: "مَدَنِيَّةٌ", ayahs: 22 },
+    { number: 59, name: "الحشر", type: "مَدَنِيَّةٌ", ayahs: 24 },
+    { number: 60, name: "الممتحنة", type: "مَدَنِيَّةٌ", ayahs: 13 },
+    { number: 61, name: "الصف", type: "مَدَنِيَّةٌ", ayahs: 14 },
+    { number: 62, name: "الجمعة", type: "مَدَنِيَّةٌ", ayahs: 11 },
+    { number: 63, name: "المنافقون", type: "مَدَنِيَّةٌ", ayahs: 11 },
+    { number: 64, name: "التغابن", type: "مَدَنِيَّةٌ", ayahs: 18 },
+    { number: 65, name: "الطلاق", type: "مَدَنِيَّةٌ", ayahs: 12 },
+    { number: 66, name: "التحريم", type: "مَدَنِيَّةٌ", ayahs: 12 },
+    { number: 67, name: "الملك", type: "مَكِّيَّةٌ", ayahs: 30 },
+    { number: 68, name: "القلم", type: "مَكِّيَّةٌ", ayahs: 52 },
+    { number: 69, name: "الحاقة", type: "مَكِّيَّةٌ", ayahs: 52 },
+    { number: 70, name: "المعارج", type: "مَكِّيَّةٌ", ayahs: 44 },
+    { number: 71, name: "نوح", type: "مَكِّيَّةٌ", ayahs: 28 },
+    { number: 72, name: "الجن", type: "مَكِّيَّةٌ", ayahs: 28 },
+    { number: 73, name: "المزمل", type: "مَكِّيَّةٌ", ayahs: 20 },
+    { number: 74, name: "المدثر", type: "مَكِّيَّةٌ", ayahs: 56 },
+    { number: 75, name: "القيامة", type: "مَكِّيَّةٌ", ayahs: 40 },
+    { number: 76, name: "الإنسان", type: "مَدَنِيَّةٌ", ayahs: 31 },
+    { number: 77, name: "المرسلات", type: "مَكِّيَّةٌ", ayahs: 50 },
+    { number: 78, name: "النبأ", type: "مَكِّيَّةٌ", ayahs: 40 },
+    { number: 79, name: "النازعات", type: "مَكِّيَّةٌ", ayahs: 46 },
+    { number: 80, name: "عبس", type: "مَكِّيَّةٌ", ayahs: 42 },
+    { number: 81, name: "التكوير", type: "مَكِّيَّةٌ", ayahs: 29 },
+    { number: 82, name: "الانفطار", type: "مَكِّيَّةٌ", ayahs: 19 },
+    { number: 83, name: "المطففين", type: "مَكِّيَّةٌ", ayahs: 36 },
+    { number: 84, name: "الانشقاق", type: "مَكِّيَّةٌ", ayahs: 25 },
+    { number: 85, name: "البروج", type: "مَكِّيَّةٌ", ayahs: 22 },
+    { number: 86, name: "الطارق", type: "مَكِّيَّةٌ", ayahs: 17 },
+    { number: 87, name: "الأعلى", type: "مَكِّيَّةٌ", ayahs: 19 },
+    { number: 88, name: "الغاشية", type: "مَكِّيَّةٌ", ayahs: 26 },
+    { number: 89, name: "الفجر", type: "مَكِّيَّةٌ", ayahs: 30 },
+    { number: 90, name: "البلد", type: "مَكِّيَّةٌ", ayahs: 20 },
+    { number: 91, name: "الشمس", type: "مَكِّيَّةٌ", ayahs: 15 },
+    { number: 92, name: "الليل", type: "مَكِّيَّةٌ", ayahs: 21 },
+    { number: 93, name: "الضحى", type: "مَكِّيَّةٌ", ayahs: 11 },
+    { number: 94, name: "الشرح", type: "مَكِّيَّةٌ", ayahs: 8 },
+    { number: 95, name: "التين", type: "مَكِّيَّةٌ", ayahs: 8 },
+    { number: 96, name: "العلق", type: "مَكِّيَّةٌ", ayahs: 19 },
+    { number: 97, name: "القدر", type: "مَكِّيَّةٌ", ayahs: 5 },
+    { number: 98, name: "البينة", type: "مَدَنِيَّةٌ", ayahs: 8 },
+    { number: 99, name: "الزلزلة", type: "مَدَنِيَّةٌ", ayahs: 8 },
+    { number: 100, name: "العاديات", type: "مَكِّيَّةٌ", ayahs: 11 },
+    { number: 101, name: "القارعة", type: "مَكِّيَّةٌ", ayahs: 11 },
+    { number: 102, name: "التكاثر", type: "مَكِّيَّةٌ", ayahs: 8 },
+    { number: 103, name: "العصر", type: "مَكِّيَّةٌ", ayahs: 3 },
+    { number: 104, name: "الهمزة", type: "مَكِّيَّةٌ", ayahs: 9 },
+    { number: 105, name: "الفيل", type: "مَكِّيَّةٌ", ayahs: 5 },
+    { number: 106, name: "قريش", type: "مَكِّيَّةٌ", ayahs: 4 },
+    { number: 107, name: "الماعون", type: "مَكِّيَّةٌ", ayahs: 7 },
+    { number: 108, name: "الكوثر", type: "مَكِّيَّةٌ", ayahs: 3 },
+    { number: 109, name: "الكافرون", type: "مَكِّيَّةٌ", ayahs: 6 },
+    { number: 110, name: "النصر", type: "مَدَنِيَّةٌ", ayahs: 3 },
+    { number: 111, name: "المسد", type: "مَكِّيَّةٌ", ayahs: 5 },
+    { number: 112, name: "الإخلاص", type: "مَكِّيَّةٌ", ayahs: 4 },
+    { number: 113, name: "الفلق", type: "مَكِّيَّةٌ", ayahs: 5 },
+    { number: 114, name: "الناس", type: "مَكِّيَّةٌ", ayahs: 6 }
 ];
 
-// المتغيرات العامة للقارئ
-let currentSurahIndex = 0;
-let currentFontSize = parseInt(localStorage.getItem("quran_font_size") || "24", 10);
+// المتغيرات العامة
+let currentSurahTarget = 67; // سورة الملك افتراضياً
 let quranAudio = new Audio();
 let isSurahAudioPlaying = false;
+let currentFontSize = parseInt(localStorage.getItem("quran_font_size") || "24", 10);
+const surahCache = {};
 
 document.addEventListener("DOMContentLoaded", () => {
     initQuranReader();
@@ -92,53 +146,11 @@ document.addEventListener("DOMContentLoaded", () => {
 function initQuranReader() {
     renderFeaturedSurahButtons();
     populateAllSurahsDropdown();
-    loadSurah(0);
     applyFontSize();
+    setupControls();
 
-    // التحكم في حجم الخط
-    const btnIncrease = document.getElementById("btn-font-increase");
-    const btnDecrease = document.getElementById("btn-font-decrease");
-
-    if (btnIncrease) {
-        btnIncrease.addEventListener("click", () => {
-            if (currentFontSize < 38) {
-                currentFontSize += 2;
-                applyFontSize();
-            }
-        });
-    }
-
-    if (btnDecrease) {
-        btnDecrease.addEventListener("click", () => {
-            if (currentFontSize > 16) {
-                currentFontSize -= 2;
-                applyFontSize();
-            }
-        });
-    }
-
-    // زر مشغل تلاوة السورة
-    const btnPlayAudio = document.getElementById("btn-surah-audio");
-    if (btnPlayAudio) {
-        btnPlayAudio.addEventListener("click", toggleSurahAudio);
-    }
-
-    // زر إهداء ثواب القراءة لروح الجد
-    const btnGiftReward = document.getElementById("btn-gift-quran-reward");
-    if (btnGiftReward) {
-        btnGiftReward.addEventListener("click", handleGiftReward);
-    }
-
-    // قائمة جميع السور
-    const selectAllSurahs = document.getElementById("select-all-surahs");
-    if (selectAllSurahs) {
-        selectAllSurahs.addEventListener("change", (e) => {
-            const surahNumber = parseInt(e.target.value, 10);
-            if (surahNumber) {
-                fetchSurahFromAPI(surahNumber);
-            }
-        });
-    }
+    // تحميل سورة الملك كاملة 100% بالرسم العثماني فور فتح الصفحة
+    loadSurahByNumber(67);
 }
 
 function renderFeaturedSurahButtons() {
@@ -146,17 +158,36 @@ function renderFeaturedSurahButtons() {
     if (!container) return;
 
     container.innerHTML = "";
-    FEATURED_SURAHS.forEach((surah, idx) => {
+    QUICK_SURAHS.forEach((item) => {
         const btn = document.createElement("button");
         btn.type = "button";
-        btn.className = `surah-pill ${idx === currentSurahIndex ? 'active' : ''}`;
-        btn.textContent = surah.name;
+        btn.className = `surah-pill ${item.id === currentSurahTarget ? 'active' : ''}`;
+        btn.setAttribute("data-surah-id", item.id);
+        btn.innerHTML = `<i class="fa-solid fa-book-quran"></i> <span>${item.name}</span>`;
+        btn.title = item.subtitle;
         btn.onclick = () => {
-            currentSurahIndex = idx;
-            renderFeaturedSurahButtons();
-            loadSurah(idx);
+            currentSurahTarget = item.id;
+            updateActivePill();
+            if (item.id === "muawidhat") {
+                loadMuawidhat();
+            } else if (item.id === "ayat_kursi") {
+                loadAyatKursi();
+            } else {
+                loadSurahByNumber(item.id);
+            }
         };
         container.appendChild(btn);
+    });
+}
+
+function updateActivePill() {
+    document.querySelectorAll(".surah-pill").forEach(btn => {
+        const id = btn.getAttribute("data-surah-id");
+        if (id == currentSurahTarget) {
+            btn.classList.add("active");
+        } else {
+            btn.classList.remove("active");
+        }
     });
 }
 
@@ -164,32 +195,45 @@ function populateAllSurahsDropdown() {
     const select = document.getElementById("select-all-surahs");
     if (!select) return;
 
-    select.innerHTML = '<option value="">📖 تصفح جميع سور القرآن الكريم (114 سورة)...</option>';
-    ALL_SURAHS_NAMES.forEach((name, idx) => {
+    select.innerHTML = '<option value="">📖 تصفح جميع سور القرآن الكريم (114 سورة كاملة من المصحف)...</option>';
+    ALL_SURAHS_CATALOG.forEach((surah) => {
         const option = document.createElement("option");
-        option.value = idx + 1;
-        option.textContent = `${idx + 1}. سورة ${name}`;
+        option.value = surah.number;
+        option.textContent = `${surah.number}. سورة ${surah.name} (${surah.type} - ${surah.ayahs} آية)`;
         select.appendChild(option);
+    });
+
+    select.addEventListener("change", (e) => {
+        const num = parseInt(e.target.value, 10);
+        if (num) {
+            currentSurahTarget = num;
+            updateActivePill();
+            loadSurahByNumber(num);
+        }
     });
 }
 
-function loadSurah(index) {
-    const surah = FEATURED_SURAHS[index];
-    if (!surah) return;
+function setupControls() {
+    // تكبير وتصغير الخط
+    const btnInc = document.getElementById("btn-font-increase");
+    const btnDec = document.getElementById("btn-font-decrease");
+    if (btnInc) btnInc.onclick = () => changeFontSize(2);
+    if (btnDec) btnDec.onclick = () => changeFontSize(-2);
 
-    stopSurahAudio();
+    // مشغل الصوت
+    const btnAudio = document.getElementById("btn-surah-audio");
+    if (btnAudio) btnAudio.onclick = toggleSurahAudio;
 
-    const titleEl = document.getElementById("quran-surah-title");
-    const countEl = document.getElementById("quran-verses-count");
-    const contentEl = document.getElementById("quran-mushaf-text");
+    // زر إهداء الثواب لروح الجد
+    const btnGift = document.getElementById("btn-gift-quran-reward");
+    if (btnGift) btnGift.onclick = handleGiftReward;
+}
 
-    if (titleEl) titleEl.textContent = surah.title || surah.name;
-    if (countEl) countEl.textContent = `${surah.versesCount} آية`;
-    if (contentEl) contentEl.textContent = surah.text;
-
-    // تجهيز الصوت
-    if (surah.audioUrl) {
-        quranAudio.src = surah.audioUrl;
+function changeFontSize(delta) {
+    const newSize = currentFontSize + delta;
+    if (newSize >= 16 && newSize <= 38) {
+        currentFontSize = newSize;
+        applyFontSize();
     }
 }
 
@@ -200,11 +244,208 @@ function applyFontSize() {
         localStorage.setItem("quran_font_size", currentFontSize.toString());
     }
     const indicator = document.getElementById("font-size-indicator");
-    if (indicator) {
-        indicator.textContent = `${currentFontSize}px`;
+    if (indicator) indicator.textContent = `${currentFontSize}px`;
+}
+
+// تحميل وعرض السورة كاملة بالرسم العثماني من المصحف
+async function loadSurahByNumber(surahNumber) {
+    const contentEl = document.getElementById("quran-mushaf-text");
+    const titleEl = document.getElementById("quran-surah-title");
+    const countEl = document.getElementById("quran-verses-count");
+
+    if (!contentEl) return;
+    stopSurahAudio();
+
+    // ضبط رابط الصوت للشيخ مشاري العفاسي
+    const padded = String(surahNumber).padStart(3, "0");
+    quranAudio.src = `https://server8.mp3quran.net/afs/${padded}.mp3`;
+
+    // فحص الكاش
+    if (surahCache[surahNumber]) {
+        renderSurahData(surahCache[surahNumber]);
+        return;
+    }
+
+    contentEl.innerHTML = `
+        <div style="text-align:center; padding: 3rem 1rem; color: var(--gold-300);">
+            <i class="fa-solid fa-spinner fa-spin" style="font-size: 2rem; margin-bottom: 1rem;"></i>
+            <div style="font-size: 1.1rem; font-family: var(--font-body);">جاري فتح السورة كاملة من المصحف الشريف...</div>
+        </div>
+    `;
+
+    try {
+        const res = await fetch(`https://api.alquran.cloud/v1/surah/${surahNumber}/quran-uthmani`);
+        const json = await res.json();
+
+        if (json.code === 200 && json.data) {
+            surahCache[surahNumber] = json.data;
+            renderSurahData(json.data);
+        } else {
+            throw new Error("API failed");
+        }
+    } catch (err) {
+        contentEl.innerHTML = `
+            <div style="text-align:center; padding: 2rem; color: #f87171;">
+                <p>تعذر الاتصال بالمصحف الإلكتروني حالياً. تأكد من اتصال الإنترنت وحاول ثانية.</p>
+            </div>
+        `;
     }
 }
 
+// تشكيل وعرض السورة تماماً كالمصحف الشريف
+function renderSurahData(surahData) {
+    const contentEl = document.getElementById("quran-mushaf-text");
+    const titleEl = document.getElementById("quran-surah-title");
+    const countEl = document.getElementById("quran-verses-count");
+
+    const surahNumber = surahData.number;
+    const surahName = surahData.name; // مثل "سُورَةُ يسٓ"
+    const versesCount = surahData.numberOfAyahs;
+    const typeAr = surahData.revelationType === "Meccan" ? "مَكِّيَّةٌ" : "مَدَنِيَّةٌ";
+
+    if (titleEl) titleEl.textContent = surahName;
+    if (countEl) countEl.textContent = `${typeAr} • ${versesCount} آية`;
+
+    // إعداد البسملة والآيات
+    const hasBasmalah = (surahNumber !== 1 && surahNumber !== 9);
+    const basmalahPattern = /^بِسْمِ\s+اللَّهِ\s+الرَّحْمَٰنِ\s+الرَّحِيمِ\s*/;
+
+    let ayahsHTML = "";
+
+    surahData.ayahs.forEach((ayah, index) => {
+        let text = ayah.text;
+
+        // إزالة البسملة الملتصقة بأول آية لوضعها في برواز البسملة المخصص
+        if (index === 0 && hasBasmalah) {
+            text = text.replace(basmalahPattern, "").trim();
+        }
+
+        ayahsHTML += `${text} <span class="ayah-symbol">﴿${ayah.numberInSurah}﴾</span> `;
+    });
+
+    contentEl.innerHTML = `
+        <div class="mushaf-surah-frame">
+            <div class="mushaf-frame-side">آيَاتُهَا ${versesCount}</div>
+            <div class="mushaf-frame-center">${surahName}</div>
+            <div class="mushaf-frame-side">${typeAr}</div>
+        </div>
+
+        ${hasBasmalah ? `
+            <div class="mushaf-basmalah-banner">
+                بِسْمِ ٱللَّهِ ٱلرَّحْمَـٰنِ ٱلرَّحِيمِ
+            </div>
+        ` : ''}
+
+        <div class="mushaf-verses-flow">
+            ${ayahsHTML}
+        </div>
+    `;
+
+    applyFontSize();
+}
+
+// عرض الإخلاص والمعوذتين معاً كالمصحف
+async function loadMuawidhat() {
+    const contentEl = document.getElementById("quran-mushaf-text");
+    const titleEl = document.getElementById("quran-surah-title");
+    const countEl = document.getElementById("quran-verses-count");
+
+    if (titleEl) titleEl.textContent = "الإِخْلَاصُ وَالمُعَوِّذَتَانِ";
+    if (countEl) countEl.textContent = "سورة الإخلاص • الفلق • الناس";
+    stopSurahAudio();
+    quranAudio.src = "https://server8.mp3quran.net/afs/112.mp3";
+
+    contentEl.innerHTML = '<div style="text-align:center; padding: 2rem;"><i class="fa-solid fa-spinner fa-spin"></i> جاري فتح السور...</div>';
+
+    try {
+        const [r112, r113, r114] = await Promise.all([
+            fetch("https://api.alquran.cloud/v1/surah/112/quran-uthmani").then(r => r.json()),
+            fetch("https://api.alquran.cloud/v1/surah/113/quran-uthmani").then(r => r.json()),
+            fetch("https://api.alquran.cloud/v1/surah/114/quran-uthmani").then(r => r.json())
+        ]);
+
+        let html = "";
+        [r112.data, r113.data, r114.data].forEach(s => {
+            const basmalahPattern = /^بِسْمِ\s+اللَّهِ\s+الرَّحْمَٰنِ\s+الرَّحِيمِ\s*/;
+            let ayahs = "";
+            s.ayahs.forEach((a, i) => {
+                let t = a.text;
+                if (i === 0) t = t.replace(basmalahPattern, "").trim();
+                ayahs += `${t} <span class="ayah-symbol">﴿${a.numberInSurah}﴾</span> `;
+            });
+
+            html += `
+                <div class="mushaf-surah-frame" style="margin-top: 2rem;">
+                    <div class="mushaf-frame-side">آيَاتُهَا ${s.numberOfAyahs}</div>
+                    <div class="mushaf-frame-center">${s.name}</div>
+                    <div class="mushaf-frame-side">مَكِّيَّةٌ</div>
+                </div>
+                <div class="mushaf-basmalah-banner">بِسْمِ ٱللَّهِ ٱلرَّحْمَـٰنِ ٱلرَّحِيمِ</div>
+                <div class="mushaf-verses-flow">${ayahs}</div>
+            `;
+        });
+
+        contentEl.innerHTML = html;
+        applyFontSize();
+    } catch (e) {
+        contentEl.innerHTML = '<p style="text-align:center; color:#f87171;">حدث خطأ في تحميل السور.</p>';
+    }
+}
+
+// عرض آية الكرسي وخواتيم سورة البقرة
+async function loadAyatKursi() {
+    const contentEl = document.getElementById("quran-mushaf-text");
+    const titleEl = document.getElementById("quran-surah-title");
+    const countEl = document.getElementById("quran-verses-count");
+
+    if (titleEl) titleEl.textContent = "آيَةُ الكُرْسِيِّ وَخَوَاتِيمُ سُورَةِ البَقَرَةِ";
+    if (countEl) countEl.textContent = "من سورة البقرة (الآيات 255 و 284-286)";
+    stopSurahAudio();
+    quranAudio.src = "https://server8.mp3quran.net/afs/002.mp3";
+
+    contentEl.innerHTML = '<div style="text-align:center; padding: 2rem;"><i class="fa-solid fa-spinner fa-spin"></i> جاري التحميل...</div>';
+
+    try {
+        const res = await fetch("https://api.alquran.cloud/v1/ayah/2:255/quran-uthmani");
+        const json = await res.json();
+        const resEnd = await fetch("https://api.alquran.cloud/v1/surah/2/quran-uthmani");
+        const jsonEnd = await resEnd.json();
+
+        const a255 = json.data.text;
+        const last3 = jsonEnd.data.ayahs.slice(-3);
+
+        let lastAyahsText = "";
+        last3.forEach(a => {
+            lastAyahsText += `${a.text} <span class="ayah-symbol">﴿${a.numberInSurah}﴾</span> `;
+        });
+
+        contentEl.innerHTML = `
+            <div class="mushaf-surah-frame">
+                <div class="mushaf-frame-side">سورة البقرة</div>
+                <div class="mushaf-frame-center">آيَةُ الكُرْسِيِّ</div>
+                <div class="mushaf-frame-side">آية ٢٥٥</div>
+            </div>
+            <div class="mushaf-basmalah-banner">بِسْمِ ٱللَّهِ ٱلرَّحْمَـٰنِ ٱلرَّحِيمِ</div>
+            <div class="mushaf-verses-flow" style="margin-bottom: 2.5rem;">
+                ${a255} <span class="ayah-symbol">﴿٢٥٥﴾</span>
+            </div>
+
+            <div class="mushaf-surah-frame">
+                <div class="mushaf-frame-side">سورة البقرة</div>
+                <div class="mushaf-frame-center">خَوَاتِيمُ سُورَةِ البَقَرَةِ</div>
+                <div class="mushaf-frame-side">الآيات ٢٨٤-٢٨٦</div>
+            </div>
+            <div class="mushaf-verses-flow">
+                ${lastAyahsText}
+            </div>
+        `;
+        applyFontSize();
+    } catch (e) {
+        contentEl.innerHTML = '<p style="text-align:center; color:#f87171;">حدث خطأ في التحميل.</p>';
+    }
+}
+
+// التحكم في الصوت
 function toggleSurahAudio() {
     const btn = document.getElementById("btn-surah-audio");
     if (!btn) return;
@@ -216,8 +457,7 @@ function toggleSurahAudio() {
             isSurahAudioPlaying = true;
             btn.innerHTML = '<i class="fa-solid fa-pause"></i> <span>إيقاف التلاوة</span>';
             btn.classList.add("active");
-        }).catch(err => {
-            console.warn("Audio play blocked:", err);
+        }).catch(() => {
             showToast("يرجى النقر أولاً في الصفحة للسماح بتشغيل الصوت");
         });
     }
@@ -233,55 +473,13 @@ function stopSurahAudio() {
     }
 }
 
-// جلب أي سورة من الـ 114 عبر API الرسمي المفتوح
-async function fetchSurahFromAPI(surahNumber) {
-    const contentEl = document.getElementById("quran-mushaf-text");
-    const titleEl = document.getElementById("quran-surah-title");
-    const countEl = document.getElementById("quran-verses-count");
-
-    if (!contentEl) return;
-
-    stopSurahAudio();
-    contentEl.innerHTML = '<div style="text-align:center; padding: 2rem; color: var(--gold-300);"><i class="fa-solid fa-spinner fa-spin"></i> جاري تحميل السورة الكريمة...</div>';
-
-    try {
-        const response = await fetch(`https://api.alquran.cloud/v1/surah/${surahNumber}/quran-uthmani`);
-        const data = await response.json();
-
-        if (data.code === 200 && data.data) {
-            const surahData = data.data;
-            if (titleEl) titleEl.textContent = `سُورَةُ ${surahData.name}`;
-            if (countEl) countEl.textContent = `${surahData.numberOfAyahs} آية`;
-
-            let formattedText = "";
-            surahData.ayahs.forEach(ayah => {
-                formattedText += `${ayah.text} ﴿${ayah.numberInSurah}﴾ `;
-            });
-
-            contentEl.textContent = formattedText;
-
-            // رابط الصوت لسورة الشيخ مشاري العفاسي
-            const paddedNumber = String(surahNumber).padStart(3, '0');
-            quranAudio.src = `https://server8.mp3quran.net/afs/${paddedNumber}.mp3`;
-
-            // إلغاء تفعيل أزرار السور الفاضلة لإظهار أن السورة المختارة من القائمة
-            document.querySelectorAll(".surah-pill").forEach(p => p.classList.remove("active"));
-        } else {
-            throw new Error("API Error");
-        }
-    } catch (e) {
-        contentEl.innerHTML = '<div style="text-align:center; padding: 2rem; color: #ef4444;">تعذر تحميل السورة حالياً، يرجى اختيار إحدى السور الفاضلة المجهزة أعلاه.</div>';
-    }
-}
-
-// التفاعل مع زر إهداء الثواب لروح الجد
+// إهداء ثواب القراءة لروح الجد
 function handleGiftReward() {
     playCompletionChime();
     const deceasedName = (typeof DECEASED_INFO !== "undefined" && DECEASED_INFO.name) ? DECEASED_INFO.name : "فقيدنا الغالي";
 
     showToast(`تقبل الله تلاوتكم، وجعل ثوابها نوراً وفسحة في قبر ${deceasedName} 🌿🤲`);
 
-    // إشعار شكر وتأكيد
     const btn = document.getElementById("btn-gift-quran-reward");
     if (btn) {
         btn.classList.add("gifted");
