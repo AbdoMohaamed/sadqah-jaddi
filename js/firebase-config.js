@@ -1,4 +1,4 @@
-﻿/**
+/**
  * إعدادات Firebase لتخزين ومزامنة الأدعية بين جميع الزوار حول العالم لحظياً
  * 
  * للحصول على هذه البيانات مجاناً في دقيقتين:
@@ -9,13 +9,13 @@
  */
 
 const FIREBASE_CONFIG = {
-    apiKey: "", // ضع apiKey هنا
-    authDomain: "",
-    databaseURL: "", // رابط قاعدة البيانات (ينتهي بـ firebasedatabase.app)
-    projectId: "",
-    storageBucket: "",
-    messagingSenderId: "",
-    appId: ""
+    apiKey: "AIzaSyAgp_rzi7QhFrNRHpy3D7TU0OEyrCsWjBg",
+    authDomain: "sadqah-jaddi.firebaseapp.com",
+    databaseURL: "https://sadqah-jaddi-default-rtdb.firebaseio.com",
+    projectId: "sadqah-jaddi",
+    storageBucket: "sadqah-jaddi.firebasestorage.app",
+    messagingSenderId: "649618994454",
+    appId: "1:649618994454:web:ebaa20bcb0722818874c37"
 };
 
 // فحص هل تم تفعيل ووضع الإعدادات
