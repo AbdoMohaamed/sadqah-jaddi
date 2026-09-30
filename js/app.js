@@ -1,4 +1,4 @@
-﻿/**
+/**
  * المنطق البرمجي لموقع صدقة جارية على روح جدي
  */
 
@@ -38,13 +38,15 @@ function initDeceasedInfo() {
 }
 
 /* ==========================================================================
-   2. سلايدر الأدعية (Swiper.js)
+   2. سلايدر الأدعية (Swiper.js) والمزامنة السحابية (Firebase Realtime)
    ========================================================================== */
 let prayersSwiperInstance = null;
 let allPrayers = [];
+let firebaseDb = null;
+let prayersRef = null;
 
 function initPrayersSwiper() {
-    // جلب الأدعية المخزنة محلياً أو استخدام الافتراضية
+    // 1. تحميل الأدعية المحلية أو الافتراضية أولاً لضمان سرعة الفتح الفوري
     const storedPrayers = localStorage.getItem("user_prayers_list");
     if (storedPrayers) {
         try {
@@ -88,6 +90,57 @@ function initPrayersSwiper() {
             }
         }
     });
+
+    // 2. إذا تم تفعيل Firebase، ابدأ المزامنة السحابية اللحظية مع جميع الزوار في العالم
+    initFirebaseRealtimeSync();
+}
+
+function initFirebaseRealtimeSync() {
+    if (typeof firebase === "undefined" || typeof isFirebaseConfigured !== "function" || !isFirebaseConfigured()) {
+        console.log("Firebase not configured yet; using local storage mode.");
+        return;
+    }
+
+    try {
+        if (!firebase.apps.length) {
+            firebase.initializeApp(FIREBASE_CONFIG);
+        }
+        firebaseDb = firebase.database();
+        prayersRef = firebaseDb.ref("prayers");
+
+        // استماع لحظي لأي أدعية جديدة يضيفها أي شخص حول العالم
+        prayersRef.limitToLast(60).on("value", (snapshot) => {
+            const data = snapshot.val();
+            if (data) {
+                const cloudPrayers = [];
+                Object.keys(data).forEach((key) => {
+                    cloudPrayers.push({
+                        id: key,
+                        isCloud: true,
+                        author: data[key].author || "فاعل خير",
+                        text: data[key].text || "",
+                        date: data[key].date || "مؤخراً",
+                        amenCount: data[key].amenCount || 0,
+                        timestamp: data[key].timestamp || 0
+                    });
+                });
+
+                // ترتيب الأدعية من الأحدث للأقدم
+                cloudPrayers.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
+
+                // دمج الأدعية السحابية مع الأدعية المأثورة الافتراضية
+                allPrayers = [...cloudPrayers, ...DEFAULT_PRAYERS];
+                renderPrayerSlides();
+
+                if (prayersSwiperInstance) {
+                    prayersSwiperInstance.update();
+                }
+            }
+        });
+        console.log("Firebase Realtime Database connected successfully! 🌍✨");
+    } catch (err) {
+        console.warn("Firebase sync error:", err);
+    }
 }
 
 function renderPrayerSlides() {
@@ -155,6 +208,15 @@ window.handleAmenClick = function(prayerId) {
         
         amenState[prayerId] = true;
         localStorage.setItem("amen_prayers_voted", JSON.stringify(amenState));
+
+        // إذا كان الدعاء سحابياً في Firebase، حدّث العداد عالمياً ليراه الجميع
+        if (prayer.isCloud && firebaseDb) {
+            try {
+                firebaseDb.ref(`prayers/${prayerId}/amenCount`).transaction(curr => (curr || 0) + 1);
+            } catch (e) {
+                console.warn("Amen transaction error:", e);
+            }
+        }
 
         // تأثير صوتي خفيف
         playBeadSound(650);
@@ -361,19 +423,38 @@ function initAddPrayerModal() {
                 amenCount: 1
             };
 
-            // حفظ محلياً
+            // 1. إذا كان Firebase متصلاً، ارفع الدعاء للسحابة ليظهر فوراً لجميع الزوار حول العالم
+            if (prayersRef) {
+                try {
+                    prayersRef.push({
+                        author: author,
+                        text: text,
+                        date: "الآن",
+                        timestamp: (typeof firebase !== 'undefined' && firebase.database && firebase.database.ServerValue) ? firebase.database.ServerValue.TIMESTAMP : Date.now(),
+                        amenCount: 1
+                    }).then(() => {
+                        console.log("Prayer published to cloud successfully!");
+                    }).catch(err => {
+                        console.error("Firebase push error:", err);
+                    });
+                } catch (e) {
+                    console.warn("Could not push to Firebase:", e);
+                }
+            }
+
+            // 2. حفظ محلياً أيضاً لضمان ظهوره الفوري دائماً
             const stored = JSON.parse(localStorage.getItem("user_prayers_list") || "[]");
             stored.unshift(newPrayer);
             localStorage.setItem("user_prayers_list", JSON.stringify(stored));
 
-            // تحديث القائمة
-            allPrayers.unshift(newPrayer);
-            renderPrayerSlides();
-
-            // تحديث الـ Swiper
-            if (prayersSwiperInstance) {
-                prayersSwiperInstance.update();
-                prayersSwiperInstance.slideToLoop(0, 500);
+            // تحديث القائمة المحلية إن لم يكن فيربيز متصلاً
+            if (!prayersRef) {
+                allPrayers.unshift(newPrayer);
+                renderPrayerSlides();
+                if (prayersSwiperInstance) {
+                    prayersSwiperInstance.update();
+                    prayersSwiperInstance.slideToLoop(0, 500);
+                }
             }
 
             // إغلاق وتفريغ
