@@ -39,7 +39,8 @@
                 <li><a href="#hero" class="active">الرئيسية</a></li>
                 <li><a href="#prayers">أدعية الزوار</a></li>
                 <li><a href="#tasbeeh">السبحة الإلكترونية</a></li>
-                <li><a href="#quran">آيات وأحاديث</a></li>
+                <li><a href="#quran-reader">المصحف الشريف</a></li>
+                <li><a href="#quran">فضل الصدقة</a></li>
             </ul>
 
             <div class="nav-actions">
@@ -210,6 +211,75 @@
     </section>
 
     <!-- ==========================================
+         قسم مصحف الصدقة الجارية (Quran Reader Section)
+         ========================================== -->
+    <section id="quran-reader" class="quran-reader-section">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-tag"><i class="fa-solid fa-book-open-reader"></i> تلاوة وتدبر</span>
+                <h2 class="section-title">مصحف الصدقة الجارية</h2>
+                <p class="section-desc">
+                    اقرأ ما تيسر من آيات الذكر الحكيم وانوِ ثواب تلاوتها لروح فقيدنا الغالي <span class="deceased-name">جدي الغالي (عبدالمعبود أمين سعيد)</span>، لتكون نوراً وفسحة وأُنساً له في قبره بإذن الله.
+                </p>
+            </div>
+
+            <!-- عناصر اختيار السورة -->
+            <div class="surahs-controls-container">
+                <!-- أزرار سريعة لأشهر السور الفاضلة -->
+                <div class="featured-surahs-pills" id="featured-surahs-pills">
+                    <!-- تُنشأ برمجياً من js/quran.js -->
+                </div>
+
+                <!-- قائمة منسدلة لجميع سور القرآن الـ 114 سورة -->
+                <div class="all-surahs-dropdown-wrapper">
+                    <select id="select-all-surahs" class="select-surah-dropdown">
+                        <!-- يُملأ من js/quran.js -->
+                    </select>
+                </div>
+            </div>
+
+            <!-- بطاقة صفحة المصحف الشريف الكبرى -->
+            <div class="quran-mushaf-card">
+                <!-- إطار ترويسة السورة -->
+                <div class="mushaf-header-frame">
+                    <div class="mushaf-surah-title" id="quran-surah-title">سُورَةُ المُلْكِ</div>
+                    <div class="mushaf-verses-count" id="quran-verses-count">30 آية</div>
+                </div>
+
+                <!-- شريط تحكم القارئ -->
+                <div class="mushaf-toolbar">
+                    <div class="font-size-controls">
+                        <span style="font-size: 0.85rem; color: var(--text-gold);">حجم الخط:</span>
+                        <button type="button" class="btn-font-control" id="btn-font-increase" title="تكبير الخط">+</button>
+                        <button type="button" class="btn-font-control" id="btn-font-decrease" title="تصغير الخط">-</button>
+                        <span class="font-size-indicator" id="font-size-indicator">24px</span>
+                    </div>
+
+                    <div class="mushaf-audio-control">
+                        <button type="button" class="btn btn-outline" id="btn-surah-audio">
+                            <i class="fa-solid fa-volume-high"></i>
+                            <span>استماع للتلاوة</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- نص الآيات الكريمة -->
+                <div class="quran-mushaf-text" id="quran-mushaf-text">
+                    <!-- يُملأ من js/quran.js -->
+                </div>
+
+                <!-- زر إهداء ثواب القراءة -->
+                <div class="mushaf-footer-actions">
+                    <button type="button" class="btn-gift-reward" id="btn-gift-quran-reward">
+                        <i class="fa-solid fa-gift"></i>
+                        <span>أهديت ثواب هذه القراءة لروحه</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==========================================
          قسم آيات وأحاديث عن الدعاء للميت
          ========================================== -->
     <section id="quran" class="quran-section">
@@ -322,9 +392,10 @@
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
 
-    <!-- ملف البيانات وإعدادات السحابة والمنطق البرمجي -->
+    <!-- ملف البيانات وإعدادات السحابة والمنطق البرمجي وقارئ القرآن -->
     <script src="js/data.js"></script>
     <script src="js/firebase-config.js"></script>
     <script src="js/app.js"></script>
+    <script src="js/quran.js"></script>
 </body>
 </html>
