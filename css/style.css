@@ -243,6 +243,7 @@ body {
   color: var(--gold-300);
   position: relative;
   display: inline-block;
+  padding-top:10px;
 }
 
 .hero-subtitle {
@@ -705,8 +706,8 @@ body {
   position: absolute;
   top: -8px;
   left: -8px;
-  width: 236px;
-  height: 236px;
+  width: 174px;
+  height: 176px;
   transform: rotate(-90deg);
   pointer-events: none;
 }
