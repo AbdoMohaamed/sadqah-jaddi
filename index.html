@@ -200,8 +200,25 @@
             </div>
 
             <!-- شبكة الأجزاء الـ 30 -->
-            <div class="khatma-grid" id="khatma-grid-container">
-                <!-- يُنشأ برمجياً من js/app.js -->
+            <div class="khatma-grid-wrapper">
+                <div class="khatma-mobile-nav-bar">
+                    <div class="khatma-scroll-hint">
+                        <i class="fa-solid fa-arrows-left-right"></i>
+                        <span>اسحب أفقياً لتصفح الأجزاء (1 - 30)</span>
+                    </div>
+                    <div class="khatma-scroll-arrows">
+                        <button type="button" class="btn-scroll-khatma" onclick="scrollKhatmaGrid('right')" title="السابق">
+                            <i class="fa-solid fa-chevron-right"></i>
+                        </button>
+                        <button type="button" class="btn-scroll-khatma" onclick="scrollKhatmaGrid('left')" title="التالي">
+                            <i class="fa-solid fa-chevron-left"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="khatma-grid" id="khatma-grid-container">
+                    <!-- يُنشأ برمجياً من js/app.js -->
+                </div>
             </div>
         </div>
     </section>

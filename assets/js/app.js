@@ -1448,3 +1448,13 @@ function escapeHTML(str) {
         .replace(/"/g, "&quot;")
         .replace(/'/g, "&#039;");
 }
+
+// تمرير شبكة أجزاء الختمة أفقياً في شاشات الجوال
+window.scrollKhatmaGrid = function(direction) {
+    const grid = document.getElementById("khatma-grid-container");
+    if (!grid) return;
+    const scrollAmount = 270;
+    const delta = direction === "left" ? -scrollAmount : scrollAmount;
+    grid.scrollBy({ left: delta, behavior: "smooth" });
+};
+
