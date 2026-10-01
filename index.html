@@ -25,6 +25,7 @@
     <meta name="twitter:image" content="https://abdomohaamed.github.io/sadqah-jaddi/assets/share-preview.jpg">
 
     <meta name="theme-color" content="#070d18">
+    <link rel="manifest" href="manifest.json">
 
     <!-- الخطوط العربية (Google Fonts) -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -38,7 +39,7 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css">
 
     <!-- تنسيقات الموقع -->
-    <link rel="stylesheet" href="assets/css/style.css?v=56">
+    <link rel="stylesheet" href="assets/css/style.css?v=57">
 </head>
 <body>
 
@@ -52,16 +53,18 @@
 
             <ul class="nav-links">
                 <li><a href="#hero" class="active">الرئيسية</a></li>
+                <li><a href="#khatma">ختمة القرآن</a></li>
                 <li><a href="#prayers">أدعية الزوار</a></li>
-                <li><a href="#tasbeeh">السبحة الإلكترونية</a></li>
+                <li><a href="#tasbeeh">السبحة</a></li>
+                <li><a href="#azkar">أذكار اليوم</a></li>
                 <li><a href="#quran-reader">المصحف الشريف</a></li>
                 <li><a href="#quran">فضل الصدقة</a></li>
             </ul>
 
             <div class="nav-actions">
-                <button id="btn-toggle-audio" class="btn btn-outline" title="تشغيل/إيقاف تلاوة هادئة">
-                    <i class="fa-solid fa-volume-high"></i>
-                    <span>تلاوة خاشعة</span>
+                <button id="btn-toggle-radio-nav" class="btn btn-outline" title="إذاعة القرآن الكريم">
+                    <i class="fa-solid fa-tower-broadcast"></i>
+                    <span>الإذاعة</span>
                 </button>
                 <button class="btn btn-gold btn-open-prayer-modal">
                     <i class="fa-solid fa-hands-praying"></i>
@@ -121,6 +124,84 @@
                         <span>نسخ الرابط</span>
                     </button>
                 </div>
+            </div>
+
+            <!-- شريط إحصائيات الصدقة الجارية العالمي الموحد -->
+            <div class="global-stats-banner">
+                <div class="stat-card">
+                    <div class="stat-icon"><i class="fa-solid fa-hands-praying"></i></div>
+                    <div class="stat-details">
+                        <span class="stat-number" id="global-tasbeeh-stat">0</span>
+                        <span class="stat-title">تسبيحة واستغفار أهداها الزوار</span>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon"><i class="fa-solid fa-book-quran"></i></div>
+                    <div class="stat-details">
+                        <span class="stat-number" id="global-khatma-stat">1</span>
+                        <span class="stat-title">الختمة القرآنية الحالية</span>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon"><i class="fa-solid fa-heart"></i></div>
+                    <div class="stat-details">
+                        <span class="stat-number" id="global-prayers-stat">60+</span>
+                        <span class="stat-title">دعاء في ميزان حسناته</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==========================================
+         قسم ختمة القرآن الجماعية (Live Quran Khatma Section)
+         ========================================== -->
+    <section id="khatma" class="khatma-section">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-tag"><i class="fa-solid fa-book-open"></i> ختمة مباركة سحابية</span>
+                <h2 class="section-title">ختمة القرآن الكريم الجماعية لروحه</h2>
+                <p class="section-desc">
+                    شارك الأهل والأحباب والزوار في إتمام ختمات القرآن الكريم لروح فقيدنا الغالي؛ احجز جزءاً لتتلوه وانوِ ثوابه له، فلكل حرف حسنة والحسنة بعشر أمثالها.
+                </p>
+            </div>
+
+            <!-- لوحة إحصائيات الختمة -->
+            <div class="khatma-summary-card">
+                <div class="khatma-meta-row">
+                    <div class="khatma-badge-title">
+                        <i class="fa-solid fa-star-and-crescent text-gold"></i>
+                        <span>الختمة المباركة: <strong id="khatma-cycle-display" class="text-gold">رقم 1</strong></span>
+                    </div>
+                    <div class="khatma-progress-text">
+                        <span>أُنجز <strong id="khatma-completed-count">0</strong> من 30 جزءاً</span>
+                        (<span id="khatma-percent-display">0%</span>)
+                    </div>
+                </div>
+
+                <!-- شريط التقدم -->
+                <div class="khatma-progress-bar-wrapper">
+                    <div class="khatma-progress-bar-fill" id="khatma-progress-fill" style="width: 0%;"></div>
+                </div>
+
+                <div class="khatma-status-legend">
+                    <span class="legend-item"><span class="legend-dot status-available"></span> متاح للقراءة</span>
+                    <span class="legend-item"><span class="legend-dot status-reading"></span> قيد القراءة</span>
+                    <span class="legend-item"><span class="legend-dot status-completed"></span> تمت القراءة</span>
+                </div>
+            </div>
+
+            <!-- أزرار تصفية الأجزاء -->
+            <div class="khatma-filters">
+                <button type="button" class="khatma-filter-btn active" data-filter="all">جميع الأجزاء (30)</button>
+                <button type="button" class="khatma-filter-btn" data-filter="available">المتاح للحجز</button>
+                <button type="button" class="khatma-filter-btn" data-filter="reading">قيد القراءة</button>
+                <button type="button" class="khatma-filter-btn" data-filter="completed">المكتملة</button>
+            </div>
+
+            <!-- شبكة الأجزاء الـ 30 -->
+            <div class="khatma-grid" id="khatma-grid-container">
+                <!-- يُنشأ برمجياً من js/app.js -->
             </div>
         </div>
     </section>
@@ -215,12 +296,63 @@
 
                     <!-- إحصائيات التسبيح -->
                     <div class="tasbeeh-stats-bar">
-                        <div>
-                            <span>إجمالي تسبيحاتك على روحه:</span>
+                        <div class="stat-item">
+                            <span>تسبيحاتك بالجلسة:</span>
                             <span class="stat-val" id="total-tasbeeh-count">0</span>
+                        </div>
+                        <div class="stat-separator">•</div>
+                        <div class="stat-item">
+                            <span>إجمالي الزوار عالمياً:</span>
+                            <span class="stat-val text-gold" id="total-global-tasbeeh-count">0</span>
                         </div>
                     </div>
                 </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==========================================
+         قسم أذكار الصباح والمساء الذكية (Azkar Section)
+         ========================================== -->
+    <section id="azkar" class="azkar-section">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-tag"><i class="fa-solid fa-sun"></i> حصن المسلم اليومي</span>
+                <h2 class="section-title">أذكار الصباح والمساء</h2>
+                <p class="section-desc">
+                    داوم على أذكار يومك وانوِ بركتها وأجرها لروحه الطاهرة، فالذكر حصن منيع وسكينة للقلوب وبركة في العمر والعمل.
+                </p>
+            </div>
+
+            <!-- شريط التبديل بين الصباح والمساء -->
+            <div class="azkar-tab-controls">
+                <button type="button" class="azkar-tab-btn active" id="tab-morning" data-mode="morning">
+                    <i class="fa-solid fa-sun"></i>
+                    <span>أذكار الصباح</span>
+                </button>
+                <button type="button" class="azkar-tab-btn" id="tab-evening" data-mode="evening">
+                    <i class="fa-solid fa-moon"></i>
+                    <span>أذكار المساء</span>
+                </button>
+            </div>
+
+            <!-- إشعار التوقيت التلقائي الذكي -->
+            <div class="azkar-time-hint" id="azkar-time-hint">
+                <i class="fa-solid fa-clock"></i>
+                <span id="azkar-time-hint-text">حان الآن وقت أذكار الصباح ☀️</span>
+            </div>
+
+            <!-- إحصائية الإنجاز للأذكار -->
+            <div class="azkar-progress-summary">
+                <span>تم إتمام: <strong id="azkar-completed-count">0</strong> من <span id="azkar-total-count">10</span> أذكار</span>
+                <div class="azkar-progress-bar">
+                    <div class="azkar-progress-fill" id="azkar-progress-fill" style="width: 0%;"></div>
+                </div>
+            </div>
+
+            <!-- قائمة بطاقات الأذكار التفاعلية -->
+            <div class="azkar-cards-container" id="azkar-cards-container">
+                <!-- يُملأ من js/azkar-data.js و js/app.js -->
             </div>
         </div>
     </section>
@@ -259,21 +391,23 @@
                 <div class="mushaf-header-frame">
                     <div class="mushaf-surah-title" id="quran-surah-title">سُورَةُ المُلْكِ</div>
                     <div class="mushaf-verses-count" id="quran-verses-count">الجزء ٢٩ • صفحة ٥٦٢ من ٦٠٤</div>
+                    <div class="mushaf-audio-control">
+                        <button type="button" class="btn btn-outline" id="btn-surah-audio">
+                            <i class="fa-solid fa-volume-high"></i>
+                            <span>استماع للتلاوة</span>
+                        </button>
+                    </div>
                 </div>
 
                 <!-- شريط تحكم وتصفح المصحف الحقيقي -->
-                <div class="mushaf-toolbar real-mushaf-toolbar">
+                <!--<div class="mushaf-toolbar real-mushaf-toolbar">
                     <div class="mushaf-nav-controls">
                         <button type="button" class="btn btn-gold btn-page-nav" id="btn-mushaf-prev" title="الصفحة السابقة">
                             <i class="fa-solid fa-angle-right"></i>
                             <span>الصفحة السابقة</span>
                         </button>
 
-                        <div class="page-jump-box">
-                            <label for="mushaf-page-input">صفحة:</label>
-                            <input type="number" id="mushaf-page-input" class="mushaf-page-input" min="1" max="604" value="562">
-                            <span>/ 604</span>
-                        </div>
+                       
 
                         <button type="button" class="btn btn-gold btn-page-nav" id="btn-mushaf-next" title="الصفحة التالية">
                             <span>الصفحة التالية</span>
@@ -287,7 +421,7 @@
                             <span>استماع للتلاوة</span>
                         </button>
                     </div>
-                </div>
+                </div>-->
 
                 <!-- حاوية صفحة المصحف الشريف الحقيقية -->
                 <div class="mushaf-real-page-wrapper">
@@ -304,7 +438,12 @@
                         <i class="fa-solid fa-angle-right"></i>
                         <span>السابق</span>
                     </button>
-                    <span class="mushaf-hint-text"><i class="fa-solid fa-hand-pointer"></i> يمكنك أيضاً استخدام مفاتيح الأسهم (➔ / ⬅) لتقليب الصفحات</span>
+                    <div class="page-jump-box">
+                        <label for="mushaf-page-input">صفحة:</label>
+                        <input type="number" id="mushaf-page-input" class="mushaf-page-input" min="1" max="604" value="562">
+                        <span>/ 604</span>
+                    </div>
+                    <!--  <span class="mushaf-hint-text"><i class="fa-solid fa-hand-pointer"></i> يمكنك أيضاً استخدام مفاتيح الأسهم (➔ / ⬅) لتقليب الصفحات</span>-->
                     <button type="button" class="btn btn-outline btn-page-nav" onclick="document.getElementById('btn-mushaf-next').click()">
                         <span>التالي</span>
                         <i class="fa-solid fa-angle-left"></i>
@@ -405,6 +544,89 @@
         </div>
     </div>
 
+    <!-- نافذة حجز وقراءة جزء في ختمة القرآن -->
+    <div class="modal-overlay" id="reserve-part-modal">
+        <div class="modal-card">
+            <button class="modal-close-btn" id="btn-close-khatma-modal" aria-label="إغلاق">&times;</button>
+            <h3 class="modal-title" id="khatma-modal-title">قراءة جزء لروحه الطاهرة</h3>
+            <p class="modal-desc" id="khatma-modal-desc">
+                اكتب اسمك لتسجيل حجز هذا الجزء، ثم اضغط على زر إتمام القراءة عند الانتهاء لتنال الأجر كاملاً إن شاء الله.
+            </p>
+
+            <form id="reserve-part-form">
+                <input type="hidden" id="khatma-selected-part-id" value="">
+
+                <div class="form-group" id="khatma-reader-group">
+                    <label class="form-label" for="khatma-reader-name">اسم القارئ (أو اتركه فاعل خير):</label>
+                    <input type="text" id="khatma-reader-name" class="form-input" placeholder="اسمك الكريم...">
+                </div>
+
+                <div class="modal-actions-dual">
+                    <button type="submit" class="btn btn-gold" id="btn-confirm-reserve">
+                        <i class="fa-solid fa-bookmark"></i>
+                        <span>تأكيد حجز الجزء</span>
+                    </button>
+                    <button type="button" class="btn btn-outline" id="btn-read-now-in-mushaf">
+                        <i class="fa-solid fa-book-open"></i>
+                        <span>فتح بالمصحف</span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- ==========================================
+         ويدجت إذاعة القرآن الكريم المباشرة (24/7 Live Radio)
+         ========================================== -->
+    <div class="live-radio-widget" id="live-radio-widget">
+        <!-- الزر العائم المصغر -->
+        <button class="radio-fab-btn" id="radio-fab-btn" title="إذاعة القرآن الكريم">
+            <i class="fa-solid fa-radio radio-icon" id="radio-icon"></i>
+            <span class="radio-pulse"></span>
+            <div class="radio-waves" id="radio-waves">
+                <span></span><span></span><span></span><span></span>
+            </div>
+        </button>
+
+        <!-- لوحة التحكم المنبثقة -->
+        <div class="radio-panel" id="radio-panel">
+            <div class="radio-panel-header">
+                <div class="radio-header-title">
+                    <i class="fa-solid fa-tower-broadcast text-gold"></i>
+                    <span>بث إذاعي مباشر 24/7</span>
+                </div>
+                <button class="btn-close-radio" id="btn-close-radio" aria-label="إغلاق">&times;</button>
+            </div>
+
+            <div class="radio-station-info">
+                <div class="radio-station-name" id="current-station-name">إذاعة القرآن الكريم من القاهرة</div>
+                <div class="radio-station-desc" id="current-station-desc">بث مباشر رسمي على مدار 24 ساعة</div>
+            </div>
+
+            <!-- اختيار الإذاعة -->
+            <div class="radio-station-select-group">
+                <label for="radio-station-select">اختر المحطة:</label>
+                <select id="radio-station-select" class="radio-station-select">
+                    <!-- يُملأ من RADIO_STATIONS -->
+                </select>
+            </div>
+
+            <!-- شريط التحكم بالتشغيل والصوت -->
+            <div class="radio-controls-row">
+                <button type="button" class="btn-radio-play" id="btn-radio-play" title="تشغيل / إيقاف">
+                    <i class="fa-solid fa-play" id="radio-play-icon"></i>
+                </button>
+
+                <div class="radio-volume-group">
+                    <i class="fa-solid fa-volume-high text-muted"></i>
+                    <input type="range" id="radio-volume-slider" min="0" max="1" step="0.05" value="0.8">
+                </div>
+            </div>
+
+            <audio id="live-radio-audio" preload="none"></audio>
+        </div>
+    </div>
+
     <!-- تذييل الصفحة (Footer) -->
     <footer class="footer">
         <div class="container">
@@ -438,8 +660,9 @@
 
     <!-- ملف البيانات وإعدادات السحابة والمنطق البرمجي وقارئ القرآن -->
     <script src="assets/js/data.js"></script>
+    <script src="assets/js/azkar-data.js"></script>
     <script src="assets/js/firebase-config.js"></script>
-    <script src="assets/js/app.js?v=2"></script>
+    <script src="assets/js/app.js?v=3"></script>
     <script src="assets/js/quran.js"></script>
 </body>
 </html>

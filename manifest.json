@@ -1,0 +1,21 @@
+{
+  "name": "صدقة جارية لروح جدي عبدالمعبود أمين سعيد",
+  "short_name": "صدقة جارية",
+  "description": "موقع صدقة جارية ودعاء ومصحف وتسبيح وختمات قرآنية لروح جدي الغالي عبدالمعبود أمين سعيد رحمه الله",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#070d18",
+  "theme_color": "#070d18",
+  "orientation": "portrait-primary",
+  "lang": "ar",
+  "dir": "rtl",
+  "icons": [
+    {
+      "src": "assets/share-preview.jpg",
+      "sizes": "1200x675",
+      "type": "image/jpeg",
+      "purpose": "any"
+    }
+  ]
+}

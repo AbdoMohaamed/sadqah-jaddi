@@ -9,17 +9,27 @@ document.addEventListener("DOMContentLoaded", () => {
     // 2. تهيئة الأدعية وسلايدر Swiper
     initPrayersSwiper();
 
-    // 3. تهيئة السبحة الإلكترونية
+    // 3. تهيئة السبحة الإلكترونية والعداد الموحد
     initTasbeeh();
 
-    // 4. تهيئة نافذة إضافة دعاء
+    // 4. تهيئة ختمة القرآن الكريم الجماعية
+    initKhatma();
+
+    // 5. تهيئة أذكار الصباح والمساء التفاعلية
+    initSmartAzkar();
+
+    // 6. تهيئة نافذة إضافة دعاء
     initAddPrayerModal();
 
-    // 5. تهيئة أزرار المشاركة والنسخ
+    // 7. تهيئة أزرار المشاركة والنسخ
     initShareButtons();
 
-    // 6. تهيئة مشغل التلاوة الخاشعة
+    // 8. تهيئة مشغل التلاوة الخاشعة وإذاعة القرآن الكريم
     initAudioPlayer();
+    initLiveRadio();
+
+    // 9. تهيئة تطبيق الهاتف التقدمي (PWA)
+    initPWA();
 });
 
 /* ==========================================================================
@@ -226,18 +236,31 @@ function initPrayersSwiper() {
     initFirebaseRealtimeSync();
 }
 
+function getFirebaseDb() {
+    if (firebaseDb) return firebaseDb;
+    if (typeof firebase !== "undefined" && typeof isFirebaseConfigured === "function" && isFirebaseConfigured()) {
+        try {
+            if (!firebase.apps.length) {
+                firebase.initializeApp(FIREBASE_CONFIG);
+            }
+            firebaseDb = firebase.database();
+            return firebaseDb;
+        } catch (e) {
+            console.warn("Firebase init error:", e);
+        }
+    }
+    return null;
+}
+
 function initFirebaseRealtimeSync() {
-    if (typeof firebase === "undefined" || typeof isFirebaseConfigured !== "function" || !isFirebaseConfigured()) {
+    const db = getFirebaseDb();
+    if (!db) {
         console.log("Firebase not configured yet; using local storage mode.");
         return;
     }
 
     try {
-        if (!firebase.apps.length) {
-            firebase.initializeApp(FIREBASE_CONFIG);
-        }
-        firebaseDb = firebase.database();
-        prayersRef = firebaseDb.ref("prayers");
+        prayersRef = db.ref("prayers");
 
         // استماع لحظي لأي أدعية جديدة يضيفها أي شخص حول العالم
         prayersRef.limitToLast(60).on("value", (snapshot) => {
@@ -362,11 +385,14 @@ window.handleAmenClick = function(prayerId) {
 };
 
 /* ==========================================================================
-   3. السبحة الإلكترونية للتسبيح على روحه
+   3. السبحة الإلكترونية للتسبيح على روحه والعداد الموحد
    ========================================================================== */
 let activeZkrIndex = 0;
 let currentZkrCount = 0;
 let totalTasbeehSession = 0;
+let globalTasbeehCount = 0;
+let pendingTasbeehBatch = 0;
+let tasbeehBatchTimer = null;
 const RADIUS = 110;
 const CIRCUMFERENCE = 2 * Math.PI * RADIUS;
 
@@ -378,6 +404,9 @@ function initTasbeeh() {
     const storedTotal = localStorage.getItem("tasbeeh_lifetime_total") || "0";
     totalTasbeehSession = parseInt(storedTotal, 10);
     updateTotalDisplays();
+
+    // إعداد المزامنة السحابية للعداد العالمي الموحد
+    initGlobalTasbeehSync();
 
     // إعداد دائرة شريط التقدم SVG
     const circle = document.querySelector(".progress-ring__circle");
@@ -396,6 +425,52 @@ function initTasbeeh() {
     const resetBtn = document.getElementById("btn-reset-tasbeeh");
     if (resetBtn) {
         resetBtn.addEventListener("click", resetCurrentZkr);
+    }
+}
+
+function initGlobalTasbeehSync() {
+    const db = getFirebaseDb();
+    if (!db) return;
+
+    try {
+        const statsRef = db.ref("stats/globalTasbeehCount");
+        statsRef.on("value", snapshot => {
+            const val = snapshot.val();
+            if (typeof val === "number") {
+                globalTasbeehCount = val;
+                updateGlobalTasbeehDisplays();
+            } else if (val === null) {
+                db.ref("stats/globalTasbeehCount").set(24530);
+                globalTasbeehCount = 24530;
+                updateGlobalTasbeehDisplays();
+            }
+        });
+    } catch (e) {
+        console.warn("Global tasbeeh sync error:", e);
+    }
+}
+
+function updateGlobalTasbeehDisplays() {
+    const statEl = document.getElementById("global-tasbeeh-stat");
+    const tasbeehEl = document.getElementById("total-global-tasbeeh-count");
+    const formatted = (globalTasbeehCount + pendingTasbeehBatch).toLocaleString("ar-EG");
+
+    if (statEl) statEl.textContent = formatted;
+    if (tasbeehEl) tasbeehEl.textContent = formatted;
+}
+
+function syncTasbeehBatchToCloud() {
+    if (pendingTasbeehBatch <= 0) return;
+    const db = getFirebaseDb();
+    const batchToPush = pendingTasbeehBatch;
+    pendingTasbeehBatch = 0;
+
+    if (db) {
+        try {
+            db.ref("stats/globalTasbeehCount").transaction(curr => (curr || 0) + batchToPush);
+        } catch (e) {
+            console.warn("Error incrementing global tasbeeh:", e);
+        }
     }
 }
 
@@ -443,8 +518,15 @@ function incrementTasbeeh() {
     currentZkrCount++;
     totalTasbeehSession++;
 
-    // حفظ الإجمالي
+    // حفظ الإجمالي المحلي
     localStorage.setItem("tasbeeh_lifetime_total", totalTasbeehSession.toString());
+
+    // تحديث العداد السحابي العالمي الموحد بالدفع المجمع
+    pendingTasbeehBatch++;
+    updateGlobalTasbeehDisplays();
+
+    if (tasbeehBatchTimer) clearTimeout(tasbeehBatchTimer);
+    tasbeehBatchTimer = setTimeout(syncTasbeehBatchToCloud, 1200);
 
     // اهتزاز خفيف للموبايل إن كان مدعوماً
     if ("vibrate" in navigator) {
@@ -682,6 +764,591 @@ function initAudioPlayer() {
             });
         }
     });
+}
+
+/* ==========================================================================
+   7. ختمة القرآن الكريم الجماعية (Live Quran Khatma)
+   ========================================================================== */
+let currentKhatmaData = {
+    cycle: 1,
+    parts: {}
+};
+let activeKhatmaFilter = "all";
+
+function initKhatma() {
+    initDefaultKhatmaParts();
+    renderKhatmaGrid();
+    initKhatmaFirebaseSync();
+    initKhatmaFilters();
+    initKhatmaModal();
+}
+
+function initDefaultKhatmaParts() {
+    const stored = localStorage.getItem("local_khatma_cache");
+    if (stored) {
+        try {
+            currentKhatmaData = JSON.parse(stored);
+        } catch (e) {
+            buildDefaultKhatmaObject();
+        }
+    } else {
+        buildDefaultKhatmaObject();
+    }
+}
+
+function buildDefaultKhatmaObject() {
+    currentKhatmaData.cycle = currentKhatmaData.cycle || 1;
+    currentKhatmaData.parts = {};
+    if (typeof QURAN_PARTS_INFO !== "undefined") {
+        QURAN_PARTS_INFO.forEach(p => {
+            currentKhatmaData.parts[p.id] = {
+                id: p.id,
+                status: "available",
+                reader: "",
+                time: 0
+            };
+        });
+    }
+}
+
+function initKhatmaFirebaseSync() {
+    const db = getFirebaseDb();
+    if (!db) return;
+
+    try {
+        const khatmaRef = db.ref("khatma");
+        khatmaRef.on("value", snapshot => {
+            const data = snapshot.val();
+            if (data && data.parts) {
+                currentKhatmaData = data;
+                localStorage.setItem("local_khatma_cache", JSON.stringify(currentKhatmaData));
+                updateKhatmaUI();
+            } else if (!data) {
+                buildDefaultKhatmaObject();
+                khatmaRef.set(currentKhatmaData);
+                updateKhatmaUI();
+            }
+        });
+    } catch (e) {
+        console.warn("Khatma Firebase error:", e);
+    }
+}
+
+function updateKhatmaUI() {
+    const cycle = currentKhatmaData.cycle || 1;
+    let completedCount = 0;
+
+    Object.keys(currentKhatmaData.parts || {}).forEach(k => {
+        if (currentKhatmaData.parts[k].status === "completed") {
+            completedCount++;
+        }
+    });
+
+    const percent = Math.round((completedCount / 30) * 100);
+
+    const cycleDisplay = document.getElementById("khatma-cycle-display");
+    const completedCountEl = document.getElementById("khatma-completed-count");
+    const percentEl = document.getElementById("khatma-percent-display");
+    const fillEl = document.getElementById("khatma-progress-fill");
+    const globalKhatmaStat = document.getElementById("global-khatma-stat");
+
+    if (cycleDisplay) cycleDisplay.textContent = `رقم ${cycle}`;
+    if (completedCountEl) completedCountEl.textContent = completedCount;
+    if (percentEl) percentEl.textContent = `${percent}%`;
+    if (fillEl) fillEl.style.width = `${percent}%`;
+    if (globalKhatmaStat) globalKhatmaStat.textContent = cycle;
+
+    renderKhatmaGrid();
+
+    // فحص اكتمال الختمة بالكامل
+    if (completedCount === 30) {
+        handleKhatmaCompleted(cycle);
+    }
+}
+
+function handleKhatmaCompleted(currentCycle) {
+    const celebrationKey = `khatma_cycle_${currentCycle}_celebrated`;
+    if (!sessionStorage.getItem(celebrationKey)) {
+        sessionStorage.setItem(celebrationKey, "true");
+        playCompletionChime();
+        showToast(`مبارك! اكتملت الختمة رقم ${currentCycle} كاملة بحمد الله، ونبدأ الآن ختمة جديدة لروحه 🌿✨`);
+
+        const db = getFirebaseDb();
+        if (db) {
+            setTimeout(() => {
+                const nextCycle = currentCycle + 1;
+                buildDefaultKhatmaObject();
+                currentKhatmaData.cycle = nextCycle;
+                db.ref("khatma").set(currentKhatmaData);
+            }, 3000);
+        }
+    }
+}
+
+function renderKhatmaGrid() {
+    const container = document.getElementById("khatma-grid-container");
+    if (!container || typeof QURAN_PARTS_INFO === "undefined") return;
+
+    container.innerHTML = "";
+    const myReserved = JSON.parse(localStorage.getItem("my_reserved_parts") || "{}");
+
+    QURAN_PARTS_INFO.forEach(partInfo => {
+        const partState = (currentKhatmaData.parts && currentKhatmaData.parts[partInfo.id]) || {
+            status: "available",
+            reader: ""
+        };
+
+        if (activeKhatmaFilter !== "all" && partState.status !== activeKhatmaFilter) {
+            return;
+        }
+
+        const card = document.createElement("div");
+        card.className = `juz-card status-${partState.status}`;
+
+        let statusText = "متاح للقراءة";
+        let actionBtnHTML = "";
+
+        if (partState.status === "available") {
+            statusText = "متاح للقراءة";
+            actionBtnHTML = `
+                <button type="button" class="juz-btn juz-btn-reserve" onclick="openReserveModal(${partInfo.id})">
+                    <i class="fa-solid fa-bookmark"></i>
+                    <span>احجز لقراءته</span>
+                </button>
+            `;
+        } else if (partState.status === "reading") {
+            statusText = "قيد القراءة";
+            const isMine = !!myReserved[partInfo.id];
+            actionBtnHTML = `
+                <button type="button" class="juz-btn juz-btn-complete" onclick="markPartCompleted(${partInfo.id})">
+                    <i class="fa-solid fa-check"></i>
+                    <span>${isMine ? "أتممت القراءة بحمد الله" : "تأكيد إتمام الجزء"}</span>
+                </button>
+            `;
+        } else if (partState.status === "completed") {
+            statusText = "تمت القراءة";
+            actionBtnHTML = `
+                <div class="juz-btn juz-btn-done">
+                    <i class="fa-solid fa-circle-check"></i>
+                    <span>تمت القراءة بحمد الله</span>
+                </div>
+            `;
+        }
+
+        card.innerHTML = `
+            <div class="juz-header">
+                <span class="juz-number-badge">${partInfo.id}</span>
+                <span class="juz-badge-tag">${statusText}</span>
+            </div>
+            <div class="juz-title">${partInfo.name}</div>
+            <div class="juz-meta">
+                <i class="fa-regular fa-compass text-gold"></i> يبدأ من: ${escapeHTML(partInfo.start)}
+                <br>
+                <i class="fa-regular fa-file text-muted"></i> الصفحات: ${escapeHTML(partInfo.pages)}
+            </div>
+            ${partState.reader ? `
+                <div class="juz-reader-info">
+                    <i class="fa-solid fa-user-check"></i>
+                    <span>القارئ: ${escapeHTML(partState.reader)}</span>
+                </div>
+            ` : ''}
+            <div class="juz-actions">
+                ${actionBtnHTML}
+            </div>
+        `;
+
+        container.appendChild(card);
+    });
+}
+
+function initKhatmaFilters() {
+    const filterBtns = document.querySelectorAll(".khatma-filter-btn");
+    filterBtns.forEach(btn => {
+        btn.addEventListener("click", () => {
+            filterBtns.forEach(b => b.classList.remove("active"));
+            btn.classList.add("active");
+            activeKhatmaFilter = btn.dataset.filter || "all";
+            renderKhatmaGrid();
+        });
+    });
+}
+
+window.openReserveModal = function(partId) {
+    if (typeof QURAN_PARTS_INFO === "undefined") return;
+    const partInfo = QURAN_PARTS_INFO.find(p => p.id === partId);
+    if (!partInfo) return;
+
+    const modal = document.getElementById("reserve-part-modal");
+    const idInput = document.getElementById("khatma-selected-part-id");
+    const titleEl = document.getElementById("khatma-modal-title");
+    const descEl = document.getElementById("khatma-modal-desc");
+
+    if (idInput) idInput.value = partId;
+    if (titleEl) titleEl.textContent = `حجز ${partInfo.name} لروحه الطاهرة`;
+    if (descEl) descEl.textContent = `يبدأ من ${partInfo.start} (صفحات ${partInfo.pages}). اكتب اسمك لتأكيد الحجز ونيل الأجر بإذن الله.`;
+
+    if (modal) modal.classList.add("open");
+};
+
+function initKhatmaModal() {
+    const modal = document.getElementById("reserve-part-modal");
+    const closeBtn = document.getElementById("btn-close-khatma-modal");
+    const form = document.getElementById("reserve-part-form");
+    const readNowBtn = document.getElementById("btn-read-now-in-mushaf");
+
+    if (closeBtn && modal) {
+        closeBtn.addEventListener("click", () => modal.classList.remove("open"));
+    }
+
+    if (modal) {
+        modal.addEventListener("click", (e) => {
+            if (e.target === modal) modal.classList.remove("open");
+        });
+    }
+
+    if (readNowBtn) {
+        readNowBtn.addEventListener("click", () => {
+            const partId = parseInt(document.getElementById("khatma-selected-part-id").value, 10);
+            if (typeof QURAN_PARTS_INFO !== "undefined") {
+                const partInfo = QURAN_PARTS_INFO.find(p => p.id === partId);
+                if (partInfo && typeof window.goToQuranPage === "function") {
+                    const startPage = parseInt(partInfo.pages.split("-")[0].trim(), 10);
+                    if (startPage) {
+                        window.goToQuranPage(startPage);
+                    }
+                }
+            }
+            if (modal) modal.classList.remove("open");
+            const readerSection = document.getElementById("quran-reader");
+            if (readerSection) readerSection.scrollIntoView({ behavior: "smooth" });
+        });
+    }
+
+    if (form) {
+        form.addEventListener("submit", (e) => {
+            e.preventDefault();
+            const partId = parseInt(document.getElementById("khatma-selected-part-id").value, 10);
+            const nameInput = document.getElementById("khatma-reader-name");
+            const readerName = (nameInput && nameInput.value.trim()) || "فاعل خير";
+
+            reservePart(partId, readerName);
+            if (modal) modal.classList.remove("open");
+            if (nameInput) nameInput.value = "";
+        });
+    }
+}
+
+function reservePart(partId, readerName) {
+    if (!currentKhatmaData.parts) currentKhatmaData.parts = {};
+    currentKhatmaData.parts[partId] = {
+        id: partId,
+        status: "reading",
+        reader: readerName,
+        time: Date.now()
+    };
+
+    const myReserved = JSON.parse(localStorage.getItem("my_reserved_parts") || "{}");
+    myReserved[partId] = true;
+    localStorage.setItem("my_reserved_parts", JSON.stringify(myReserved));
+
+    const db = getFirebaseDb();
+    if (db) {
+        db.ref(`khatma/parts/${partId}`).set(currentKhatmaData.parts[partId]);
+    } else {
+        localStorage.setItem("local_khatma_cache", JSON.stringify(currentKhatmaData));
+    }
+
+    updateKhatmaUI();
+    playBeadSound(600);
+    showToast(`تم حجز الجزء ${partId} باسم (${readerName})، تقبل الله منك ونفع بك 🤲`);
+}
+
+window.markPartCompleted = function(partId) {
+    if (!currentKhatmaData.parts || !currentKhatmaData.parts[partId]) return;
+
+    const currentReader = currentKhatmaData.parts[partId].reader || "فاعل خير";
+    currentKhatmaData.parts[partId].status = "completed";
+    currentKhatmaData.parts[partId].time = Date.now();
+
+    const db = getFirebaseDb();
+    if (db) {
+        db.ref(`khatma/parts/${partId}`).set(currentKhatmaData.parts[partId]);
+    } else {
+        localStorage.setItem("local_khatma_cache", JSON.stringify(currentKhatmaData));
+    }
+
+    updateKhatmaUI();
+    playCompletionChime();
+    showToast(`هنيئاً لك! كُتبت تلاوة الجزء ${partId} نوراً لروح فقيدنا وفي ميزان حسنات (${currentReader}) 🌿✨`);
+};
+
+/* ==========================================================================
+   8. أذكار الصباح والمساء التفاعلية (Smart Azkar)
+   ========================================================================== */
+let currentAzkarMode = "morning";
+let azkarProgressMap = {};
+
+function initSmartAzkar() {
+    const currentHour = new Date().getHours();
+    if (currentHour >= 3 && currentHour < 12) {
+        currentAzkarMode = "morning";
+    } else {
+        currentAzkarMode = "evening";
+    }
+
+    updateAzkarModeUI();
+
+    const morningBtn = document.getElementById("tab-morning");
+    const eveningBtn = document.getElementById("tab-evening");
+
+    if (morningBtn) {
+        morningBtn.addEventListener("click", () => {
+            currentAzkarMode = "morning";
+            updateAzkarModeUI();
+        });
+    }
+
+    if (eveningBtn) {
+        eveningBtn.addEventListener("click", () => {
+            currentAzkarMode = "evening";
+            updateAzkarModeUI();
+        });
+    }
+}
+
+function updateAzkarModeUI() {
+    const morningBtn = document.getElementById("tab-morning");
+    const eveningBtn = document.getElementById("tab-evening");
+    const hintText = document.getElementById("azkar-time-hint-text");
+
+    if (currentAzkarMode === "morning") {
+        if (morningBtn) morningBtn.classList.add("active");
+        if (eveningBtn) eveningBtn.classList.remove("active");
+        if (hintText) hintText.textContent = "حان الآن وقت أذكار الصباح وسؤال العافية ☀️";
+    } else {
+        if (eveningBtn) eveningBtn.classList.add("active");
+        if (morningBtn) morningBtn.classList.remove("active");
+        if (hintText) hintText.textContent = "حان الآن وقت أذكار المساء وحفظ الليل 🌙";
+    }
+
+    renderAzkarCards();
+}
+
+function renderAzkarCards() {
+    const container = document.getElementById("azkar-cards-container");
+    if (!container || typeof MORNING_AZKAR === "undefined") return;
+
+    const list = currentAzkarMode === "morning" ? MORNING_AZKAR : EVENING_AZKAR;
+    container.innerHTML = "";
+
+    const cacheKey = `azkar_progress_${currentAzkarMode}_${new Date().toDateString()}`;
+    azkarProgressMap = JSON.parse(localStorage.getItem(cacheKey) || "{}");
+
+    let completedCount = 0;
+
+    list.forEach((item) => {
+        const remaining = (typeof azkarProgressMap[item.id] === "number") ? azkarProgressMap[item.id] : item.count;
+        const isFinished = remaining <= 0;
+        if (isFinished) completedCount++;
+
+        const card = document.createElement("div");
+        card.className = `azkar-card ${isFinished ? 'is-finished' : ''}`;
+        card.id = `azkar-card-${item.id}`;
+
+        card.innerHTML = `
+            <div class="azkar-text">"${escapeHTML(item.text)}"</div>
+            <div class="azkar-virtue">
+                <i class="fa-solid fa-award text-gold"></i>
+                <span>${escapeHTML(item.virtue)}</span>
+            </div>
+            <div class="azkar-footer">
+                <div class="azkar-count-badge">
+                    <span>التكرار المستحب: <strong>${item.count} مرات</strong></span>
+                </div>
+                <button type="button" class="azkar-tap-btn" onclick="handleAzkarTap('${item.id}', ${item.count})">
+                    <i class="fa-solid ${isFinished ? 'fa-check-double' : 'fa-hand-pointer'}"></i>
+                    <span>${isFinished ? 'تم الذكر بنجاح' : `تبقى: ${remaining}`}</span>
+                </button>
+            </div>
+        `;
+
+        container.appendChild(card);
+    });
+
+    updateAzkarSummary(completedCount, list.length);
+}
+
+window.handleAzkarTap = function(itemId, totalCount) {
+    if (typeof MORNING_AZKAR === "undefined") return;
+    const list = currentAzkarMode === "morning" ? MORNING_AZKAR : EVENING_AZKAR;
+    const cacheKey = `azkar_progress_${currentAzkarMode}_${new Date().toDateString()}`;
+
+    let remaining = (typeof azkarProgressMap[itemId] === "number") ? azkarProgressMap[itemId] : totalCount;
+    if (remaining <= 0) return;
+
+    remaining--;
+    azkarProgressMap[itemId] = remaining;
+    localStorage.setItem(cacheKey, JSON.stringify(azkarProgressMap));
+
+    if ("vibrate" in navigator) navigator.vibrate(25);
+    playBeadSound(520 + (remaining * 20));
+
+    const card = document.getElementById(`azkar-card-${itemId}`);
+    if (card) {
+        const btn = card.querySelector(".azkar-tap-btn span");
+        const icon = card.querySelector(".azkar-tap-btn i");
+        if (remaining > 0) {
+            if (btn) btn.textContent = `تبقى: ${remaining}`;
+        } else {
+            card.classList.add("is-finished");
+            if (btn) btn.textContent = "تم الذكر بنجاح";
+            if (icon) icon.className = "fa-solid fa-check-double";
+            playCompletionChime();
+        }
+    }
+
+    let completedCount = 0;
+    list.forEach(i => {
+        if (azkarProgressMap[i.id] === 0) completedCount++;
+    });
+
+    updateAzkarSummary(completedCount, list.length);
+
+    if (completedCount === list.length) {
+        showToast("هنيئاً لك! أتممت أذكار يومك كاملة، جعله الله حصناً لك ونوراً لروح فقيدنا 🌿✨");
+    }
+};
+
+function updateAzkarSummary(completed, total) {
+    const completedEl = document.getElementById("azkar-completed-count");
+    const totalEl = document.getElementById("azkar-total-count");
+    const fillEl = document.getElementById("azkar-progress-fill");
+
+    if (completedEl) completedEl.textContent = completed;
+    if (totalEl) totalEl.textContent = total;
+    if (fillEl) {
+        const pct = total > 0 ? (completed / total) * 100 : 0;
+        fillEl.style.width = `${pct}%`;
+    }
+}
+
+/* ==========================================================================
+   9. إذاعة القرآن الكريم المباشرة 24/7 (Live Radio)
+   ========================================================================== */
+let radioAudio = null;
+let isRadioPlaying = false;
+
+function initLiveRadio() {
+    radioAudio = document.getElementById("live-radio-audio");
+    const fabBtn = document.getElementById("radio-fab-btn");
+    const navBtn = document.getElementById("btn-toggle-radio-nav");
+    const panel = document.getElementById("radio-panel");
+    const closeBtn = document.getElementById("btn-close-radio");
+    const playBtn = document.getElementById("btn-radio-play");
+    const playIcon = document.getElementById("radio-play-icon");
+    const select = document.getElementById("radio-station-select");
+    const volumeSlider = document.getElementById("radio-volume-slider");
+    const nameEl = document.getElementById("current-station-name");
+    const descEl = document.getElementById("current-station-desc");
+
+    if (!radioAudio || typeof RADIO_STATIONS === "undefined") return;
+
+    if (select) {
+        select.innerHTML = "";
+        RADIO_STATIONS.forEach(st => {
+            const opt = document.createElement("option");
+            opt.value = st.id;
+            opt.textContent = st.name;
+            select.appendChild(opt);
+        });
+
+        select.addEventListener("change", () => {
+            const st = RADIO_STATIONS.find(s => s.id === select.value) || RADIO_STATIONS[0];
+            if (nameEl) nameEl.textContent = st.name;
+            if (descEl) descEl.textContent = st.desc;
+            radioAudio.src = st.url;
+            if (isRadioPlaying) {
+                radioAudio.play().catch(e => console.warn(e));
+            }
+        });
+    }
+
+    const defaultStation = RADIO_STATIONS[0];
+    radioAudio.src = defaultStation.url;
+
+    if (fabBtn && panel) {
+        fabBtn.addEventListener("click", () => {
+            panel.classList.toggle("open");
+        });
+    }
+
+    if (closeBtn && panel) {
+        closeBtn.addEventListener("click", () => {
+            panel.classList.remove("open");
+        });
+    }
+
+    if (navBtn && panel) {
+        navBtn.addEventListener("click", () => {
+            panel.classList.toggle("open");
+            if (!isRadioPlaying) {
+                toggleRadioPlayback();
+            }
+        });
+    }
+
+    function toggleRadioPlayback() {
+        if (!isRadioPlaying) {
+            const legacyAudio = document.getElementById("quran-audio");
+            if (legacyAudio && !legacyAudio.paused) {
+                legacyAudio.pause();
+                const btnToggleAudio = document.getElementById("btn-toggle-audio");
+                if (btnToggleAudio) btnToggleAudio.classList.remove("active");
+            }
+
+            radioAudio.play().then(() => {
+                isRadioPlaying = true;
+                if (fabBtn) fabBtn.classList.add("is-playing");
+                if (navBtn) navBtn.classList.add("active");
+                if (playIcon) playIcon.className = "fa-solid fa-pause";
+                showToast("جاري الاستماع لإذاعة القرآن الكريم 📻🌿");
+            }).catch(err => {
+                console.warn("Radio play error:", err);
+                showToast("تعذر تشغيل البث المباشر حالياً، يرجى المحاولة بعد قليل");
+            });
+        } else {
+            radioAudio.pause();
+            isRadioPlaying = false;
+            if (fabBtn) fabBtn.classList.remove("is-playing");
+            if (navBtn) navBtn.classList.remove("active");
+            if (playIcon) playIcon.className = "fa-solid fa-play";
+        }
+    }
+
+    if (playBtn) {
+        playBtn.addEventListener("click", toggleRadioPlayback);
+    }
+
+    if (volumeSlider) {
+        volumeSlider.addEventListener("input", (e) => {
+            radioAudio.volume = parseFloat(e.target.value);
+        });
+    }
+}
+
+/* ==========================================================================
+   10. تطبيق الهاتف التقدمي (PWA Service Worker)
+   ========================================================================== */
+function initPWA() {
+    if ("serviceWorker" in navigator) {
+        window.addEventListener("load", () => {
+            navigator.serviceWorker.register("./sw.js").then(reg => {
+                console.log("PWA Service Worker registered successfully! Scope:", reg.scope);
+            }).catch(err => {
+                console.warn("PWA Service Worker registration failed:", err);
+            });
+        });
+    }
 }
 
 /* ==========================================================================
