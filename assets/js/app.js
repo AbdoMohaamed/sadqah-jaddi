@@ -34,15 +34,19 @@ document.addEventListener("DOMContentLoaded", () => {
     // 9. تهيئة تطبيق الهاتف التقدمي (PWA)
     initPWA();
 
-    // 10. تهيئة مواقيت الصلاة وساعة الاستجابة ومواسم الصيام وبوصلة القبلة
+    // 10. تهيئة مواقيت الصلاة وساعة الاستجابة ومواسم الصيام وبوصلة القبلة وتحديد الموقع GPS
     initPrayerTimes();
+    initGPSLocation();
     initFastingTracker();
     initQiblaCompass();
 
-    // 11. تهيئة صانع بطاقات الأدعية المصورة
+    // 11. تهيئة جدول الورد والمهام الإيمانية اليومية
+    initDailyWird();
+
+    // 12. تهيئة صانع بطاقات الأدعية المصورة
     initDuaCardGenerator();
 
-    // 12. تهيئة دليل وآداب زيارة القبور
+    // 13. تهيئة دليل وآداب زيارة القبور
     initCemeteryGuide();
 });
 
@@ -1617,6 +1621,15 @@ function initPrayerTimes() {
     const savedCity = localStorage.getItem("selected_prayer_city") || "Cairo";
 
     if (citySelect) {
+        if (savedCity === "gps") {
+            let gpsOpt = citySelect.querySelector('option[value="gps"]');
+            if (!gpsOpt) {
+                gpsOpt = document.createElement("option");
+                gpsOpt.value = "gps";
+                gpsOpt.textContent = "📍 موقعي الحالي (GPS)";
+                citySelect.insertBefore(gpsOpt, citySelect.firstChild);
+            }
+        }
         citySelect.value = savedCity;
         citySelect.addEventListener("change", (e) => {
             const city = e.target.value;
@@ -1657,8 +1670,30 @@ function checkSpecialTimesNotice() {
 }
 
 function fetchPrayerTimes(cityKey) {
-    const config = CITY_CONFIGS[cityKey] || CITY_CONFIGS["Cairo"];
-    const cacheKey = `prayer_times_${cityKey}_${new Date().toISOString().slice(0, 10)}`;
+    let url;
+    let cacheKey;
+
+    if (cityKey === "gps") {
+        const savedGps = localStorage.getItem("gps_prayer_coords");
+        if (savedGps) {
+            try {
+                const parsed = JSON.parse(savedGps);
+                if (parsed.lat && parsed.lng) {
+                    const latNum = Number(parsed.lat);
+                    const lngNum = Number(parsed.lng);
+                    cacheKey = `prayer_times_gps_${latNum.toFixed(2)}_${lngNum.toFixed(2)}_${new Date().toISOString().slice(0, 10)}`;
+                    url = `https://api.aladhan.com/v1/timings?latitude=${latNum}&longitude=${lngNum}&method=5`;
+                }
+            } catch(e) {}
+        }
+    }
+
+    if (!url) {
+        const config = CITY_CONFIGS[cityKey] || CITY_CONFIGS["Cairo"];
+        cacheKey = `prayer_times_${cityKey}_${new Date().toISOString().slice(0, 10)}`;
+        url = `https://api.aladhan.com/v1/timingsByCity?city=${encodeURIComponent(config.city)}&country=${encodeURIComponent(config.country)}&method=${config.method}`;
+    }
+
     const cached = localStorage.getItem(cacheKey);
 
     if (cached) {
@@ -1666,11 +1701,10 @@ function fetchPrayerTimes(cityKey) {
             prayerTimings = JSON.parse(cached);
             renderPrayerTimesUI(prayerTimings);
             startPrayerCountdown();
+            initFastingTracker();
             return;
         } catch(e) {}
     }
-
-    const url = `https://api.aladhan.com/v1/timingsByCity?city=${encodeURIComponent(config.city)}&country=${encodeURIComponent(config.country)}&method=${config.method}`;
 
     fetch(url)
         .then(res => res.json())
@@ -2580,9 +2614,25 @@ function initQiblaCompass() {
 
     function refreshQiblaData() {
         const cityKey = localStorage.getItem("selected_prayer_city") || "Cairo";
-        const coords = (typeof QIBLA_CITIES_COORDS !== "undefined" && QIBLA_CITIES_COORDS[cityKey])
-            ? QIBLA_CITIES_COORDS[cityKey]
-            : { name: "القاهرة", lat: 30.0444, lng: 31.2357 };
+        let coords = null;
+
+        if (cityKey === "gps") {
+            const savedGps = localStorage.getItem("gps_prayer_coords");
+            if (savedGps) {
+                try {
+                    const parsed = JSON.parse(savedGps);
+                    if (parsed.lat && parsed.lng) {
+                        coords = { name: "موقعي الحالي (GPS)", lat: Number(parsed.lat), lng: Number(parsed.lng) };
+                    }
+                } catch(e) {}
+            }
+        }
+
+        if (!coords) {
+            coords = (typeof QIBLA_CITIES_COORDS !== "undefined" && QIBLA_CITIES_COORDS[cityKey])
+                ? QIBLA_CITIES_COORDS[cityKey]
+                : { name: "القاهرة", lat: 30.0444, lng: 31.2357 };
+        }
 
         currentQiblaAngle = calculateBearing(coords.lat, coords.lng);
 
@@ -2687,5 +2737,192 @@ window.copyTextToClipboard = function(text) {
         showToast("تم نسخ الدعاء بنجاح للحافظة 📋");
     }
 };
+
+/* ==========================================================================
+   17. تحديد الموقع الجغرافي التلقائي لمواقيت الصلاة والقبلة (GPS Location)
+   ========================================================================== */
+function initGPSLocation() {
+    const btnGps = document.getElementById("btn-gps-location");
+    if (!btnGps) return;
+
+    btnGps.addEventListener("click", () => {
+        if (!navigator.geolocation) {
+            showToast("خاصية تحديد الموقع الجغرافي غير مدعومة في متصفحك ⚠️");
+            return;
+        }
+
+        const originalContent = btnGps.innerHTML;
+        btnGps.disabled = true;
+        btnGps.innerHTML = '<i class="fa-solid fa-spinner fa-spin text-gold"></i> <span>جارٍ التحديد...</span>';
+
+        navigator.geolocation.getCurrentPosition(
+            (pos) => {
+                btnGps.disabled = false;
+                btnGps.innerHTML = originalContent;
+
+                const lat = pos.coords.latitude;
+                const lng = pos.coords.longitude;
+                const gpsData = { name: "موقعي الحالي (GPS)", lat: lat, lng: lng };
+
+                localStorage.setItem("gps_prayer_coords", JSON.stringify(gpsData));
+                localStorage.setItem("selected_prayer_city", "gps");
+
+                const citySelect = document.getElementById("select-prayer-city");
+                if (citySelect) {
+                    let gpsOpt = citySelect.querySelector('option[value="gps"]');
+                    if (!gpsOpt) {
+                        gpsOpt = document.createElement("option");
+                        gpsOpt.value = "gps";
+                        gpsOpt.textContent = "📍 موقعي الحالي (GPS)";
+                        citySelect.insertBefore(gpsOpt, citySelect.firstChild);
+                    }
+                    citySelect.value = "gps";
+                }
+
+                showToast("تم تحديد موقعك بدقة 📍 وحساب مواقيت الصلاة والقبلة بنجاح");
+                fetchPrayerTimes("gps");
+            },
+            (err) => {
+                btnGps.disabled = false;
+                btnGps.innerHTML = originalContent;
+                let msg = "تعذر الحصول على إحداثيات الموقع عبر GPS";
+                if (err.code === 1) msg = "يرجى منح الإذن للوصول إلى الموقع في المتصفح 📍";
+                showToast(msg);
+            },
+            { timeout: 10000, enableHighAccuracy: true }
+        );
+    });
+}
+
+/* ==========================================================================
+   18. جدول الورد والمهام الإيمانية اليومية (Daily Wird Tracker)
+   ========================================================================== */
+function initDailyWird() {
+    const section = document.getElementById("daily-wird");
+    if (!section) return;
+
+    const checkboxes = section.querySelectorAll(".wird-checkbox");
+    const progressBadge = document.getElementById("wird-progress-badge");
+    const progressFill = document.getElementById("wird-progress-fill");
+    const resetBtn = document.getElementById("btn-reset-wird");
+
+    const todayKey = `daily_wird_${new Date().toISOString().slice(0, 10)}`;
+    let completedTasks = [];
+
+    try {
+        const saved = localStorage.getItem(todayKey);
+        if (saved) completedTasks = JSON.parse(saved);
+    } catch(e) {
+        completedTasks = [];
+    }
+
+    function updateUI() {
+        const total = checkboxes.length || 8;
+        const count = completedTasks.length;
+        const pct = Math.round((count / total) * 100);
+
+        checkboxes.forEach(cb => {
+            const taskId = cb.dataset.task;
+            const item = cb.closest(".wird-task-item");
+            const isDone = completedTasks.includes(taskId);
+            cb.checked = isDone;
+            if (item) {
+                item.classList.toggle("is-completed", isDone);
+            }
+        });
+
+        if (progressBadge) {
+            progressBadge.textContent = `${count} من ${total} مهام (${pct}%)`;
+            progressBadge.classList.toggle("all-done", count === total && total > 0);
+        }
+
+        if (progressFill) {
+            progressFill.style.width = `${pct}%`;
+            progressFill.classList.toggle("all-done", count === total && total > 0);
+        }
+    }
+
+    checkboxes.forEach(cb => {
+        cb.addEventListener("change", () => {
+            const taskId = cb.dataset.task;
+            if (cb.checked) {
+                if (!completedTasks.includes(taskId)) {
+                    completedTasks.push(taskId);
+                }
+                const isAllDone = completedTasks.length === checkboxes.length;
+                playWirdAudio(isAllDone);
+                if (isAllDone) {
+                    showToast("ما شاء الله تبارك الله! أتممت جميع مهام وردك اليومي 🌟 تقبل الله طاعاتكم");
+                }
+            } else {
+                completedTasks = completedTasks.filter(id => id !== taskId);
+            }
+
+            try {
+                localStorage.setItem(todayKey, JSON.stringify(completedTasks));
+            } catch(e) {}
+
+            updateUI();
+        });
+    });
+
+    if (resetBtn) {
+        resetBtn.addEventListener("click", () => {
+            if (completedTasks.length === 0) {
+                showToast("الجدول فارغ بالفعل لليوم 🌿");
+                return;
+            }
+            if (confirm("هل تريد إعادة ضبط مهام الورد اليومي والبدء من جديد؟")) {
+                completedTasks = [];
+                try {
+                    localStorage.removeItem(todayKey);
+                } catch(e) {}
+                updateUI();
+                showToast("تمت إعادة ضبط جدول الورد لليوم 🌿");
+            }
+        });
+    }
+
+    function playWirdAudio(isFull) {
+        try {
+            const AudioContext = window.AudioContext || window.webkitAudioContext;
+            if (!AudioContext) return;
+            const ctx = new AudioContext();
+
+            if (isFull) {
+                const freqs = [523.25, 659.25, 783.99, 1046.50];
+                freqs.forEach((freq, idx) => {
+                    const osc = ctx.createOscillator();
+                    const gain = ctx.createGain();
+                    osc.type = "sine";
+                    osc.frequency.value = freq;
+                    gain.gain.setValueAtTime(0.001, ctx.currentTime + idx * 0.12);
+                    gain.gain.exponentialRampToValueAtTime(0.2, ctx.currentTime + idx * 0.12 + 0.04);
+                    gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + idx * 0.12 + 0.55);
+                    osc.connect(gain);
+                    gain.connect(ctx.destination);
+                    osc.start(ctx.currentTime + idx * 0.12);
+                    osc.stop(ctx.currentTime + idx * 0.12 + 0.65);
+                });
+            } else {
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
+                osc.type = "sine";
+                osc.frequency.setValueAtTime(659.25, ctx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(880, ctx.currentTime + 0.09);
+                gain.gain.setValueAtTime(0.001, ctx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.18, ctx.currentTime + 0.03);
+                gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.42);
+                osc.connect(gain);
+                gain.connect(ctx.destination);
+                osc.start();
+                osc.stop(ctx.currentTime + 0.45);
+            }
+        } catch(e) {}
+    }
+
+    // التهيئة الأولى
+    updateUI();
+}
 
 
