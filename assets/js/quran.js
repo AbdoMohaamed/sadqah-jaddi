@@ -146,6 +146,7 @@ function initRealMushaf() {
     renderQuickJumpButtons();
     populateSurahsDropdown();
     setupMushafNavigation();
+    initTafsirModal();
     
     // تحميل الصفحة الافتراضية الأولى
     goToMushafPage(currentPageNumber);
@@ -378,7 +379,144 @@ function handleGiftReward() {
 
 // إتاحة التنقل لصفحة المصحف من خارج الملف (لقسم الختمة القرآنية)
 window.goToQuranPage = function(pageNumber) {
-    if (typeof loadPage === "function") {
-        loadPage(pageNumber);
+    if (typeof goToMushafPage === "function") {
+        goToMushafPage(pageNumber);
     }
 };
+
+/* ==========================================================================
+   نافذة التفسير الميسر لصفحة المصحف الشريف
+   ========================================================================== */
+let currentTafsirFontSize = 1.1;
+
+function initTafsirModal() {
+    const modal = document.getElementById("tafsir-modal");
+    const btnOpen = document.getElementById("btn-page-tafsir");
+    const btnClose = document.getElementById("btn-close-tafsir-modal");
+    const btnZoomIn = document.getElementById("btn-zoom-in");
+    const btnZoomOut = document.getElementById("btn-zoom-out");
+    const contentBox = document.getElementById("tafsir-content-box");
+
+    if (btnOpen) {
+        btnOpen.addEventListener("click", () => {
+            openTafsirModal();
+        });
+    }
+
+    if (btnClose && modal) {
+        btnClose.addEventListener("click", () => modal.classList.remove("open"));
+    }
+
+    if (modal) {
+        modal.addEventListener("click", (e) => {
+            if (e.target === modal) modal.classList.remove("open");
+        });
+    }
+
+    if (btnZoomIn && contentBox) {
+        btnZoomIn.addEventListener("click", () => {
+            if (currentTafsirFontSize < 1.6) {
+                currentTafsirFontSize += 0.1;
+                contentBox.style.fontSize = `${currentTafsirFontSize}rem`;
+            }
+        });
+    }
+
+    if (btnZoomOut && contentBox) {
+        btnZoomOut.addEventListener("click", () => {
+            if (currentTafsirFontSize > 0.85) {
+                currentTafsirFontSize -= 0.1;
+                contentBox.style.fontSize = `${currentTafsirFontSize}rem`;
+            }
+        });
+    }
+}
+
+function openTafsirModal() {
+    const modal = document.getElementById("tafsir-modal");
+    const titleEl = document.getElementById("tafsir-modal-title");
+    const pageBadge = document.getElementById("tafsir-page-badge");
+    const contentBox = document.getElementById("tafsir-content-box");
+
+    if (!modal || !contentBox) return;
+
+    modal.classList.add("open");
+    if (pageBadge) pageBadge.textContent = `صفحة ${currentPageNumber}`;
+    if (titleEl) {
+        const surahInfo = findSurahForPage(currentPageNumber);
+        titleEl.textContent = `التفسير الميسر - ${surahInfo ? 'سورة ' + surahInfo.name : ''}`;
+    }
+
+    loadTafsirForPage(currentPageNumber);
+}
+
+function loadTafsirForPage(pageNum) {
+    const contentBox = document.getElementById("tafsir-content-box");
+    if (!contentBox) return;
+
+    const cacheKey = `tafsir_cache_p${pageNum}`;
+    const cached = localStorage.getItem(cacheKey);
+    if (cached) {
+        try {
+            const data = JSON.parse(cached);
+            renderTafsirData(data);
+            return;
+        } catch(e) {}
+    }
+
+    contentBox.innerHTML = `
+        <div class="tafsir-loader">
+            <i class="fa-solid fa-spinner fa-spin fa-2x"></i>
+            <span>جاري جلب التفسير الميسر لصفحة ${pageNum}...</span>
+        </div>
+    `;
+
+    fetch(`https://api.alquran.cloud/v1/page/${pageNum}/ar.muyassar`)
+        .then(res => res.json())
+        .then(result => {
+            if (result && result.code === 200 && result.data && result.data.ayahs) {
+                localStorage.setItem(cacheKey, JSON.stringify(result.data.ayahs));
+                renderTafsirData(result.data.ayahs);
+            } else {
+                contentBox.innerHTML = `
+                    <div style="text-align: center; padding: 2rem; color: var(--gold-300);">
+                        <i class="fa-solid fa-triangle-exclamation fa-2x"></i>
+                        <p style="margin-top: 1rem;">تعذر جلب التفسير حالياً، يرجى التأكد من اتصال الإنترنت والمحاولة مرة أخرى.</p>
+                    </div>
+                `;
+            }
+        })
+        .catch(() => {
+            contentBox.innerHTML = `
+                <div style="text-align: center; padding: 2rem; color: var(--gold-300);">
+                    <i class="fa-solid fa-triangle-exclamation fa-2x"></i>
+                    <p style="margin-top: 1rem;">تعذر جلب التفسير حالياً، يرجى المحاولة لاحقاً.</p>
+                </div>
+            `;
+        });
+}
+
+function renderTafsirData(ayahs) {
+    const contentBox = document.getElementById("tafsir-content-box");
+    if (!contentBox) return;
+
+    if (!ayahs || ayahs.length === 0) {
+        contentBox.innerHTML = "<p>لا يوجد تفسير متاح لهذه الصفحة.</p>";
+        return;
+    }
+
+    contentBox.innerHTML = "";
+    ayahs.forEach(item => {
+        const div = document.createElement("div");
+        div.className = "tafsir-ayah-item";
+        div.innerHTML = `
+            <div class="tafsir-ayah-header">
+                <span class="ayah-badge">الآية ${item.numberInSurah}</span>
+                <span class="ayah-quran-text">${item.surah ? 'سورة ' + item.surah.name : ''}</span>
+            </div>
+            <div class="ayah-tafsir-text">${item.text}</div>
+        `;
+        contentBox.appendChild(div);
+    });
+}
+

@@ -26,6 +26,8 @@
 
     <meta name="theme-color" content="#070d18">
     <link rel="manifest" href="manifest.json">
+    <link rel="icon" type="image/svg+xml" href="assets/icon.svg">
+    <link rel="apple-touch-icon" href="assets/icon.svg">
 
     <!-- الخطوط العربية (Google Fonts) -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -54,14 +56,20 @@
             <ul class="nav-links">
                 <li><a href="#hero" class="active">الرئيسية</a></li>
                 <li><a href="#khatma">ختمة القرآن</a></li>
+                <li><a href="#prayer-times">مواقيت الصلاة</a></li>
                 <li><a href="#prayers">أدعية الزوار</a></li>
                 <li><a href="#tasbeeh">السبحة</a></li>
                 <li><a href="#azkar">أذكار اليوم</a></li>
                 <li><a href="#quran-reader">المصحف الشريف</a></li>
+                <li><a href="#cemetery-guide">آداب المقابر</a></li>
                 <li><a href="#quran">فضل الصدقة</a></li>
             </ul>
 
             <div class="nav-actions">
+                <button id="btn-install-app" class="btn btn-install-pwa" style="display: none;" title="تثبيت التطبيق على جهازك">
+                    <i class="fa-solid fa-mobile-screen-button"></i>
+                    <span>تثبيت التطبيق</span>
+                </button>
                 <button id="btn-toggle-radio-nav" class="btn btn-outline" title="إذاعة القرآن الكريم">
                     <i class="fa-solid fa-tower-broadcast"></i>
                     <span>الإذاعة</span>
@@ -113,11 +121,15 @@
                 <div class="prayer-action-row">
                     <button class="btn btn-gold btn-open-prayer-modal">
                         <i class="fa-solid fa-pen-fancy"></i>
-                        <span>اكتب دعاءً في ميزان حسناته</span>
+                        <span>اكتب دعاءً لروحه</span>
+                    </button>
+                    <button class="btn btn-outline" id="btn-open-dua-card">
+                        <i class="fa-solid fa-image text-gold"></i>
+                        <span>تصميم بطاقة دعاء</span>
                     </button>
                     <button class="btn btn-outline btn-share-whatsapp">
                         <i class="fa-brands fa-whatsapp" style="color: #25D366;"></i>
-                        <span>مشاركة عبر واتساب</span>
+                        <span>واتساب</span>
                     </button>
                     <button class="btn btn-outline btn-copy-link">
                         <i class="fa-solid fa-link"></i>
@@ -218,6 +230,93 @@
 
                 <div class="khatma-grid" id="khatma-grid-container">
                     <!-- يُنشأ برمجياً من js/app.js -->
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==========================================
+         قسم مواقيت الصلاة وساعة الاستجابة (Prayer Times Section)
+         ========================================== -->
+    <section id="prayer-times" class="prayer-times-section">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-tag"><i class="fa-solid fa-mosque"></i> صلواتك بركة ونور</span>
+                <h2 class="section-title">مواقيت الصلاة وساعة الاستجابة</h2>
+                <p class="section-desc">
+                    أفضل أوقات استجابة الدعاء دبر الصلوات المكتوبة، وبين الأذان والإقامة، وفي الثلث الأخير من الليل.
+                </p>
+            </div>
+
+            <!-- بنر ساعة الاستجابة الذكي (يوم الجمعة / الثلث الأخير) -->
+            <div class="response-hour-banner" id="response-hour-banner" style="display: none;">
+                <div class="banner-icon"><i class="fa-solid fa-star-and-crescent"></i></div>
+                <div class="banner-content">
+                    <h4 class="banner-title" id="response-banner-title">🕌 فضل يوم الجمعة وساعة الاستجابة</h4>
+                    <p class="banner-text" id="response-banner-text">
+                        خير يوم طلعت عليه الشمس؛ لا تنسَ قراءة سورة الكهف، والإكثار من الصلاة على النبي ﷺ، واغتنام ساعة الاستجابة بالدعاء لفقيدنا الغالي.
+                    </p>
+                </div>
+            </div>
+
+            <!-- بطاقة التحكم والعد التنازلي لمواقيت الصلاة -->
+            <div class="prayer-times-card">
+                <div class="prayer-times-meta">
+                    <div class="prayer-location-selector">
+                        <i class="fa-solid fa-location-dot text-gold"></i>
+                        <label for="select-prayer-city" class="sr-only">اختر المدينة:</label>
+                        <select id="select-prayer-city" class="prayer-city-select">
+                            <option value="Cairo" selected>القاهرة (مصر)</option>
+                            <option value="Alexandria">الإسكندرية (مصر)</option>
+                            <option value="Giza">الجيزة (مصر)</option>
+                            <option value="Mansoura">المنصورة (الدقهلية)</option>
+                            <option value="Tanta">طنطا (الغربية)</option>
+                            <option value="Zagazig">الزقازيق (الشرقية)</option>
+                            <option value="Assiut">أسيوط (مصر)</option>
+                            <option value="Makkah">مكة المكرمة (السعودية)</option>
+                            <option value="Madinah">المدينة المنورة (السعودية)</option>
+                            <option value="Riyadh">الرياض (السعودية)</option>
+                        </select>
+                    </div>
+
+                    <div class="prayer-next-countdown">
+                        <span class="countdown-label">الصلاة القادمة: <strong id="next-prayer-name">جاري الحساب...</strong></span>
+                        <span class="countdown-badge" id="next-prayer-timer">--:--:--</span>
+                    </div>
+                </div>
+
+                <!-- شبكة أوقات الصلوات الخمس والشروق -->
+                <div class="prayer-times-grid" id="prayer-times-grid">
+                    <div class="prayer-time-item" id="prayer-fajr">
+                        <span class="prayer-name">الفجر</span>
+                        <span class="prayer-time" id="time-fajr">--:--</span>
+                        <span class="prayer-status-label"></span>
+                    </div>
+                    <div class="prayer-time-item" id="prayer-sunrise">
+                        <span class="prayer-name">الشروق</span>
+                        <span class="prayer-time" id="time-sunrise">--:--</span>
+                        <span class="prayer-status-label"></span>
+                    </div>
+                    <div class="prayer-time-item" id="prayer-dhuhr">
+                        <span class="prayer-name">الظهر</span>
+                        <span class="prayer-time" id="time-dhuhr">--:--</span>
+                        <span class="prayer-status-label"></span>
+                    </div>
+                    <div class="prayer-time-item" id="prayer-asr">
+                        <span class="prayer-name">العصر</span>
+                        <span class="prayer-time" id="time-asr">--:--</span>
+                        <span class="prayer-status-label"></span>
+                    </div>
+                    <div class="prayer-time-item" id="prayer-maghrib">
+                        <span class="prayer-name">المغرب</span>
+                        <span class="prayer-time" id="time-maghrib">--:--</span>
+                        <span class="prayer-status-label"></span>
+                    </div>
+                    <div class="prayer-time-item" id="prayer-isha">
+                        <span class="prayer-name">العشاء</span>
+                        <span class="prayer-time" id="time-isha">--:--</span>
+                        <span class="prayer-status-label"></span>
+                    </div>
                 </div>
             </div>
         </div>
@@ -427,6 +526,10 @@
                     <div class="mushaf-surah-title" id="quran-surah-title">سُورَةُ المُلْكِ</div>
                     <div class="mushaf-verses-count" id="quran-verses-count">الجزء ٢٩ • صفحة ٥٦٢ من ٦٠٤</div>
                     <div class="mushaf-audio-control">
+                        <button type="button" class="btn btn-outline" id="btn-page-tafsir" title="تفسير الصفحة الحالية">
+                            <i class="fa-solid fa-book-open text-gold"></i>
+                            <span>تفسير الصفحة</span>
+                        </button>
                         <button type="button" class="btn btn-outline" id="btn-surah-audio">
                             <i class="fa-solid fa-volume-high"></i>
                             <span>استماع للتلاوة</span>
@@ -544,6 +647,74 @@
     </section>
 
     <!-- ==========================================
+         قسم دليل وآداب زيارة القبور (Cemetery Etiquette & Sadaqah Guide)
+         ========================================== -->
+    <section id="cemetery-guide" class="cemetery-guide-section">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-tag"><i class="fa-solid fa-monument"></i> سنّة نبوية وهدي قويم</span>
+                <h2 class="section-title">دليل وآداب زيارة القبور للمتوفى</h2>
+                <p class="section-desc">
+                    زيارة القبور تذكّر بالآخرة، وترقق القلوب، وينتفع بها الميت بالدعاء له والاستغفار وطلب الرحمة لروحه.
+                </p>
+            </div>
+
+            <!-- بطاقة دعاء دخول المقابر النبوي العظيم -->
+            <div class="cemetery-dua-featured-card">
+                <div class="cemetery-dua-tag">
+                    <i class="fa-solid fa-quote-right text-gold"></i>
+                    <span>ما يقوله المسلم عند دخول المقابر:</span>
+                </div>
+                <div class="cemetery-dua-text">
+                    "السَّلامُ عَلَيْكُمْ دَارَ قَوْمٍ مُؤْمِنِينَ، وَإِنَّا إِنْ شَاءَ اللَّهُ بِكُمْ لاحِقُونَ، نَسْأَلُ اللَّهَ لَنَا وَلَكُمُ الْعَافِيَةَ، يَرْحَمُ اللَّهُ الْمُسْتَقْدِمِينَ مِنَّا وَالْمُسْتَأْخِرِينَ"
+                </div>
+                <div class="cemetery-dua-actions">
+                    <button type="button" class="btn btn-outline" id="btn-copy-cemetery-dua">
+                        <i class="fa-solid fa-copy"></i>
+                        <span>نسخ دعاء المقابر</span>
+                    </button>
+                    <span class="cemetery-dua-narrator">رواه مسلم عن بريدة رضي الله عنه</span>
+                </div>
+            </div>
+
+            <!-- شبكة آداب الزيارة وما يصل للميت -->
+            <div class="cemetery-guide-grid">
+                <div class="cemetery-card">
+                    <div class="cemetery-card-icon"><i class="fa-solid fa-hands-holding-circle"></i></div>
+                    <h3 class="cemetery-card-title">ما يصل ثوابه للميت بإجماع العلماء</h3>
+                    <ul class="cemetery-list">
+                        <li><strong>الدعاء والاستغفار:</strong> أنفع ما يقدمه الحي للميت، ويرفع درجته في الجنة.</li>
+                        <li><strong>الصدقة الجارية:</strong> كإطعام الطعام، حفر الآبار، طباعة المصاحف، وبناء المساجد.</li>
+                        <li><strong>الحج والعمرة عنه:</strong> لمن حج واعتمر عن نفسه أولاً.</li>
+                        <li><strong>قضاء ديونه ونذوره:</strong> إبراء لذمته وتخفيف عنه.</li>
+                    </ul>
+                </div>
+
+                <div class="cemetery-card">
+                    <div class="cemetery-card-icon"><i class="fa-solid fa-circle-check"></i></div>
+                    <h3 class="cemetery-card-title">آداب الزيارة الشرعية المستحبة</h3>
+                    <ul class="cemetery-list">
+                        <li><strong>إخلاص النية:</strong> للاتعاظ وتذكر الآخرة والإحسان للميت بالدعاء.</li>
+                        <li><strong>إلقاء السلام:</strong> على أهل القبور كما ورد في السنة.</li>
+                        <li><strong>استقبال القبلة:</strong> عند الدعاء للميت والتضرع ورفع اليدين.</li>
+                        <li><strong>الدعاء بثباته ومغفرته:</strong> وسؤال الفسحة والنور له في قبره.</li>
+                    </ul>
+                </div>
+
+                <div class="cemetery-card">
+                    <div class="cemetery-card-icon"><i class="fa-solid fa-triangle-exclamation text-gold"></i></div>
+                    <h3 class="cemetery-card-title">تنبيهات ومخالفات يجب اجتنابها</h3>
+                    <ul class="cemetery-list">
+                        <li><strong>عدم الجلوس أو المشي فوق القبور:</strong> لنهي النبي ﷺ الصريح عن ذلك تعظيماً للمسلم.</li>
+                        <li><strong>اجتناب النياحة وشق الجيوب:</strong> والرضا بقضاء الله وقدره واحتساب الصبر.</li>
+                        <li><strong>الدعاء للميت لا دعاء الميت:</strong> فالميت فقير إلى رحمة ربه ودعائكم له.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==========================================
          نافذة كتابة دعاء (Modal Form)
          ========================================== -->
     <div class="modal-overlay" id="add-prayer-modal">
@@ -607,6 +778,118 @@
                     </button>
                 </div>
             </form>
+        </div>
+    </div>
+
+    <!-- ==========================================
+         نافذة صانع بطاقات الأدعية المصورة (Dua Card Generator Modal)
+         ========================================== -->
+    <div class="modal-overlay" id="dua-card-modal">
+        <div class="modal-card modal-card-wide">
+            <button class="modal-close-btn" id="btn-close-dua-card-modal" aria-label="إغلاق">&times;</button>
+            <h3 class="modal-title">صانع بطاقات الأدعية للمشاركة 🖼️✨</h3>
+            <p class="modal-desc">
+                اختر أو اكتب دعاءً لروح جدي الغالي، واحفظه كصورة إسلامية راقية لنشرها في حالات واتساب أو ستوري.
+            </p>
+
+            <div class="dua-card-creator-layout">
+                <!-- لوحة التحكم بالاختيارات -->
+                <div class="dua-creator-controls">
+                    <div class="form-group">
+                        <label class="form-label" for="dua-template-select">اختر دعاءً مأثوراً جاهزاً:</label>
+                        <select id="dua-template-select" class="form-input">
+                            <option value="اللهم اغفر له وارحمه، وعافه واعف عنه، وأكرم نزله، ووسع مدخله، واغسله بالماء والثلج والبرد، ونقه من الذنوب والخطايا كما ينقى الثوب الأبيض من الدنس.">اللهم اغفر له وارحمه وعافه واعف عنه...</option>
+                            <option value="اللهم اجعل قبره روضة من رياض الجنة، ولا تجعله حفرة من حفر النار، وافسح له في قبره مد بصره، وافرش قبره من فراش الجنة.">اللهم اجعل قبره روضة من رياض الجنة...</option>
+                            <option value="اللهم يَمِّن كتابه، ويَسِّر حسابه، وثَقِّل بالحسنات ميزانه، وثَبِّت على الصراط أقدامه، وأسكنه في أعلى الجنات بجوار حبيبك ومصطفاك ﷺ.">اللهم يمن كتابه ويسر حسابه...</option>
+                            <option value="اللهم أبدله داراً خيراً من داره، وأهلاً خيراً من أهله، وأدخله الجنة، وأعذه من عذاب القبر ومن عذاب النار يا أرحم الراحمين.">اللهم أبدله داراً خيراً من داره...</option>
+                            <option value="اللهم إنه كان يشهد أنك لا إله إلا أنت، وأن محمداً عبدك ورسولك، وأنت أعلم به، فارحمه برحمتك التي وسعت كل شيء.">اللهم إنه كان يشهد أنك لا إله إلا أنت...</option>
+                            <option value="custom">✏️ كتابة دعاء مخصص بقلمك...</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group" id="custom-dua-group" style="display: none;">
+                        <label class="form-label" for="custom-dua-input">اكتب نص الدعاء المخصص:</label>
+                        <textarea id="custom-dua-input" class="form-textarea" placeholder="اكتب دعاءك هنا بصدق..."></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">اختر السمة واللون المفضل للبطاقة:</label>
+                        <div class="dua-theme-pills">
+                            <button type="button" class="theme-pill active" data-theme="royal-navy">
+                                <span class="theme-color-dot" style="background: #0b172a; border: 1px solid #d4af37;"></span>
+                                <span>الملكي الكحلي 🌙</span>
+                            </button>
+                            <button type="button" class="theme-pill" data-theme="emerald">
+                                <span class="theme-color-dot" style="background: #064e3b; border: 1px solid #34d399;"></span>
+                                <span>الزمردي 🌿</span>
+                            </button>
+                            <button type="button" class="theme-pill" data-theme="parchment">
+                                <span class="theme-color-dot" style="background: #fbf8ee; border: 1px solid #aa820a;"></span>
+                                <span>الرخامي 📜</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="dua-creator-actions">
+                        <button type="button" class="btn btn-gold" id="btn-download-dua-image">
+                            <i class="fa-solid fa-download"></i>
+                            <span>تحميل الصورة (PNG)</span>
+                        </button>
+                        <button type="button" class="btn btn-outline" id="btn-share-dua-image">
+                            <i class="fa-brands fa-whatsapp" style="color: #25D366;"></i>
+                            <span>مشاركة لواتساب</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- لوحة المعاينة الحية للبطاقة -->
+                <div class="dua-creator-preview">
+                    <div class="canvas-preview-wrapper">
+                        <canvas id="dua-card-canvas" width="1080" height="1350"></canvas>
+                    </div>
+                    <span class="preview-hint"><i class="fa-solid fa-arrows-rotate"></i> المعاينة تتحدث تلقائياً مع كل اختيار</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==========================================
+         نافذة التفسير الميسر لصفحة المصحف (Tafsir Modal)
+         ========================================== -->
+    <div class="modal-overlay" id="tafsir-modal">
+        <div class="modal-card modal-card-wide">
+            <div class="modal-header-row">
+                <div class="tafsir-header-meta">
+                    <h3 class="modal-title" id="tafsir-modal-title">التفسير الميسر</h3>
+                    <span class="tafsir-page-badge" id="tafsir-page-badge">صفحة ...</span>
+                </div>
+                <div class="tafsir-zoom-controls">
+                    <button type="button" class="btn-zoom" id="btn-zoom-in" title="تكبير الخط"><i class="fa-solid fa-magnifying-glass-plus"></i></button>
+                    <button type="button" class="btn-zoom" id="btn-zoom-out" title="تصغير الخط"><i class="fa-solid fa-magnifying-glass-minus"></i></button>
+                    <button class="modal-close-btn" id="btn-close-tafsir-modal" aria-label="إغلاق">&times;</button>
+                </div>
+            </div>
+
+            <div class="tafsir-content-box" id="tafsir-content-box">
+                <!-- يُملأ برمجياً من quran.js -->
+            </div>
+        </div>
+    </div>
+
+    <!-- بنر تثبيت التطبيق الذكي للهواتف (PWA Install Banner) -->
+    <div class="pwa-install-banner" id="pwa-install-banner" style="display: none;">
+        <div class="pwa-banner-icon">
+            <img src="assets/icon.svg" alt="أيقونة التطبيق" width="44" height="44">
+        </div>
+        <div class="pwa-banner-text">
+            <strong>تطبيق صدقة جارية على هاتفك</strong>
+            <span>ثبّت الموقع كتطبيق للوصول السريع للأدعية والسبحة بدون إنترنت</span>
+        </div>
+        <div class="pwa-banner-actions">
+            <button type="button" class="btn btn-gold btn-sm" id="btn-pwa-banner-install">
+                <span>تثبيت الآن</span>
+            </button>
+            <button type="button" class="pwa-close-btn" id="btn-pwa-banner-dismiss" aria-label="إغلاق">&times;</button>
         </div>
     </div>
 

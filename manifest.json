@@ -12,6 +12,12 @@
   "dir": "rtl",
   "icons": [
     {
+      "src": "assets/icon.svg",
+      "sizes": "192x192 512x512 any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    },
+    {
       "src": "assets/share-preview.jpg",
       "sizes": "1200x675",
       "type": "image/jpeg",

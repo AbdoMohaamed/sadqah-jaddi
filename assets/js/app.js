@@ -30,6 +30,15 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // 9. تهيئة تطبيق الهاتف التقدمي (PWA)
     initPWA();
+
+    // 10. تهيئة مواقيت الصلاة وساعة الاستجابة
+    initPrayerTimes();
+
+    // 11. تهيئة صانع بطاقات الأدعية المصورة
+    initDuaCardGenerator();
+
+    // 12. تهيئة دليل وآداب زيارة القبور
+    initCemeteryGuide();
 });
 
 /* ==========================================================================
@@ -1345,8 +1354,10 @@ function initLiveRadio() {
 }
 
 /* ==========================================================================
-   10. تطبيق الهاتف التقدمي (PWA Service Worker)
+   10. تطبيق الهاتف التقدمي (PWA & Offline Support)
    ========================================================================== */
+let deferredPrompt = null;
+
 function initPWA() {
     if ("serviceWorker" in navigator) {
         window.addEventListener("load", () => {
@@ -1357,7 +1368,620 @@ function initPWA() {
             });
         });
     }
+
+    const installBtn = document.getElementById("btn-install-app");
+    const banner = document.getElementById("pwa-install-banner");
+    const bannerInstallBtn = document.getElementById("btn-pwa-banner-install");
+    const bannerDismissBtn = document.getElementById("btn-pwa-banner-dismiss");
+
+    // التحقق من تثبيت التطبيق مسبقاً (وضع Standalone)
+    const isStandalone = window.matchMedia("(display-mode: standalone)").matches || window.navigator.standalone === true;
+    if (isStandalone) {
+        if (installBtn) installBtn.style.display = "none";
+        if (banner) banner.style.display = "none";
+        return;
+    }
+
+    // التقاط حدث التثبيت لمتصفحات أندرويد وكروم
+    window.addEventListener("beforeinstallprompt", (e) => {
+        e.preventDefault();
+        deferredPrompt = e;
+
+        if (installBtn) {
+            installBtn.style.display = "inline-flex";
+        }
+
+        const isDismissed = sessionStorage.getItem("pwa_banner_dismissed");
+        if (!isDismissed && banner) {
+            setTimeout(() => {
+                banner.style.display = "flex";
+            }, 3500);
+        }
+    });
+
+    const triggerInstall = () => {
+        if (deferredPrompt) {
+            deferredPrompt.prompt();
+            deferredPrompt.userChoice.then((choiceResult) => {
+                if (choiceResult.outcome === "accepted") {
+                    showToast("جزاكم الله خيراً! تم تثبيت تطبيق صدقة جارية بنجاح 🌿📱");
+                }
+                deferredPrompt = null;
+                if (banner) banner.style.display = "none";
+                if (installBtn) installBtn.style.display = "none";
+            });
+        } else {
+            const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+            if (isIOS) {
+                alert("لتثبيت التطبيق على هاتف الآيفون (iOS):\n\n1. اضغط على زر المشاركة ⎋ أسفل متصفح Safari.\n2. مرر القائمة للأسفل واختر 'إضافة إلى الصفحة الرئيسية ➕'.\n3. اضغط 'إضافة' بالأعلى وسيظهر التطبيق كأيقونة مستقلة على هاتفك.");
+            } else {
+                showToast("يمكنك تثبيت الموقع من قائمة المتصفح (⋮) -> 'تثبيت التطبيق' أو 'إضافة للشاشة الرئيسية'");
+            }
+        }
+    };
+
+    if (installBtn) {
+        installBtn.addEventListener("click", triggerInstall);
+    }
+    if (bannerInstallBtn) {
+        bannerInstallBtn.addEventListener("click", triggerInstall);
+    }
+    if (bannerDismissBtn && banner) {
+        bannerDismissBtn.addEventListener("click", () => {
+            banner.style.display = "none";
+            sessionStorage.setItem("pwa_banner_dismissed", "true");
+        });
+    }
+
+    window.addEventListener("appinstalled", () => {
+        if (installBtn) installBtn.style.display = "none";
+        if (banner) banner.style.display = "none";
+        deferredPrompt = null;
+    });
 }
+
+/* ==========================================================================
+   11. مواقيت الصلاة وساعة الاستجابة وتنبيهات يوم الجمعة (Prayer Times)
+   ========================================================================== */
+let prayerTimings = null;
+let prayerTimerInterval = null;
+
+const CITY_CONFIGS = {
+    Cairo: { city: "Cairo", country: "Egypt", method: 5 },
+    Alexandria: { city: "Alexandria", country: "Egypt", method: 5 },
+    Giza: { city: "Giza", country: "Egypt", method: 5 },
+    Mansoura: { city: "Mansoura", country: "Egypt", method: 5 },
+    Tanta: { city: "Tanta", country: "Egypt", method: 5 },
+    Zagazig: { city: "Zagazig", country: "Egypt", method: 5 },
+    Assiut: { city: "Assiut", country: "Egypt", method: 5 },
+    Makkah: { city: "Makkah", country: "Saudi Arabia", method: 4 },
+    Madinah: { city: "Medina", country: "Saudi Arabia", method: 4 },
+    Riyadh: { city: "Riyadh", country: "Saudi Arabia", method: 4 }
+};
+
+// مواقيت افتراضية احتياطية (في حال انقطاع الإنترنت التام)
+const FALLBACK_PRAYER_TIMES = {
+    Fajr: "04:30",
+    Sunrise: "05:52",
+    Dhuhr: "11:46",
+    Asr: "15:10",
+    Maghrib: "17:40",
+    Isha: "18:58"
+};
+
+function initPrayerTimes() {
+    const citySelect = document.getElementById("select-prayer-city");
+    const savedCity = localStorage.getItem("selected_prayer_city") || "Cairo";
+
+    if (citySelect) {
+        citySelect.value = savedCity;
+        citySelect.addEventListener("change", (e) => {
+            const city = e.target.value;
+            localStorage.setItem("selected_prayer_city", city);
+            fetchPrayerTimes(city);
+        });
+    }
+
+    checkSpecialTimesNotice();
+    fetchPrayerTimes(savedCity);
+}
+
+function checkSpecialTimesNotice() {
+    const banner = document.getElementById("response-hour-banner");
+    const titleEl = document.getElementById("response-banner-title");
+    const textEl = document.getElementById("response-banner-text");
+    if (!banner || !titleEl || !textEl) return;
+
+    const now = new Date();
+    const dayOfWeek = now.getDay(); // 5 = الجمعة
+    const currentHour = now.getHours();
+
+    // 1. يوم الجمعة
+    if (dayOfWeek === 5) {
+        banner.style.display = "flex";
+        titleEl.textContent = "🕌 فضل يوم الجمعة وساعة الاستجابة";
+        textEl.textContent = "خير يوم طلعت عليه الشمس؛ لا تنسَ قراءة سورة الكهف، والإكثار من الصلاة على النبي ﷺ، واغتنام ساعة الاستجابة بالدعاء لفقيدنا الغالي.";
+    } 
+    // 2. الثلث الأخير من الليل (بين 2:00 صباحاً والفجر)
+    else if (currentHour >= 2 && currentHour < 5) {
+        banner.style.display = "flex";
+        titleEl.textContent = "✨ نسائم السحر والثلث الأخير من الليل";
+        textEl.textContent = "ينزل ربنا تبارك وتعالى إلى السماء الدنيا ويقول: 'هل من داعٍ فأستجيب له؟'... اذكروا فقيدنا الحبيب في هذه اللحظات المباركة بدعوة تضيء قبره.";
+    } 
+    else {
+        banner.style.display = "none";
+    }
+}
+
+function fetchPrayerTimes(cityKey) {
+    const config = CITY_CONFIGS[cityKey] || CITY_CONFIGS["Cairo"];
+    const cacheKey = `prayer_times_${cityKey}_${new Date().toISOString().slice(0, 10)}`;
+    const cached = localStorage.getItem(cacheKey);
+
+    if (cached) {
+        try {
+            prayerTimings = JSON.parse(cached);
+            renderPrayerTimesUI(prayerTimings);
+            startPrayerCountdown();
+            return;
+        } catch(e) {}
+    }
+
+    const url = `https://api.aladhan.com/v1/timingsByCity?city=${encodeURIComponent(config.city)}&country=${encodeURIComponent(config.country)}&method=${config.method}`;
+
+    fetch(url)
+        .then(res => res.json())
+        .then(result => {
+            if (result && result.code === 200 && result.data && result.data.timings) {
+                prayerTimings = result.data.timings;
+                localStorage.setItem(cacheKey, JSON.stringify(prayerTimings));
+                renderPrayerTimesUI(prayerTimings);
+                startPrayerCountdown();
+            } else {
+                useFallbackTimings();
+            }
+        })
+        .catch(() => {
+            useFallbackTimings();
+        });
+}
+
+function useFallbackTimings() {
+    prayerTimings = FALLBACK_PRAYER_TIMES;
+    renderPrayerTimesUI(prayerTimings);
+    startPrayerCountdown();
+}
+
+function renderPrayerTimesUI(timings) {
+    const formatTime = (timeStr) => {
+        if (!timeStr) return "--:--";
+        const clean = timeStr.split(" ")[0]; // إزالة المنطقة الزمنية إذا وجدت
+        const [h, m] = clean.split(":").map(Number);
+        const period = h >= 12 ? "م" : "ص";
+        const formattedHour = h % 12 || 12;
+        return `${formattedHour}:${String(m).padStart(2, "0")} ${period}`;
+    };
+
+    const setTime = (id, time) => {
+        const el = document.getElementById(id);
+        if (el) el.textContent = formatTime(time);
+    };
+
+    setTime("time-fajr", timings.Fajr);
+    setTime("time-sunrise", timings.Sunrise);
+    setTime("time-dhuhr", timings.Dhuhr);
+    setTime("time-asr", timings.Asr);
+    setTime("time-maghrib", timings.Maghrib);
+    setTime("time-isha", timings.Isha);
+}
+
+function startPrayerCountdown() {
+    if (prayerTimerInterval) clearInterval(prayerTimerInterval);
+
+    const updateCountdown = () => {
+        if (!prayerTimings) return;
+
+        const now = new Date();
+        const prayersList = [
+            { name: "الفجر", key: "fajr", time: prayerTimings.Fajr },
+            { name: "الشروق", key: "sunrise", time: prayerTimings.Sunrise },
+            { name: "الظهر", key: "dhuhr", time: prayerTimings.Dhuhr },
+            { name: "العصر", key: "asr", time: prayerTimings.Asr },
+            { name: "المغرب", key: "maghrib", time: prayerTimings.Maghrib },
+            { name: "العشاء", key: "isha", time: prayerTimings.Isha }
+        ];
+
+        let nextPrayer = null;
+        let nextPrayerDate = null;
+
+        for (const p of prayersList) {
+            const [h, m] = p.time.split(" ")[0].split(":").map(Number);
+            const pDate = new Date(now.getFullYear(), now.getMonth(), now.getDate(), h, m, 0);
+
+            if (pDate > now) {
+                nextPrayer = p;
+                nextPrayerDate = pDate;
+                break;
+            }
+        }
+
+        // إذا انتهت صلوات اليوم كلها، فالصلاة القادمة فجر الغد
+        if (!nextPrayer) {
+            nextPrayer = prayersList[0];
+            const [h, m] = prayersList[0].time.split(" ")[0].split(":").map(Number);
+            nextPrayerDate = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1, h, m, 0);
+        }
+
+        // إبراز بطاقة الصلاة القادمة
+        document.querySelectorAll(".prayer-time-item").forEach(item => {
+            item.classList.remove("is-next");
+            const statusLabel = item.querySelector(".prayer-status-label");
+            if (statusLabel) statusLabel.textContent = "";
+        });
+
+        const activeCard = document.getElementById(`prayer-${nextPrayer.key}`);
+        if (activeCard) {
+            activeCard.classList.add("is-next");
+            const statusLabel = activeCard.querySelector(".prayer-status-label");
+            if (statusLabel) statusLabel.textContent = "الصلاة القادمة";
+        }
+
+        // تحديث العداد
+        const diffMs = nextPrayerDate - now;
+        const totalSecs = Math.max(0, Math.floor(diffMs / 1000));
+        const hours = Math.floor(totalSecs / 3600);
+        const mins = Math.floor((totalSecs % 3600) / 60);
+        const secs = totalSecs % 60;
+
+        const nameEl = document.getElementById("next-prayer-name");
+        const timerEl = document.getElementById("next-prayer-timer");
+
+        if (nameEl) nameEl.textContent = nextPrayer.name;
+        if (timerEl) {
+            timerEl.textContent = `${String(hours).padStart(2, "0")}:${String(mins).padStart(2, "0")}:${String(secs).padStart(2, "0")}`;
+        }
+    };
+
+    updateCountdown();
+    prayerTimerInterval = setInterval(updateCountdown, 1000);
+}
+
+/* ==========================================================================
+   12. صانع بطاقات الأدعية المصورة (Dua Card Image Generator)
+   ========================================================================== */
+let currentDuaTheme = "royal-navy";
+
+function initDuaCardGenerator() {
+    const modal = document.getElementById("dua-card-modal");
+    const openBtns = [
+        document.getElementById("btn-open-dua-card"),
+        document.getElementById("btn-open-dua-card-hero")
+    ];
+    const closeBtn = document.getElementById("btn-close-dua-card-modal");
+    const selectTemplate = document.getElementById("dua-template-select");
+    const customGroup = document.getElementById("custom-dua-group");
+    const customInput = document.getElementById("custom-dua-input");
+    const themePills = document.querySelectorAll(".theme-pill");
+    const downloadBtn = document.getElementById("btn-download-dua-image");
+    const shareBtn = document.getElementById("btn-share-dua-image");
+
+    openBtns.forEach(btn => {
+        if (btn) {
+            btn.addEventListener("click", () => {
+                if (modal) modal.classList.add("open");
+                drawDuaCard();
+            });
+        }
+    });
+
+    if (closeBtn && modal) {
+        closeBtn.addEventListener("click", () => modal.classList.remove("open"));
+    }
+
+    if (modal) {
+        modal.addEventListener("click", (e) => {
+            if (e.target === modal) modal.classList.remove("open");
+        });
+    }
+
+    if (selectTemplate) {
+        selectTemplate.addEventListener("change", (e) => {
+            if (e.target.value === "custom") {
+                if (customGroup) customGroup.style.display = "block";
+            } else {
+                if (customGroup) customGroup.style.display = "none";
+            }
+            drawDuaCard();
+        });
+    }
+
+    if (customInput) {
+        customInput.addEventListener("input", () => {
+            drawDuaCard();
+        });
+    }
+
+    themePills.forEach(pill => {
+        pill.addEventListener("click", () => {
+            themePills.forEach(p => p.classList.remove("active"));
+            pill.classList.add("active");
+            currentDuaTheme = pill.dataset.theme || "royal-navy";
+            drawDuaCard();
+        });
+    });
+
+    if (downloadBtn) {
+        downloadBtn.addEventListener("click", downloadDuaCardImage);
+    }
+
+    if (shareBtn) {
+        shareBtn.addEventListener("click", shareDuaCardImage);
+    }
+}
+
+function getSelectedDuaText() {
+    const select = document.getElementById("dua-template-select");
+    const custom = document.getElementById("custom-dua-input");
+    if (select && select.value === "custom" && custom && custom.value.trim()) {
+        return custom.value.trim();
+    }
+    if (select && select.value && select.value !== "custom") {
+        return select.value;
+    }
+    return "اللهم اغفر له وارحمه، وعافه واعف عنه، وأكرم نزله، ووسع مدخله، واغسله بالماء والثلج والبرد، ونقه من الذنوب والخطايا كما ينقى الثوب الأبيض من الدنس.";
+}
+
+function drawDuaCard() {
+    const canvas = document.getElementById("dua-card-canvas");
+    if (!canvas) return;
+    const ctx = canvas.getContext("2d");
+    const width = 1080;
+    const height = 1350;
+    canvas.width = width;
+    canvas.height = height;
+
+    const duaText = getSelectedDuaText();
+    const deceasedName = (typeof DECEASED_INFO !== "undefined" && DECEASED_INFO.name) ? DECEASED_INFO.name : "عبدالمعبود أمين سعيد";
+
+    // 1. رسم الخلفية
+    if (currentDuaTheme === "emerald") {
+        const bg = ctx.createRadialGradient(width / 2, height * 0.4, 100, width / 2, height / 2, 850);
+        bg.addColorStop(0, "#0a4736");
+        bg.addColorStop(0.7, "#04241b");
+        bg.addColorStop(1, "#02130e");
+        ctx.fillStyle = bg;
+    } else if (currentDuaTheme === "parchment") {
+        const bg = ctx.createLinearGradient(0, 0, width, height);
+        bg.addColorStop(0, "#fbf8ee");
+        bg.addColorStop(0.5, "#f3ecd7");
+        bg.addColorStop(1, "#e6dac0");
+        ctx.fillStyle = bg;
+    } else {
+        // Royal Navy
+        const bg = ctx.createRadialGradient(width / 2, height * 0.35, 120, width / 2, height / 2, 880);
+        bg.addColorStop(0, "#12233f");
+        bg.addColorStop(0.7, "#071224");
+        bg.addColorStop(1, "#030812");
+        ctx.fillStyle = bg;
+    }
+    ctx.fillRect(0, 0, width, height);
+
+    // 2. تدرج الذهب للإطارات والزخارف
+    const goldGrad = ctx.createLinearGradient(100, 100, width - 100, height - 100);
+    goldGrad.addColorStop(0, "#fce38a");
+    goldGrad.addColorStop(0.4, "#d4af37");
+    goldGrad.addColorStop(0.8, "#aa820a");
+    goldGrad.addColorStop(1, "#f3d179");
+
+    // 3. الإطار الإسلامي الخارجي المزدوج
+    ctx.save();
+    ctx.strokeStyle = goldGrad;
+    ctx.lineWidth = 6;
+    ctx.strokeRect(50, 50, width - 100, height - 100);
+
+    ctx.lineWidth = 2;
+    ctx.strokeRect(70, 70, width - 140, height - 140);
+
+    // زوايا مزخرفة
+    const cornerSize = 45;
+    const corners = [
+        [50, 50, 1, 1],
+        [width - 50, 50, -1, 1],
+        [50, height - 50, 1, -1],
+        [width - 50, height - 50, -1, -1]
+    ];
+    ctx.lineWidth = 4;
+    corners.forEach(([cx, cy, dx, dy]) => {
+        ctx.beginPath();
+        ctx.moveTo(cx + dx * cornerSize, cy);
+        ctx.lineTo(cx, cy);
+        ctx.lineTo(cx, cy + dy * cornerSize);
+        ctx.stroke();
+
+        ctx.fillStyle = goldGrad;
+        ctx.beginPath();
+        ctx.arc(cx + dx * 28, cy + dy * 28, 5, 0, Math.PI * 2);
+        ctx.fill();
+    });
+    ctx.restore();
+
+    // 4. البسملة والترويسة العلوية
+    ctx.save();
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+
+    ctx.fillStyle = currentDuaTheme === "parchment" ? "#8a6d1a" : "#d4af37";
+    ctx.font = "bold 34px 'Amiri', serif";
+    ctx.fillText("بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ", width / 2, 140);
+
+    // زخرفة علوية
+    ctx.fillStyle = goldGrad;
+    ctx.beginPath();
+    ctx.arc(width / 2, 195, 6, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.strokeStyle = goldGrad;
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(width / 2 - 140, 195);
+    ctx.lineTo(width / 2 - 25, 195);
+    ctx.moveTo(width / 2 + 25, 195);
+    ctx.lineTo(width / 2 + 140, 195);
+    ctx.stroke();
+
+    // عبارة الصدقة الجارية
+    ctx.fillStyle = currentDuaTheme === "parchment" ? "#6b5413" : "#e2d2a2";
+    ctx.font = "26px 'Tajawal', sans-serif";
+    ctx.fillText("صَدَقَةٌ جَارِيَةٌ وَدُعَاءٌ لِرُوحِ فَقِيدِنَا الغَالِي", width / 2, 245);
+
+    // اسم الفقيد بالفخامة الذهبية
+    ctx.fillStyle = currentDuaTheme === "parchment" ? "#2a1f05" : "#ffffff";
+    ctx.font = "bold 46px 'Amiri', serif";
+    ctx.shadowColor = currentDuaTheme === "parchment" ? "rgba(0,0,0,0.1)" : "rgba(212, 175, 55, 0.4)";
+    ctx.shadowBlur = 12;
+    ctx.fillText(`( ${deceasedName} )`, width / 2, 305);
+    ctx.shadowBlur = 0;
+
+    ctx.fillStyle = currentDuaTheme === "parchment" ? "#855e09" : "#d4af37";
+    ctx.font = "italic 24px 'Amiri', serif";
+    ctx.fillText("تغمّده الله بواسع رحمته ومغفرته وأسكنه الفردوس الأعلى", width / 2, 360);
+    ctx.restore();
+
+    // خط فاصل علوي مزخرف
+    ctx.strokeStyle = "rgba(212, 175, 55, 0.4)";
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(180, 410);
+    ctx.lineTo(width - 180, 410);
+    ctx.stroke();
+
+    // 5. نص الدعاء في المنتصف
+    ctx.save();
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+
+    let fontSize = 48;
+    if (duaText.length > 200) fontSize = 38;
+    else if (duaText.length > 130) fontSize = 42;
+
+    ctx.font = `bold ${fontSize}px 'Amiri', serif`;
+    ctx.fillStyle = currentDuaTheme === "parchment" ? "#1a1303" : "#fbf0cd";
+    ctx.shadowColor = currentDuaTheme === "parchment" ? "rgba(0,0,0,0.05)" : "rgba(0, 0, 0, 0.7)";
+    ctx.shadowBlur = 10;
+
+    const maxWidth = width - 260;
+    const lineHeight = fontSize * 1.85;
+    const lines = wrapArabicText(ctx, `« ${duaText} »`, maxWidth);
+    
+    const blockHeight = lines.length * lineHeight;
+    const startY = 440 + (580 - blockHeight) / 2 + lineHeight / 2;
+
+    lines.forEach((line, index) => {
+        ctx.fillText(line, width / 2, startY + index * lineHeight);
+    });
+    ctx.restore();
+
+    // 6. الفاصل السفلي والشعار
+    ctx.strokeStyle = "rgba(212, 175, 55, 0.4)";
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(180, 1070);
+    ctx.lineTo(width - 180, 1070);
+    ctx.stroke();
+
+    // 7. تذييل البطاقة
+    ctx.save();
+    ctx.textAlign = "center";
+    ctx.fillStyle = currentDuaTheme === "parchment" ? "#6b5413" : "#d4af37";
+    ctx.font = "bold 26px 'Amiri', serif";
+    ctx.fillText("اللَّهُمَّ تَقَبَّلْ هَذَا الدُّعَاءَ وَاجْعَلْهُ نُوراً يَسْعَى بَيْنَ يَدَيْهِ فِي قَبْرِهِ", width / 2, 1130);
+
+    ctx.fillStyle = currentDuaTheme === "parchment" ? "#88703a" : "#94a3b8";
+    ctx.font = "22px 'Tajawal', sans-serif";
+    ctx.fillText("موقع صدقة جارية • شاركنا بالدعاء وختمة القرآن", width / 2, 1180);
+
+    // وسم ختامي
+    ctx.fillStyle = currentDuaTheme === "parchment" ? "#aa820a" : "#fce38a";
+    ctx.font = "bold 22px 'Tajawal', sans-serif";
+    ctx.fillText("🌿 انشرها ولك الأجر بإذن الله 🌿", width / 2, 1225);
+    ctx.restore();
+}
+
+function wrapArabicText(ctx, text, maxWidth) {
+    const words = text.split(" ");
+    const lines = [];
+    let currentLine = words[0];
+
+    for (let i = 1; i < words.length; i++) {
+        const word = words[i];
+        const width = ctx.measureText(currentLine + " " + word).width;
+        if (width < maxWidth) {
+            currentLine += " " + word;
+        } else {
+            lines.push(currentLine);
+            currentLine = word;
+        }
+    }
+    lines.push(currentLine);
+    return lines;
+}
+
+function downloadDuaCardImage() {
+    const canvas = document.getElementById("dua-card-canvas");
+    if (!canvas) return;
+
+    const link = document.createElement("a");
+    link.download = `dua-sadqah-jaddi-${Date.now()}.png`;
+    link.href = canvas.toDataURL("image/png");
+    link.click();
+    showToast("تم تحميل بطاقة الدعاء بنجاح! شاركها في حالات واتساب ولك الأجر 🌿🖼️");
+}
+
+function shareDuaCardImage() {
+    const canvas = document.getElementById("dua-card-canvas");
+    if (!canvas) return;
+
+    if (navigator.share && navigator.canShare) {
+        canvas.toBlob((blob) => {
+            if (!blob) return;
+            const file = new File([blob], "dua-card.png", { type: "image/png" });
+            if (navigator.canShare({ files: [file] })) {
+                navigator.share({
+                    files: [file],
+                    title: "صدقة جارية لروح جدي عبدالمعبود أمين سعيد",
+                    text: "شاركنا بالدعاء وقراءة القرآن لروحه الطاهرة واكسب الأجر: https://abdomohaamed.github.io/sadqah-jaddi/"
+                }).catch(() => {});
+                return;
+            }
+            fallbackWhatsAppShare();
+        }, "image/png");
+    } else {
+        fallbackWhatsAppShare();
+    }
+}
+
+function fallbackWhatsAppShare() {
+    const dua = getSelectedDuaText();
+    const text = encodeURIComponent(`🌿 صدقة جارية ودعاء لروح جدي الغالي عبدالمعبود أمين سعيد رحمه الله:\n\n"${dua}"\n\nشاركنا الأجر والدعاء وختمات القرآن والتسبيح عبر الرابط:\nhttps://abdomohaamed.github.io/sadqah-jaddi/`);
+    window.open(`https://api.whatsapp.com/send?text=${text}`, "_blank");
+}
+
+/* ==========================================================================
+   13. دليل وآداب زيارة القبور (Cemetery Guide)
+   ========================================================================== */
+function initCemeteryGuide() {
+    const copyBtn = document.getElementById("btn-copy-cemetery-dua");
+    if (!copyBtn) return;
+
+    copyBtn.addEventListener("click", () => {
+        const text = "السَّلامُ عَلَيْكُمْ دَارَ قَوْمٍ مُؤْمِنِينَ، وَإِنَّا إِنْ شَاءَ اللَّهُ بِكُمْ لاحِقُونَ، نَسْأَلُ اللَّهَ لَنَا وَلَكُمُ الْعَافِيَةَ، يَرْحَمُ اللَّهُ الْمُسْتَقْدِمِينَ مِنَّا وَالْمُسْتَأْخِرِينَ";
+        navigator.clipboard.writeText(text).then(() => {
+            showToast("تم نسخ دعاء دخول المقابر بنجاح 📋🌿");
+        }).catch(() => {
+            showToast("تعذر النسخ تلقائياً");
+        });
+    });
+}
+
 
 /* ==========================================================================
    أدوات مساعدة: الصوت التخليقي والإشعارات (Web Audio Synth & Toast)
