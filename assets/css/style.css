@@ -1572,6 +1572,148 @@ body {
 }
 
 /* ==========================================================================
+   قسم المصحف الشريف وختمة القرآن الموحد (Unified Quran & Khatma Hub)
+   ========================================================================== */
+.quran-khatma-section {
+  padding: 30px 0 50px;
+  position: relative;
+  background: radial-gradient(circle at 50% 10%, rgba(16, 185, 129, 0.04) 0%, transparent 60%);
+}
+
+/* تبويبات التبديل بين المصحف والختمة */
+.quran-khatma-tabs {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.75rem;
+  margin: 0 auto 2.5rem;
+  flex-wrap: wrap;
+  max-width: 780px;
+  background: rgba(15, 23, 42, 0.6);
+  padding: 0.5rem;
+  border-radius: var(--radius-full, 9999px);
+  border: 1px solid rgba(212, 175, 55, 0.25);
+  backdrop-filter: blur(12px);
+}
+
+.quran-tab-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.65rem 1.4rem;
+  border-radius: var(--radius-full, 9999px);
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--text-muted);
+  font-family: var(--font-arabic-heading, inherit);
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  white-space: nowrap;
+}
+
+.quran-tab-btn:hover {
+  color: var(--gold-400);
+  background: rgba(212, 175, 55, 0.08);
+}
+
+.quran-tab-btn.active {
+  background: linear-gradient(135deg, rgba(212, 175, 55, 0.2) 0%, rgba(16, 185, 129, 0.25) 100%);
+  color: #fff;
+  border-color: var(--gold-500);
+  box-shadow: 0 4px 15px rgba(212, 175, 55, 0.25);
+}
+
+.quran-tab-btn i {
+  color: var(--gold-400);
+}
+
+.quran-tab-btn.active i {
+  color: var(--gold-300);
+}
+
+/* بطاقات أجزاء السكشن الفرعية */
+.quran-subpart-block {
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.quran-subpart-block.is-hidden {
+  display: none !important;
+}
+
+.subpart-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.8rem;
+  margin-bottom: 1.5rem;
+  padding-bottom: 0.8rem;
+  border-bottom: 1px solid rgba(212, 175, 55, 0.15);
+}
+
+.subpart-title {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--text-color);
+}
+
+.subpart-badge {
+  font-size: 0.8rem;
+  padding: 0.3rem 0.8rem;
+  border-radius: var(--radius-full, 9999px);
+  background: rgba(16, 185, 129, 0.12);
+  color: #10b981;
+  border: 1px solid rgba(16, 185, 129, 0.3);
+  font-weight: 600;
+}
+
+/* فاصل زخرفي إسلامي فخم */
+.islamic-section-divider {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1.5rem;
+  margin: 3.5rem auto;
+  max-width: 600px;
+}
+
+.islamic-section-divider.is-hidden {
+  display: none !important;
+}
+
+.islamic-section-divider .divider-line {
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(212, 175, 55, 0.4), transparent);
+}
+
+.islamic-section-divider .divider-icon {
+  font-size: 1.25rem;
+  color: var(--gold-400);
+  filter: drop-shadow(0 0 8px rgba(212, 175, 55, 0.5));
+}
+
+@media (max-width: 640px) {
+  .quran-khatma-tabs {
+    border-radius: var(--radius-md);
+    padding: 0.4rem;
+    gap: 0.4rem;
+    width: 100%;
+  }
+  .quran-tab-btn {
+    flex: 1 1 100%;
+    justify-content: center;
+    padding: 0.55rem 0.8rem;
+    font-size: 0.88rem;
+  }
+}
+
+/* ==========================================================================
    قسم ختمة القرآن الكريم الجماعية (Khatma Section)
    ========================================================================== */
 .khatma-section {

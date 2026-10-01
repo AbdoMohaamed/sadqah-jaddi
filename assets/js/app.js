@@ -12,7 +12,8 @@ document.addEventListener("DOMContentLoaded", () => {
     // 3. تهيئة السبحة الإلكترونية والعداد الموحد
     initTasbeeh();
 
-    // 4. تهيئة ختمة القرآن الكريم الجماعية
+    // 4. تهيئة سكشن المصحف وختمة القرآن الموحد
+    initQuranKhatmaTabs();
     initKhatma();
 
     // 5. تهيئة أذكار الصباح والمساء التفاعلية
@@ -784,6 +785,55 @@ let currentKhatmaData = {
 };
 let activeKhatmaFilter = "all";
 
+/* ==========================================================================
+   تبويبات سكشن المصحف وختمة القرآن الموحد
+   ========================================================================== */
+function initQuranKhatmaTabs() {
+    const tabBtns = document.querySelectorAll(".quran-tab-btn");
+    const mushafBlock = document.getElementById("subpart-mushaf");
+    const khatmaBlock = document.getElementById("subpart-khatma");
+    const divider = document.querySelector(".islamic-section-divider");
+
+    if (!tabBtns.length || !mushafBlock || !khatmaBlock) return;
+
+    window.switchQuranKhatmaTab = function(targetTab) {
+        tabBtns.forEach(btn => {
+            if (btn.dataset.tab === targetTab) {
+                btn.classList.add("active");
+            } else {
+                btn.classList.remove("active");
+            }
+        });
+
+        if (targetTab === "all") {
+            mushafBlock.classList.remove("is-hidden");
+            khatmaBlock.classList.remove("is-hidden");
+            if (divider) divider.classList.remove("is-hidden");
+        } else if (targetTab === "mushaf") {
+            mushafBlock.classList.remove("is-hidden");
+            khatmaBlock.classList.add("is-hidden");
+            if (divider) divider.classList.add("is-hidden");
+        } else if (targetTab === "khatma") {
+            mushafBlock.classList.add("is-hidden");
+            khatmaBlock.classList.remove("is-hidden");
+            if (divider) divider.classList.add("is-hidden");
+        }
+    };
+
+    tabBtns.forEach(btn => {
+        btn.addEventListener("click", () => {
+            const targetTab = btn.dataset.tab || "all";
+            window.switchQuranKhatmaTab(targetTab);
+        });
+    });
+
+    if (window.location.hash === "#khatma") {
+        window.switchQuranKhatmaTab("khatma");
+    } else if (window.location.hash === "#quran-reader") {
+        window.switchQuranKhatmaTab("mushaf");
+    }
+}
+
 function initKhatma() {
     initDefaultKhatmaParts();
     renderKhatmaGrid();
@@ -1018,6 +1068,12 @@ function initKhatmaModal() {
     if (readNowBtn) {
         readNowBtn.addEventListener("click", () => {
             const partId = parseInt(document.getElementById("khatma-selected-part-id").value, 10);
+            if (typeof window.switchQuranKhatmaTab === "function") {
+                const mushafBlock = document.getElementById("subpart-mushaf");
+                if (mushafBlock && mushafBlock.classList.contains("is-hidden")) {
+                    window.switchQuranKhatmaTab("mushaf");
+                }
+            }
             if (typeof QURAN_PARTS_INFO !== "undefined") {
                 const partInfo = QURAN_PARTS_INFO.find(p => p.id === partId);
                 if (partInfo && typeof window.goToQuranPage === "function") {
@@ -1028,7 +1084,7 @@ function initKhatmaModal() {
                 }
             }
             if (modal) modal.classList.remove("open");
-            const readerSection = document.getElementById("quran-reader");
+            const readerSection = document.getElementById("subpart-mushaf") || document.getElementById("quran-reader");
             if (readerSection) readerSection.scrollIntoView({ behavior: "smooth" });
         });
     }

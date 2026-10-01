@@ -55,12 +55,11 @@
 
             <ul class="nav-links">
                 <li><a href="#hero" class="active">الرئيسية</a></li>
-                <li><a href="#khatma">ختمة القرآن</a></li>
+                <li><a href="#quran-khatma">المصحف والختمة</a></li>
                 <li><a href="#prayer-times">مواقيت الصلاة</a></li>
                 <li><a href="#prayers">أدعية الزوار</a></li>
                 <li><a href="#tasbeeh">السبحة</a></li>
                 <li><a href="#azkar">أذكار اليوم</a></li>
-                <li><a href="#quran-reader">المصحف الشريف</a></li>
                 <li><a href="#cemetery-guide">آداب المقابر</a></li>
                 <li><a href="#quran">فضل الصدقة</a></li>
             </ul>
@@ -168,68 +167,186 @@
     <!-- ==========================================
          قسم ختمة القرآن الجماعية (Live Quran Khatma Section)
          ========================================== -->
-    <section id="khatma" class="khatma-section">
+    <!-- ==========================================
+         قسم المصحف الشريف والختمة القرآنية المباركة (Unified Quran & Khatma Hub)
+         ========================================== -->
+    <section id="quran-khatma" class="quran-khatma-section">
+        <div id="khatma"></div>
+        <div id="quran-reader"></div>
         <div class="container">
             <div class="section-header">
-                <span class="section-tag"><i class="fa-solid fa-book-open"></i> ختمة مباركة سحابية</span>
-                <h2 class="section-title">ختمة القرآن الكريم الجماعية لروحه</h2>
+                <span class="section-tag"><i class="fa-solid fa-book-quran"></i> تلاوة وتدبر • ختمة مباركة سحابية</span>
+                <h2 class="section-title">مصحف الصدقة الجارية والختمة الجماعية</h2>
                 <p class="section-desc">
-                    شارك الأهل والأحباب والزوار في إتمام ختمات القرآن الكريم لروح فقيدنا الغالي؛ احجز جزءاً لتتلوه وانوِ ثوابه له، فلكل حرف حسنة والحسنة بعشر أمثالها.
+                    اقرأ وتدبر آيات الذكر الحكيم من المصحف الشريف، أو شارك الأهل والزوار في إتمام ختمات القرآن الكريم لروح فقيدنا الغالي <span class="deceased-name">جدي الغالي (عبدالمعبود أمين سعيد)</span> لنيل الأجر والثواب.
                 </p>
             </div>
 
-            <!-- لوحة إحصائيات الختمة -->
-            <div class="khatma-summary-card">
-                <div class="khatma-meta-row">
-                    <div class="khatma-badge-title">
-                        <i class="fa-solid fa-star-and-crescent text-gold"></i>
-                        <span>الختمة المباركة: <strong id="khatma-cycle-display" class="text-gold">رقم 1</strong></span>
+            <!-- أزرار التبديل والتنقل بين المصحف وأجزاء الختمة -->
+            <div class="quran-khatma-tabs">
+                <button type="button" class="quran-tab-btn active" data-tab="all">
+                    <i class="fa-solid fa-layer-group"></i>
+                    <span>عرض الكل معاً</span>
+                </button>
+                <button type="button" class="quran-tab-btn" data-tab="mushaf">
+                    <i class="fa-solid fa-book-open-reader"></i>
+                    <span>مصحف الصدقة الجارية (تلاوة وتدبر)</span>
+                </button>
+                <button type="button" class="quran-tab-btn" data-tab="khatma">
+                    <i class="fa-solid fa-star-and-crescent"></i>
+                    <span>ختمة الـ 30 جزء الجماعية</span>
+                </button>
+            </div>
+
+            <!-- الجزء الأول: مصحف الصدقة الجارية (تلاوة وتدبر) -->
+            <div class="quran-subpart-block" id="subpart-mushaf">
+                <div class="subpart-header">
+                    <div class="subpart-title">
+                        <i class="fa-solid fa-book-open-reader text-gold"></i>
+                        <span>مصحف الصدقة الجارية • تلاوة وتدبر</span>
                     </div>
-                    <div class="khatma-progress-text">
-                        <span>أُنجز <strong id="khatma-completed-count">0</strong> من 30 جزءاً</span>
-                        (<span id="khatma-percent-display">0%</span>)
+                    <span class="subpart-badge">طبعة مجمع الملك فهد بالمدينة المنورة</span>
+                </div>
+
+                <!-- عناصر اختيار السورة -->
+                <div class="surahs-controls-container">
+                    <!-- أزرار سريعة لأشهر السور الفاضلة -->
+                    <div class="featured-surahs-pills" id="featured-surahs-pills">
+                        <!-- تُنشأ برمجياً من js/quran.js -->
+                    </div>
+
+                    <!-- قائمة منسدلة لجميع سور القرآن الـ 114 سورة -->
+                    <div class="all-surahs-dropdown-wrapper">
+                        <select id="select-all-surahs" class="select-surah-dropdown">
+                            <!-- يُملأ من js/quran.js -->
+                        </select>
                     </div>
                 </div>
 
-                <!-- شريط التقدم -->
-                <div class="khatma-progress-bar-wrapper">
-                    <div class="khatma-progress-bar-fill" id="khatma-progress-fill" style="width: 0%;"></div>
-                </div>
+                <!-- بطاقة صفحة المصحف الشريف الحقيقية الكبرى -->
+                <div class="quran-mushaf-card real-mushaf-card">
+                    <!-- إطار ترويسة السورة والجزء -->
+                    <div class="mushaf-header-frame">
+                        <div class="mushaf-surah-title" id="quran-surah-title">سُورَةُ المُلْكِ</div>
+                        <div class="mushaf-verses-count" id="quran-verses-count">الجزء ٢٩ • صفحة ٥٦٢ من ٦٠٤</div>
+                        <div class="mushaf-audio-control">
+                            <button type="button" class="btn btn-outline" id="btn-page-tafsir" title="تفسير الصفحة الحالية">
+                                <i class="fa-solid fa-book-open text-gold"></i>
+                                <span>تفسير الصفحة</span>
+                            </button>
+                            <button type="button" class="btn btn-outline" id="btn-surah-audio">
+                                <i class="fa-solid fa-volume-high"></i>
+                                <span>استماع للتلاوة</span>
+                            </button>
+                        </div>
+                    </div>
 
-                <div class="khatma-status-legend">
-                    <span class="legend-item"><span class="legend-dot status-available"></span> متاح للقراءة</span>
-                    <span class="legend-item"><span class="legend-dot status-reading"></span> قيد القراءة</span>
-                    <span class="legend-item"><span class="legend-dot status-completed"></span> تمت القراءة</span>
+                    <!-- حاوية صفحة المصحف الشريف الحقيقية -->
+                    <div class="mushaf-real-page-wrapper">
+                        <div id="mushaf-page-loader" class="mushaf-page-loader">
+                            <i class="fa-solid fa-spinner fa-spin"></i>
+                            <span>جاري فتح صفحة المصحف الشريف...</span>
+                        </div>
+                        <img id="mushaf-real-page-img" class="mushaf-real-page-img" src="https://cdn.quran.ws/svg/pages/v1.1.1/hafs-kfqc/562.svg" alt="صفحة المصحف الشريف" loading="eager">
+                    </div>
+
+                    <!-- أزرار تقليب الصفحات السفلية السريعة -->
+                    <div class="mushaf-bottom-page-controls">
+                        <button type="button" class="btn btn-outline btn-page-nav" id="btn-mushaf-prev" title="الصفحة السابقة">
+                            <i class="fa-solid fa-angle-right"></i>
+                            <span>السابق</span>
+                        </button>
+                        <div class="page-jump-box">
+                            <label for="mushaf-page-input">صفحة:</label>
+                            <input type="number" id="mushaf-page-input" class="mushaf-page-input" min="1" max="604" value="562">
+                            <span>/ 604</span>
+                        </div>
+                        <button type="button" class="btn btn-outline btn-page-nav" id="btn-mushaf-next" title="الصفحة التالية">
+                            <span>التالي</span>
+                            <i class="fa-solid fa-angle-left"></i>
+                        </button>
+                    </div>
+
+                    <!-- زر إهداء ثواب القراءة لروح الجد -->
+                    <div class="mushaf-footer-actions">
+                        <button type="button" class="btn-gift-reward" id="btn-gift-quran-reward">
+                            <i class="fa-solid fa-gift"></i>
+                            <span>أهديت ثواب هذه القراءة لروحه</span>
+                        </button>
+                    </div>
                 </div>
             </div>
 
-            <!-- أزرار تصفية الأجزاء -->
-            <div class="khatma-filters">
-                <button type="button" class="khatma-filter-btn active" data-filter="all">جميع الأجزاء (30)</button>
-                <button type="button" class="khatma-filter-btn" data-filter="available">المتاح للحجز</button>
-                <button type="button" class="khatma-filter-btn" data-filter="reading">قيد القراءة</button>
-                <button type="button" class="khatma-filter-btn" data-filter="completed">المكتملة</button>
+            <!-- فاصل زخرفي إسلامي فخم -->
+            <div class="islamic-section-divider">
+                <span class="divider-line"></span>
+                <span class="divider-icon"><i class="fa-solid fa-star-and-crescent"></i></span>
+                <span class="divider-line"></span>
             </div>
 
-            <!-- شبكة الأجزاء الـ 30 -->
-            <div class="khatma-grid-wrapper">
-                <div class="khatma-mobile-nav-bar">
-                    <div class="khatma-scroll-hint">
-                        <i class="fa-solid fa-arrows-left-right"></i>
-                        <span>اسحب أفقياً لتصفح الأجزاء (1 - 30)</span>
+            <!-- الجزء الثاني: ختمة القرآن الكريم الجماعية (30 جزء) -->
+            <div class="quran-subpart-block" id="subpart-khatma">
+                <div class="subpart-header">
+                    <div class="subpart-title">
+                        <i class="fa-solid fa-book-open text-gold"></i>
+                        <span>ختمة القرآن الكريم الجماعية لروحه • ختمة مباركة سحابية</span>
                     </div>
-                    <div class="khatma-scroll-arrows">
-                        <button type="button" class="btn-scroll-khatma" onclick="scrollKhatmaGrid('right')" title="السابق">
-                            <i class="fa-solid fa-chevron-right"></i>
-                        </button>
-                        <button type="button" class="btn-scroll-khatma" onclick="scrollKhatmaGrid('left')" title="التالي">
-                            <i class="fa-solid fa-chevron-left"></i>
-                        </button>
+                    <span class="subpart-badge">مزامنة سحابية فورية</span>
+                </div>
+
+                <!-- لوحة إحصائيات الختمة -->
+                <div class="khatma-summary-card">
+                    <div class="khatma-meta-row">
+                        <div class="khatma-badge-title">
+                            <i class="fa-solid fa-star-and-crescent text-gold"></i>
+                            <span>الختمة المباركة: <strong id="khatma-cycle-display" class="text-gold">رقم 1</strong></span>
+                        </div>
+                        <div class="khatma-progress-text">
+                            <span>أُنجز <strong id="khatma-completed-count">0</strong> من 30 جزءاً</span>
+                            (<span id="khatma-percent-display">0%</span>)
+                        </div>
+                    </div>
+
+                    <!-- شريط التقدم -->
+                    <div class="khatma-progress-bar-wrapper">
+                        <div class="khatma-progress-bar-fill" id="khatma-progress-fill" style="width: 0%;"></div>
+                    </div>
+
+                    <div class="khatma-status-legend">
+                        <span class="legend-item"><span class="legend-dot status-available"></span> متاح للقراءة</span>
+                        <span class="legend-item"><span class="legend-dot status-reading"></span> قيد القراءة</span>
+                        <span class="legend-item"><span class="legend-dot status-completed"></span> تمت القراءة</span>
                     </div>
                 </div>
 
-                <div class="khatma-grid" id="khatma-grid-container">
-                    <!-- يُنشأ برمجياً من js/app.js -->
+                <!-- أزرار تصفية الأجزاء -->
+                <div class="khatma-filters">
+                    <button type="button" class="khatma-filter-btn active" data-filter="all">جميع الأجزاء (30)</button>
+                    <button type="button" class="khatma-filter-btn" data-filter="available">المتاح للحجز</button>
+                    <button type="button" class="khatma-filter-btn" data-filter="reading">قيد القراءة</button>
+                    <button type="button" class="khatma-filter-btn" data-filter="completed">المكتملة</button>
+                </div>
+
+                <!-- شبكة الأجزاء الـ 30 -->
+                <div class="khatma-grid-wrapper">
+                    <div class="khatma-mobile-nav-bar">
+                        <div class="khatma-scroll-hint">
+                            <i class="fa-solid fa-arrows-left-right"></i>
+                            <span>اسحب أفقياً لتصفح الأجزاء (1 - 30)</span>
+                        </div>
+                        <div class="khatma-scroll-arrows">
+                            <button type="button" class="btn-scroll-khatma" onclick="scrollKhatmaGrid('right')" title="السابق">
+                                <i class="fa-solid fa-chevron-right"></i>
+                            </button>
+                            <button type="button" class="btn-scroll-khatma" onclick="scrollKhatmaGrid('left')" title="التالي">
+                                <i class="fa-solid fa-chevron-left"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="khatma-grid" id="khatma-grid-container">
+                        <!-- يُنشأ برمجياً من js/app.js -->
+                    </div>
                 </div>
             </div>
         </div>
@@ -491,113 +608,6 @@
         </div>
     </section>
 
-    <!-- ==========================================
-         قسم مصحف الصدقة الجارية (Quran Reader Section)
-         ========================================== -->
-    <section id="quran-reader" class="quran-reader-section">
-        <div class="container">
-            <div class="section-header">
-                <span class="section-tag"><i class="fa-solid fa-book-open-reader"></i> تلاوة وتدبر</span>
-                <h2 class="section-title">مصحف الصدقة الجارية</h2>
-                <p class="section-desc">
-                    اقرأ ما تيسر من آيات الذكر الحكيم وانوِ ثواب تلاوتها لروح فقيدنا الغالي <span class="deceased-name">جدي الغالي (عبدالمعبود أمين سعيد)</span>، لتكون نوراً وفسحة وأُنساً له في قبره بإذن الله.
-                </p>
-            </div>
-
-            <!-- عناصر اختيار السورة -->
-            <div class="surahs-controls-container">
-                <!-- أزرار سريعة لأشهر السور الفاضلة -->
-                <div class="featured-surahs-pills" id="featured-surahs-pills">
-                    <!-- تُنشأ برمجياً من js/quran.js -->
-                </div>
-
-                <!-- قائمة منسدلة لجميع سور القرآن الـ 114 سورة -->
-                <div class="all-surahs-dropdown-wrapper">
-                    <select id="select-all-surahs" class="select-surah-dropdown">
-                        <!-- يُملأ من js/quran.js -->
-                    </select>
-                </div>
-            </div>
-
-            <!-- بطاقة صفحة المصحف الشريف الحقيقية الكبرى -->
-            <div class="quran-mushaf-card real-mushaf-card">
-                <!-- إطار ترويسة السورة والجزء -->
-                <div class="mushaf-header-frame">
-                    <div class="mushaf-surah-title" id="quran-surah-title">سُورَةُ المُلْكِ</div>
-                    <div class="mushaf-verses-count" id="quran-verses-count">الجزء ٢٩ • صفحة ٥٦٢ من ٦٠٤</div>
-                    <div class="mushaf-audio-control">
-                        <button type="button" class="btn btn-outline" id="btn-page-tafsir" title="تفسير الصفحة الحالية">
-                            <i class="fa-solid fa-book-open text-gold"></i>
-                            <span>تفسير الصفحة</span>
-                        </button>
-                        <button type="button" class="btn btn-outline" id="btn-surah-audio">
-                            <i class="fa-solid fa-volume-high"></i>
-                            <span>استماع للتلاوة</span>
-                        </button>
-                    </div>
-                </div>
-
-                <!-- شريط تحكم وتصفح المصحف الحقيقي -->
-                <!--<div class="mushaf-toolbar real-mushaf-toolbar">
-                    <div class="mushaf-nav-controls">
-                        <button type="button" class="btn btn-gold btn-page-nav" id="btn-mushaf-prev" title="الصفحة السابقة">
-                            <i class="fa-solid fa-angle-right"></i>
-                            <span>الصفحة السابقة</span>
-                        </button>
-
-                       
-
-                        <button type="button" class="btn btn-gold btn-page-nav" id="btn-mushaf-next" title="الصفحة التالية">
-                            <span>الصفحة التالية</span>
-                            <i class="fa-solid fa-angle-left"></i>
-                        </button>
-                    </div>
-
-                    <div class="mushaf-audio-control">
-                        <button type="button" class="btn btn-outline" id="btn-surah-audio">
-                            <i class="fa-solid fa-volume-high"></i>
-                            <span>استماع للتلاوة</span>
-                        </button>
-                    </div>
-                </div>-->
-
-                <!-- حاوية صفحة المصحف الشريف الحقيقية -->
-                <div class="mushaf-real-page-wrapper">
-                    <div id="mushaf-page-loader" class="mushaf-page-loader">
-                        <i class="fa-solid fa-spinner fa-spin"></i>
-                        <span>جاري فتح صفحة المصحف الشريف...</span>
-                    </div>
-                    <img id="mushaf-real-page-img" class="mushaf-real-page-img" src="https://cdn.quran.ws/svg/pages/v1.1.1/hafs-kfqc/562.svg" alt="صفحة المصحف الشريف" loading="eager">
-                </div>
-
-                <!-- أزرار تقليب الصفحات السفلية السريعة -->
-                <div class="mushaf-bottom-page-controls">
-                    <button type="button" class="btn btn-outline btn-page-nav" onclick="document.getElementById('btn-mushaf-prev').click()">
-                        <i class="fa-solid fa-angle-right"></i>
-                        <span>السابق</span>
-                    </button>
-                    <div class="page-jump-box">
-                        <label for="mushaf-page-input">صفحة:</label>
-                        <input type="number" id="mushaf-page-input" class="mushaf-page-input" min="1" max="604" value="562">
-                        <span>/ 604</span>
-                    </div>
-                    <!--  <span class="mushaf-hint-text"><i class="fa-solid fa-hand-pointer"></i> يمكنك أيضاً استخدام مفاتيح الأسهم (➔ / ⬅) لتقليب الصفحات</span>-->
-                    <button type="button" class="btn btn-outline btn-page-nav" onclick="document.getElementById('btn-mushaf-next').click()">
-                        <span>التالي</span>
-                        <i class="fa-solid fa-angle-left"></i>
-                    </button>
-                </div>
-
-                <!-- زر إهداء ثواب القراءة لروح الجد -->
-                <div class="mushaf-footer-actions">
-                    <button type="button" class="btn-gift-reward" id="btn-gift-quran-reward">
-                        <i class="fa-solid fa-gift"></i>
-                        <span>أهديت ثواب هذه القراءة لروحه</span>
-                    </button>
-                </div>
-            </div>
-        </div>
-    </section>
 
     <!-- ==========================================
          قسم آيات وأحاديث عن الدعاء للميت
