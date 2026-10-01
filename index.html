@@ -41,7 +41,7 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css">
 
     <!-- تنسيقات الموقع -->
-    <link rel="stylesheet" href="assets/css/style.css?v=58">
+    <link rel="stylesheet" href="assets/css/style.css?v=59">
 </head>
 <body>
 
@@ -85,23 +85,6 @@
     <div class="offline-status-banner" id="offline-status-banner" style="display: none;">
         <i class="fa-solid fa-wifi-slash"></i>
         <span>أنت تتصفح بدون إنترنت • تم تفعيل وضع الأوفلاين (القرآن، الأذكار، والسبحة تعمل بنجاح 100%)</span>
-    </div>
-
-    <!-- شريط الإهداء والنية الشخصية (Dual Dedication Bar) -->
-    <div class="dedication-top-bar" id="dedication-top-bar">
-        <div class="container dedication-bar-inner">
-            <div class="dedication-info">
-                <span class="dedication-label"><i class="fa-solid fa-heart text-gold"></i> نية الأجر والصدقة:</span>
-                <span class="dedication-current-target" id="dedication-target-name">جدي الغالي (عبدالمعبود أمين سعيد)</span>
-                <span class="dedication-streak-badge" id="user-streak-badge" title="أيام متتالية من الذكر والدعاء">
-                    <i class="fa-solid fa-fire text-gold"></i> <span id="streak-days-count">1</span> يوم تتابع
-                </span>
-            </div>
-            <button type="button" class="btn-edit-dedication" id="btn-edit-dedication" title="تخصيص نية الإهداء أو إشراك والديك">
-                <i class="fa-solid fa-pen-to-square"></i>
-                <span>تخصيص النية</span>
-            </button>
-        </div>
     </div>
 
     <!-- مشغل صوتي لتلاوة خاشعة هادئة (سورة الملك / الفاتحة) -->
@@ -967,40 +950,6 @@
     </div>
 
     <!-- ==========================================
-         نافذة تخصيص نية الإهداء (Dedication Modal)
-         ========================================== -->
-    <div class="modal-overlay" id="dedication-modal">
-        <div class="modal-card">
-            <div class="modal-header-row">
-                <h3 class="modal-title"><i class="fa-solid fa-hand-holding-heart text-gold"></i> تخصيص نية الإهداء والأجر</h3>
-                <button class="modal-close-btn" id="btn-close-dedication-modal" aria-label="إغلاق">&times;</button>
-            </div>
-            <p class="modal-desc">
-                يبقى الأجر واصلاً بإذن الله لروح <strong>جدي الغالي (عبدالمعبود أمين سعيد)</strong>، ويمكنك إشراك نيتك الخاصة لتهدي ثواب قراءتك وتسبيحك لمن تحب (لوالديك، لأحبابك، أو لنفسك):
-            </p>
-            <div class="dedication-presets">
-                <button type="button" class="dedication-preset-btn" data-preset="جدي الغالي (عبدالمعبود أمين سعيد) ووالديّ">لجدي ولوالديّ الكريمين 🤍</button>
-                <button type="button" class="dedication-preset-btn" data-preset="جدي الغالي (عبدالمعبود أمين سعيد) وجميع موتى المسلمين">لجدي ولموتى المسلمين جميعاً 🤲</button>
-                <button type="button" class="dedication-preset-btn" data-preset="جدي الغالي (عبدالمعبود أمين سعيد) ونفسي وأهلي">لجدي ولنفسي وأهل بيتي 🌿</button>
-            </div>
-            <div class="form-group" style="margin-top: 15px;">
-                <label for="custom-dedication-input">أو اكتب اسماً أو صيغة مخصصة:</label>
-                <input type="text" id="custom-dedication-input" class="form-input" placeholder="مثال: لروح أمي الغالية، أو لأبي وجدي..." maxlength="80">
-            </div>
-            <div class="modal-actions-row">
-                <button type="button" class="btn btn-gold" id="btn-save-dedication">
-                    <i class="fa-solid fa-check"></i>
-                    <span>حفظ وتثبيت النية</span>
-                </button>
-                <button type="button" class="btn btn-outline" id="btn-reset-dedication">
-                    <i class="fa-solid fa-rotate-left"></i>
-                    <span>إعادة للأصل (جدي الغالي)</span>
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <!-- ==========================================
          نافذة بوصلة القبلة التفاعلية (Qibla Compass Modal)
          ========================================== -->
     <div class="modal-overlay" id="qibla-modal">
@@ -1173,7 +1122,7 @@
     <script src="assets/js/data.js"></script>
     <script src="assets/js/azkar-data.js"></script>
     <script src="assets/js/firebase-config.js"></script>
-    <script src="assets/js/app.js?v=4"></script>
+    <script src="assets/js/app.js?v=5"></script>
     <script src="assets/js/quran.js"></script>
 </body>
 </html>

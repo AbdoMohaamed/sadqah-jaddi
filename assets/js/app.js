@@ -3,10 +3,9 @@
  */
 
 document.addEventListener("DOMContentLoaded", () => {
-    // 1. تهيئة اسم الجد والمعلومات الرئيسية والتقويم الهجري ونية الإهداء
+    // 1. تهيئة اسم الجد والمعلومات الرئيسية والتقويم الهجري
     initDeceasedInfo();
     initHijriDate();
-    initDedicationSystem();
     initOfflineIndicator();
 
     // 2. تهيئة الأدعية وسلايدر Swiper
@@ -2315,107 +2314,7 @@ function initOfflineIndicator() {
 }
 
 /* ==========================================================================
-   14. نظام الإهداء المزدوج والنية والتتابع اليومي (Dual Dedication & Daily Streak)
-   ========================================================================== */
-function initDedicationSystem() {
-    const targetNameEl = document.getElementById("dedication-target-name");
-    const modal = document.getElementById("dedication-modal");
-    const editBtn = document.getElementById("btn-edit-dedication");
-    const closeBtn = document.getElementById("btn-close-dedication-modal");
-    const saveBtn = document.getElementById("btn-save-dedication");
-    const resetBtn = document.getElementById("btn-reset-dedication");
-    const customInput = document.getElementById("custom-dedication-input");
-    const presetBtns = document.querySelectorAll(".dedication-preset-btn");
-    const streakCountEl = document.getElementById("streak-days-count");
-
-    const defaultTarget = (typeof DECEASED_INFO !== "undefined" && DECEASED_INFO.name) 
-        ? DECEASED_INFO.name 
-        : "جدي الغالي (عبدالمعبود أمين سعيد)";
-
-    let currentTarget = localStorage.getItem("user_dedication_intent") || defaultTarget;
-
-    const renderTarget = () => {
-        if (targetNameEl) {
-            targetNameEl.textContent = currentTarget;
-        }
-    };
-    renderTarget();
-
-    // تحديث التتابع اليومي (Daily Streak)
-    try {
-        const todayStr = new Date().toDateString();
-        const lastVisit = localStorage.getItem("user_last_visit_date");
-        let streak = parseInt(localStorage.getItem("user_streak_days") || "1", 10);
-
-        if (lastVisit) {
-            const lastDate = new Date(lastVisit);
-            const todayDate = new Date(todayStr);
-            const diffDays = Math.round((todayDate - lastDate) / (1000 * 60 * 60 * 24));
-
-            if (diffDays === 1) {
-                streak += 1;
-            } else if (diffDays > 1) {
-                streak = 1;
-            }
-        }
-        localStorage.setItem("user_last_visit_date", todayStr);
-        localStorage.setItem("user_streak_days", streak.toString());
-        if (streakCountEl) streakCountEl.textContent = streak;
-    } catch (e) {
-        console.warn("Streak calculation error:", e);
-    }
-
-    if (editBtn && modal) {
-        editBtn.addEventListener("click", () => {
-            if (customInput) customInput.value = (currentTarget !== defaultTarget) ? currentTarget : "";
-            modal.classList.add("open");
-        });
-    }
-
-    if (closeBtn && modal) {
-        closeBtn.addEventListener("click", () => modal.classList.remove("open"));
-    }
-
-    if (modal) {
-        modal.addEventListener("click", (e) => {
-            if (e.target === modal) modal.classList.remove("open");
-        });
-    }
-
-    presetBtns.forEach(btn => {
-        btn.addEventListener("click", () => {
-            const val = btn.dataset.preset;
-            if (customInput && val) {
-                customInput.value = val;
-            }
-        });
-    });
-
-    if (saveBtn) {
-        saveBtn.addEventListener("click", () => {
-            const inputVal = customInput ? customInput.value.trim() : "";
-            currentTarget = inputVal || defaultTarget;
-            localStorage.setItem("user_dedication_intent", currentTarget);
-            renderTarget();
-            if (modal) modal.classList.remove("open");
-            showToast("تم تثبيت نية الإهداء بنجاح، تقبل الله طاعتكم 🤲✨");
-        });
-    }
-
-    if (resetBtn) {
-        resetBtn.addEventListener("click", () => {
-            currentTarget = defaultTarget;
-            localStorage.removeItem("user_dedication_intent");
-            if (customInput) customInput.value = "";
-            renderTarget();
-            if (modal) modal.classList.remove("open");
-            showToast("تمت استعادة نية الصدقة لروح جدي الغالي 🤍");
-        });
-    }
-}
-
-/* ==========================================================================
-   15. مواسم الصيام المستحب والعد التنازلي للإفطار (Fasting Tracker & Duas)
+   14. مواسم الصيام المستحب والعد التنازلي للإفطار (Fasting Tracker & Duas)
    ========================================================================== */
 let fastingCountdownInterval = null;
 
