@@ -1680,6 +1680,7 @@ function fetchPrayerTimes(cityKey) {
                 localStorage.setItem(cacheKey, JSON.stringify(prayerTimings));
                 renderPrayerTimesUI(prayerTimings);
                 startPrayerCountdown();
+                initFastingTracker();
             } else {
                 useFallbackTimings();
             }
@@ -1693,6 +1694,7 @@ function useFallbackTimings() {
     prayerTimings = FALLBACK_PRAYER_TIMES;
     renderPrayerTimesUI(prayerTimings);
     startPrayerCountdown();
+    initFastingTracker();
 }
 
 function renderPrayerTimesUI(timings) {
@@ -2318,23 +2320,9 @@ function initOfflineIndicator() {
    ========================================================================== */
 let fastingCountdownInterval = null;
 
-function initFastingTracker() {
-    const banner = document.getElementById("fasting-tracker-banner");
-    const tagEl = document.getElementById("fasting-season-tag");
-    const titleEl = document.getElementById("fasting-banner-title");
-    const descEl = document.getElementById("fasting-banner-desc");
-    const timerLabel = document.getElementById("fasting-timer-label");
-    const timerVal = document.getElementById("fasting-timer-value");
-    const showDuaBtn = document.getElementById("btn-show-fasting-dua");
-    const fastingModal = document.getElementById("fasting-dua-modal");
-    const closeFastingModalBtn = document.getElementById("btn-close-fasting-modal");
-    const duasListEl = document.getElementById("fasting-duas-list");
-
-    if (!banner) return;
-
-    // فحص يوم الصيام الهجري والميلادي
+function getFastingInfo() {
     const now = new Date();
-    const dayOfWeek = now.getDay(); // 1 = الاثنين, 4 = الخميس
+    const dayOfWeek = now.getDay(); // 0: الأحد, 1: الاثنين, 2: الثلاثاء, 3: الأربعاء, 4: الخميس, 5: الجمعة, 6: السبت
     let hijriDay = null;
     let hijriMonth = null;
 
@@ -2348,77 +2336,138 @@ function initFastingTracker() {
             if (p.type === 'day') hijriDay = parseInt(p.value, 10);
             if (p.type === 'month') hijriMonth = parseInt(p.value, 10);
         });
-    } catch (e) {
-        // احتياطي
-    }
+    } catch (e) {}
 
-    let isFastingDay = false;
-    let seasonTag = "سنة صيام مستحبة 🌙";
-    let seasonTitle = "صيام اليوم: سنة مباركة";
-    let seasonDesc = '"للصائم عند فطره دعوة لا تُرد"... اغتنم هذه اللحظات بالدعاء لفقيدنا الحبيب.';
+    const timings = prayerTimings || (typeof FALLBACK_PRAYER_TIMES !== "undefined" ? FALLBACK_PRAYER_TIMES : null);
+    if (!timings) return { isFasting: false };
 
-    // 1. شهر رمضان المبارك
+    const maghribStr = timings.Maghrib ? timings.Maghrib.split(" ")[0] : "18:00";
+    const fajrStr = timings.Fajr ? timings.Fajr.split(" ")[0] : "04:30";
+
+    const [mH, mM] = maghribStr.split(":").map(Number);
+    const [fH, fM] = fajrStr.split(":").map(Number);
+
+    const maghribDate = new Date(now.getFullYear(), now.getMonth(), now.getDate(), mH, mM, 0);
+    const fajrDate = new Date(now.getFullYear(), now.getMonth(), now.getDate(), fH, fM, 0);
+
+    const isBeforeFajr = now < fajrDate;
+    const isDuringFast = (now >= fajrDate && now < maghribDate);
+    const isAfterMaghrib = (now >= maghribDate);
+
+    // 1. شهر رمضان المبارك (كاملاً)
     if (hijriMonth === 9) {
-        isFastingDay = true;
-        seasonTag = "شهر رمضان المبارك 🌙";
-        seasonTitle = "صيام فريضة شهر رمضان";
-        seasonDesc = "أيام النفحات والبركات والقرآن، نسأل الله أن يرحم فقيدنا ويجعل صيامه وقيامه نوراً في قبره.";
+        return {
+            isFasting: true,
+            isRamadan: true,
+            isBeforeFajr,
+            isDuringFast,
+            isAfterMaghrib,
+            fajrDate,
+            maghribDate,
+            tag: "شهر رمضان المبارك 🌙",
+            title: isDuringFast ? "صيام فريضة شهر رمضان" : "ليالي شهر رمضان المبارك",
+            desc: "أيام النفحات والبركات والقرآن، نسأل الله أن يرحم فقيدنا ويجعل صيامه وقيامه نوراً في قبره."
+        };
     }
-    // 2. الأيام البيض (13، 14، 15 من الشهر الهجري)
-    else if (hijriDay === 13 || hijriDay === 14 || hijriDay === 15) {
-        isFastingDay = true;
-        seasonTag = "صيام الأيام البيض المباركة 🌕";
-        seasonTitle = `اليوم ${hijriDay} من الشهر الهجري (الأيام البيض)`;
-        seasonDesc = "صيام ثلاثة أيام من كل شهر تعدل صيام الدهر كله كما أخبر النبي ﷺ.";
-    }
-    // 3. يوم عرفة (9 ذو الحجة)
+
+    // 2. فحص هل اليوم هو أحد أيام الصيام الشرعية فقط:
+    let isTodayFastingDay = false;
+    let tag = "";
+    let title = "";
+    let desc = "";
+
+    // الأيام البيض (13، 14، 15 من أي شهر هجري)
+    if (hijriDay === 13 || hijriDay === 14 || hijriDay === 15) {
+        isTodayFastingDay = true;
+        tag = "صيام الأيام البيض المباركة 🌕";
+        title = `اليوم ${hijriDay} من الشهر الهجري (الأيام البيض)`;
+        desc = "صيام ثلاثة أيام من كل شهر تعدل صيام الدهر كله كما أخبر النبي ﷺ.";
+    } 
+    // يوم عرفة (9 ذو الحجة)
     else if (hijriMonth === 12 && hijriDay === 9) {
-        isFastingDay = true;
-        seasonTag = "يوم عرفة المبارك 🕋";
-        seasonTitle = "صيام يوم عرفة";
-        seasonDesc = "يكفر السنة الماضية والباقية، وأعظم أيام الدعاء والرجاء.";
-    }
-    // 4. عاشوراء وتاسوعاء (9 و 10 محرم)
+        isTodayFastingDay = true;
+        tag = "يوم عرفة المبارك 🕋";
+        title = "صيام يوم عرفة";
+        desc = "يكفر السنة الماضية والباقية، وأعظم أيام الدعاء والرجاء.";
+    } 
+    // عاشوراء وتاسوعاء (9 و 10 محرم)
     else if (hijriMonth === 1 && (hijriDay === 9 || hijriDay === 10)) {
-        isFastingDay = true;
-        seasonTag = "عاشوراء المبارك 🌊";
-        seasonTitle = `صيام يوم ${hijriDay === 10 ? 'عاشوراء' : 'تاسوعاء'}`;
-        seasonDesc = "صيام يوم عاشوراء يكفر ذنوب سنة ماضية، نسأل الله القبول لفقيدنا ولكم.";
-    }
-    // 5. الاثنين أو الخميس
-    else if (dayOfWeek === 1 || dayOfWeek === 4) {
-        isFastingDay = true;
-        seasonTag = dayOfWeek === 1 ? "سنة صيام يوم الاثنين 🌿" : "سنة صيام يوم الخميس 🌿";
-        seasonTitle = "تعرض الأعمال على الله اليوم";
-        seasonDesc = "قال ﷺ: 'تُعرض الأعمال يوم الاثنين والخميس، فأحب أن يُعرض عملي وأنا صائم'.";
+        isTodayFastingDay = true;
+        tag = "عاشوراء المبارك 🌊";
+        title = `صيام يوم ${hijriDay === 10 ? 'عاشوراء' : 'تاسوعاء'}`;
+        desc = "صيام يوم عاشوراء يكفر ذنوب سنة ماضية، نسأل الله القبول لفقيدنا ولكم.";
+    } 
+    // سنة يوم الاثنين
+    else if (dayOfWeek === 1) {
+        isTodayFastingDay = true;
+        tag = "سنة صيام يوم الاثنين 🌿";
+        title = "صيام يوم الاثنين المبارك";
+        desc = "قال ﷺ: 'تُعرض الأعمال يوم الاثنين والخميس، فأحب أن يُعرض عملي وأنا صائم'.";
+    } 
+    // سنة يوم الخميس
+    else if (dayOfWeek === 4) {
+        isTodayFastingDay = true;
+        tag = "سنة صيام يوم الخميس 🌿";
+        title = "صيام يوم الخميس المبارك";
+        desc = "قال ﷺ: 'تُعرض الأعمال يوم الاثنين والخميس، فأحب أن يُعرض عملي وأنا صائم'.";
     }
 
-    if (isFastingDay) {
+    // إذا لم يكن اليوم يوم صيام شرعي، لا يُعرض السكشن نهائياً
+    if (!isTodayFastingDay) {
+        return { isFasting: false };
+    }
+
+    // إذا انتهى نهار يوم الصيام بحلول أذان المغرب، ينتهي وقت الصيام ولا يظهر بالليل
+    if (isAfterMaghrib) {
+        return { isFasting: false };
+    }
+
+    // نحن الآن في وقت يوم الصيام (إما سحراً قبل الفجر أو نهاراً أثناء الصيام حتى المغرب)
+    return {
+        isFasting: true,
+        isRamadan: false,
+        isBeforeFajr,
+        isDuringFast,
+        isAfterMaghrib,
+        fajrDate,
+        maghribDate,
+        tag,
+        title,
+        desc
+    };
+}
+
+function initFastingTracker() {
+    const banner = document.getElementById("fasting-tracker-banner");
+    const tagEl = document.getElementById("fasting-season-tag");
+    const titleEl = document.getElementById("fasting-banner-title");
+    const descEl = document.getElementById("fasting-banner-desc");
+    const showDuaBtn = document.getElementById("btn-show-fasting-dua");
+    const fastingModal = document.getElementById("fasting-dua-modal");
+    const closeFastingModalBtn = document.getElementById("btn-close-fasting-modal");
+    const duasListEl = document.getElementById("fasting-duas-list");
+
+    if (!banner) return;
+
+    const info = getFastingInfo();
+
+    if (info.isFasting) {
         banner.style.display = "flex";
-        if (tagEl) tagEl.textContent = seasonTag;
-        if (titleEl) titleEl.textContent = seasonTitle;
-        if (descEl) descEl.textContent = seasonDesc;
+        if (tagEl) tagEl.textContent = info.tag;
+        if (titleEl) titleEl.textContent = info.title;
+        if (descEl) descEl.textContent = info.desc;
 
-        // بدء العد التنازلي للإفطار أو الإمساك
         startFastingCountdown();
     } else {
-        // إظهار البنر قبل يوم الصيام أيضاً للتذكير والنية!
-        const tomorrowDay = (dayOfWeek + 1) % 7;
-        const tomorrowHijriDay = hijriDay ? hijriDay + 1 : 0;
-        if (tomorrowDay === 1 || tomorrowDay === 4 || tomorrowHijriDay === 13) {
-            banner.style.display = "flex";
-            if (tagEl) tagEl.textContent = "تذكير بسنة الصيام غداً 🌙";
-            if (titleEl) titleEl.textContent = "صيام الغد مستحب، انوِ الصيام والأجر";
-            if (descEl) descEl.textContent = "قال ﷺ: 'من صام يوماً في سبيل الله باعد الله وجهه عن النار سبعين خريفاً'.";
-            if (timerLabel) timerLabel.textContent = "الاستعداد لأذان الفجر والإمساك:";
-            startFastingCountdown();
-        } else {
-            banner.style.display = "none";
+        banner.style.display = "none";
+        if (fastingCountdownInterval) {
+            clearInterval(fastingCountdownInterval);
+            fastingCountdownInterval = null;
         }
     }
 
-    // إعداد نافذة أدعية الصائم
-    if (duasListEl && typeof FASTING_DUAS !== "undefined") {
+    // إعداد قائمة أدعية الصائم في النافذة المنبثقة
+    if (duasListEl && typeof FASTING_DUAS !== "undefined" && duasListEl.children.length === 0) {
         duasListEl.innerHTML = "";
         FASTING_DUAS.forEach(d => {
             const card = document.createElement("div");
@@ -2439,15 +2488,15 @@ function initFastingTracker() {
     }
 
     if (showDuaBtn && fastingModal) {
-        showDuaBtn.addEventListener("click", () => fastingModal.classList.add("open"));
+        showDuaBtn.onclick = () => fastingModal.classList.add("open");
     }
     if (closeFastingModalBtn && fastingModal) {
-        closeFastingModalBtn.addEventListener("click", () => fastingModal.classList.remove("open"));
+        closeFastingModalBtn.onclick = () => fastingModal.classList.remove("open");
     }
     if (fastingModal) {
-        fastingModal.addEventListener("click", (e) => {
+        fastingModal.onclick = (e) => {
             if (e.target === fastingModal) fastingModal.classList.remove("open");
-        });
+        };
     }
 }
 
@@ -2455,33 +2504,35 @@ function startFastingCountdown() {
     if (fastingCountdownInterval) clearInterval(fastingCountdownInterval);
 
     const update = () => {
+        const banner = document.getElementById("fasting-tracker-banner");
         const timerLabel = document.getElementById("fasting-timer-label");
         const timerVal = document.getElementById("fasting-timer-value");
-        if (!timerVal || !prayerTimings) return;
+        if (!banner || !timerVal) return;
+
+        const info = getFastingInfo();
+        if (!info.isFasting) {
+            banner.style.display = "none";
+            clearInterval(fastingCountdownInterval);
+            fastingCountdownInterval = null;
+            return;
+        }
 
         const now = new Date();
-        const maghribStr = prayerTimings.Maghrib ? prayerTimings.Maghrib.split(" ")[0] : "18:00";
-        const fajrStr = prayerTimings.Fajr ? prayerTimings.Fajr.split(" ")[0] : "04:30";
-
-        const [mH, mM] = maghribStr.split(":").map(Number);
-        const [fH, fM] = fajrStr.split(":").map(Number);
-
-        const maghribDate = new Date(now.getFullYear(), now.getMonth(), now.getDate(), mH, mM, 0);
-        const fajrDate = new Date(now.getFullYear(), now.getMonth(), now.getDate(), fH, fM, 0);
-
-        if (now < maghribDate && now >= fajrDate) {
+        if (info.isDuringFast) {
             // وقت الصيام نهاراً -> العد التنازلي للمغرب (الإفطار)
             if (timerLabel) timerLabel.textContent = "المتبقي على أذان المغرب والإفطار 🌅:";
-            const diff = maghribDate - now;
+            const diff = info.maghribDate - now;
             timerVal.textContent = formatDuration(diff);
-        } else {
-            // ليلاً -> العد التنازلي للإمساك وأذان الفجر
-            if (timerLabel) timerLabel.textContent = "المتبقي على أذان الفجر وبدء الصيام 🌙:";
-            let targetFajr = fajrDate;
-            if (now >= maghribDate) {
-                targetFajr = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1, fH, fM, 0);
-            }
-            const diff = targetFajr - now;
+        } else if (info.isBeforeFajr) {
+            // سحراً قبل الفجر -> العد التنازلي لأذان الفجر والإمساك
+            if (timerLabel) timerLabel.textContent = "المتبقي على أذان الفجر والإمساك 🌙:";
+            const diff = info.fajrDate - now;
+            timerVal.textContent = formatDuration(diff);
+        } else if (info.isRamadan && info.isAfterMaghrib) {
+            // في ليالي رمضان -> العد التنازلي لفجر الغد
+            if (timerLabel) timerLabel.textContent = "المتبقي على أذان الفجر والإمساك 🌙:";
+            const nextFajr = new Date(info.fajrDate.getTime() + 24 * 60 * 60 * 1000);
+            const diff = nextFajr - now;
             timerVal.textContent = formatDuration(diff);
         }
     };
