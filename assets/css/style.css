@@ -209,6 +209,25 @@ body {
     text-align: center;
 }
 
+.hero-badges-group {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  margin-bottom: 1.5rem;
+}
+
+.hero-badges-group .hero-badge {
+  margin-bottom: 0;
+}
+
+.hero-hijri-badge {
+  background: rgba(16, 185, 129, 0.12);
+  border-color: rgba(16, 185, 129, 0.3);
+  color: #34d399;
+}
+
 .hero-badge {
   display: inline-flex;
   align-items: center;
@@ -2838,6 +2857,21 @@ body {
   border-radius: var(--radius-full);
 }
 
+.prayer-hijri-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-family: var(--font-arabic-heading, inherit);
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: var(--gold-300);
+  background: rgba(15, 23, 42, 0.6);
+  padding: 0.45rem 1rem;
+  border-radius: var(--radius-full);
+  border: 1px solid rgba(212, 175, 55, 0.25);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+}
+
 .prayer-city-select {
   background: transparent;
   border: none;
@@ -3050,6 +3084,74 @@ body {
 @media (max-width: 768px) {
   .dua-card-creator-layout {
     grid-template-columns: 1fr;
+  }
+}
+
+.recipient-label-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-bottom: 0.4rem;
+}
+
+.label-badge-hint {
+  font-size: 0.76rem;
+  color: var(--gold-400);
+  background: rgba(212, 175, 55, 0.1);
+  padding: 0.15rem 0.55rem;
+  border-radius: var(--radius-full);
+  border: 1px solid rgba(212, 175, 55, 0.2);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+.recipient-quick-pills {
+  display: flex;
+  gap: 0.4rem;
+  flex-wrap: wrap;
+  margin-top: 0.5rem;
+}
+
+.recipient-pill {
+  background: rgba(15, 28, 48, 0.65);
+  border: 1px solid rgba(212, 175, 55, 0.2);
+  color: var(--text-muted);
+  padding: 0.3rem 0.65rem;
+  border-radius: var(--radius-full);
+  font-size: 0.78rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: var(--transition-fast);
+}
+
+.recipient-pill:hover {
+  color: var(--gold-300);
+  border-color: var(--gold-400);
+}
+
+.recipient-pill.active {
+  background: rgba(212, 175, 55, 0.2);
+  border-color: var(--gold-400);
+  color: #fff;
+  font-weight: 600;
+}
+
+.prayer-card-newly-added {
+  animation: prayerCardHighlight 1.5s ease-in-out infinite alternate !important;
+  border-color: var(--gold-400) !important;
+}
+
+@keyframes prayerCardHighlight {
+  0% {
+    box-shadow: 0 0 10px rgba(212, 175, 55, 0.3);
+    transform: scale(1);
+  }
+  100% {
+    box-shadow: 0 0 25px rgba(212, 175, 55, 0.75);
+    transform: scale(1.02);
   }
 }
 

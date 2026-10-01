@@ -3,8 +3,9 @@
  */
 
 document.addEventListener("DOMContentLoaded", () => {
-    // 1. تهيئة اسم الجد والمعلومات الرئيسية
+    // 1. تهيئة اسم الجد والمعلومات الرئيسية والتقويم الهجري
     initDeceasedInfo();
+    initHijriDate();
 
     // 2. تهيئة الأدعية وسلايدر Swiper
     initPrayersSwiper();
@@ -54,6 +55,44 @@ function initDeceasedInfo() {
     const bioElement = document.getElementById("deceased-bio");
     if (bioElement) {
         bioElement.textContent = DECEASED_INFO.shortBio;
+    }
+}
+
+/**
+ * حساب وعرض التاريخ الهجري المبارك بتنسيق أم القرى الفاخر
+ */
+function initHijriDate() {
+    const heroHijriEl = document.getElementById("hero-hijri-date-text");
+    const prayerHijriEl = document.getElementById("prayer-hijri-text");
+
+    let formattedDate = "";
+    try {
+        const formatter = new Intl.DateTimeFormat('ar-SA-u-ca-islamic-umalqura', {
+            weekday: 'long',
+            day: 'numeric',
+            month: 'long',
+            year: 'numeric'
+        });
+        formattedDate = formatter.format(new Date());
+    } catch (e) {
+        try {
+            const fallback = new Intl.DateTimeFormat('ar-SA-u-ca-islamic', {
+                weekday: 'long',
+                day: 'numeric',
+                month: 'long',
+                year: 'numeric'
+            });
+            formattedDate = fallback.format(new Date());
+        } catch (err) {
+            formattedDate = "التقويم الهجري المبارك";
+        }
+    }
+
+    if (heroHijriEl && formattedDate) {
+        heroHijriEl.textContent = formattedDate;
+    }
+    if (prayerHijriEl && formattedDate) {
+        prayerHijriEl.textContent = formattedDate;
     }
 }
 
@@ -663,7 +702,15 @@ function initAddPrayerModal() {
                 amenCount: 1
             };
 
-            // 1. إذا كان Firebase متصلاً، ارفع الدعاء للسحابة ليظهر فوراً لجميع الزوار حول العالم
+            // 1. إضافة الدعاء محلياً للأمام فوراً لضمان ظهوره اللحظي
+            allPrayers.unshift(newPrayer);
+            renderPrayerSlides();
+            if (prayersSwiperInstance) {
+                prayersSwiperInstance.update();
+                prayersSwiperInstance.slideToLoop(0, 600);
+            }
+
+            // 2. إذا كان Firebase متصلاً، ارفع الدعاء للسحابة ليظهر فوراً لجميع الزوار حول العالم
             if (prayersRef) {
                 try {
                     prayersRef.push({
@@ -681,27 +728,33 @@ function initAddPrayerModal() {
                 }
             }
 
-            // 2. حفظ محلياً أيضاً لضمان ظهوره الفوري دائماً
+            // 3. حفظ محلياً أيضاً لضمان ظهوره الدائم
             const stored = JSON.parse(localStorage.getItem("user_prayers_list") || "[]");
             stored.unshift(newPrayer);
             localStorage.setItem("user_prayers_list", JSON.stringify(stored));
 
-            // تحديث القائمة المحلية إن لم يكن فيربيز متصلاً
-            if (!prayersRef) {
-                allPrayers.unshift(newPrayer);
-                renderPrayerSlides();
-                if (prayersSwiperInstance) {
-                    prayersSwiperInstance.update();
-                    prayersSwiperInstance.slideToLoop(0, 500);
-                }
-            }
-
-            // إغلاق وتفريغ
+            // 4. إغلاق وتفريغ
             modal.classList.remove("open");
             form.reset();
 
             playCompletionChime();
-            showToast("جزاك الله خيراً! تم نشر دعائك وسيظهر للجميع في السلايدر 🤲");
+            showToast("جزاك الله خيراً! تم نشر دعائك ويظهر الآن في السلايدر 🤲");
+
+            // 5. التوجه الفوري السلس إلى قسم السلايدر والانتقال لأول شريحة وإبرازها
+            setTimeout(() => {
+                const prayersSection = document.getElementById("prayers");
+                if (prayersSection) {
+                    prayersSection.scrollIntoView({ behavior: "smooth" });
+                }
+                if (prayersSwiperInstance) {
+                    prayersSwiperInstance.slideToLoop(0, 600);
+                }
+                const firstCard = document.querySelector("#prayers-swiper-wrapper .swiper-slide-active .prayer-card") || document.querySelector("#prayers-swiper-wrapper .prayer-card");
+                if (firstCard) {
+                    firstCard.classList.add("prayer-card-newly-added");
+                    setTimeout(() => firstCard.classList.remove("prayer-card-newly-added"), 5000);
+                }
+            }, 350);
         });
     }
 }
@@ -1732,6 +1785,9 @@ function initDuaCardGenerator() {
     const downloadBtn = document.getElementById("btn-download-dua-image");
     const shareBtn = document.getElementById("btn-share-dua-image");
 
+    const recipientInput = document.getElementById("dua-card-recipient-input");
+    const recipientPills = document.querySelectorAll(".recipient-pill");
+
     openBtns.forEach(btn => {
         if (btn) {
             btn.addEventListener("click", () => {
@@ -1750,6 +1806,30 @@ function initDuaCardGenerator() {
             if (e.target === modal) modal.classList.remove("open");
         });
     }
+
+    if (recipientInput) {
+        recipientInput.addEventListener("input", () => {
+            recipientPills.forEach(p => {
+                if (p.dataset.name === recipientInput.value.trim()) {
+                    p.classList.add("active");
+                } else {
+                    p.classList.remove("active");
+                }
+            });
+            drawDuaCard();
+        });
+    }
+
+    recipientPills.forEach(pill => {
+        pill.addEventListener("click", () => {
+            recipientPills.forEach(p => p.classList.remove("active"));
+            pill.classList.add("active");
+            if (recipientInput) {
+                recipientInput.value = pill.dataset.name;
+                drawDuaCard();
+            }
+        });
+    });
 
     if (selectTemplate) {
         selectTemplate.addEventListener("change", (e) => {
@@ -1808,7 +1888,8 @@ function drawDuaCard() {
     canvas.height = height;
 
     const duaText = getSelectedDuaText();
-    const deceasedName = (typeof DECEASED_INFO !== "undefined" && DECEASED_INFO.name) ? DECEASED_INFO.name : "عبدالمعبود أمين سعيد";
+    const recipientInput = document.getElementById("dua-card-recipient-input");
+    const rawRecipient = (recipientInput && recipientInput.value.trim()) || ((typeof DECEASED_INFO !== "undefined" && DECEASED_INFO.name) ? DECEASED_INFO.name : "عبدالمعبود أمين سعيد");
 
     // 1. رسم الخلفية
     if (currentDuaTheme === "emerald") {
@@ -1898,19 +1979,31 @@ function drawDuaCard() {
     // عبارة الصدقة الجارية
     ctx.fillStyle = currentDuaTheme === "parchment" ? "#6b5413" : "#e2d2a2";
     ctx.font = "26px 'Tajawal', sans-serif";
-    ctx.fillText("صَدَقَةٌ جَارِيَةٌ وَدُعَاءٌ لِرُوحِ فَقِيدِنَا الغَالِي", width / 2, 245);
+    if (rawRecipient.includes("المسلمين")) {
+        ctx.fillText("صَدَقَةٌ جَارِيَةٌ وَدُعَاءٌ لِمَوْتَى المُسْلِمِينَ جَمِيعاً", width / 2, 245);
+    } else {
+        ctx.fillText("صَدَقَةٌ جَارِيَةٌ وَدُعَاءٌ لِرُوحِ المَغْفُورِ لَهُ بِإِذْنِ اللَّهِ", width / 2, 245);
+    }
 
-    // اسم الفقيد بالفخامة الذهبية
+    // اسم الفقيد / المهدى له بالفخامة الذهبية
     ctx.fillStyle = currentDuaTheme === "parchment" ? "#2a1f05" : "#ffffff";
-    ctx.font = "bold 46px 'Amiri', serif";
+    let nameFontSize = 46;
+    if (rawRecipient.length > 32) nameFontSize = 34;
+    else if (rawRecipient.length > 22) nameFontSize = 38;
+
+    ctx.font = `bold ${nameFontSize}px 'Amiri', serif`;
     ctx.shadowColor = currentDuaTheme === "parchment" ? "rgba(0,0,0,0.1)" : "rgba(212, 175, 55, 0.4)";
     ctx.shadowBlur = 12;
-    ctx.fillText(`( ${deceasedName} )`, width / 2, 305);
+    ctx.fillText(`( ${rawRecipient} )`, width / 2, 305);
     ctx.shadowBlur = 0;
 
     ctx.fillStyle = currentDuaTheme === "parchment" ? "#855e09" : "#d4af37";
     ctx.font = "italic 24px 'Amiri', serif";
-    ctx.fillText("تغمّده الله بواسع رحمته ومغفرته وأسكنه الفردوس الأعلى", width / 2, 360);
+    if (rawRecipient.includes("المسلمين")) {
+        ctx.fillText("تغمّدهم الله جميعاً بواسع رحمته ومغفرته وأسكنهم الفردوس الأعلى", width / 2, 360);
+    } else {
+        ctx.fillText("تغمّده الله بواسع رحمته ومغفرته وأسكنه الفردوس الأعلى", width / 2, 360);
+    }
     ctx.restore();
 
     // خط فاصل علوي مزخرف
@@ -2007,6 +2100,9 @@ function shareDuaCardImage() {
     const canvas = document.getElementById("dua-card-canvas");
     if (!canvas) return;
 
+    const recipientInput = document.getElementById("dua-card-recipient-input");
+    const recipientName = (recipientInput && recipientInput.value.trim()) || "فقيدنا الغالي";
+
     if (navigator.share && navigator.canShare) {
         canvas.toBlob((blob) => {
             if (!blob) return;
@@ -2014,8 +2110,8 @@ function shareDuaCardImage() {
             if (navigator.canShare({ files: [file] })) {
                 navigator.share({
                     files: [file],
-                    title: "صدقة جارية لروح جدي عبدالمعبود أمين سعيد",
-                    text: "شاركنا بالدعاء وقراءة القرآن لروحه الطاهرة واكسب الأجر: https://abdomohaamed.github.io/sadqah-jaddi/"
+                    title: `صدقة جارية ودعاء لروح: ${recipientName}`,
+                    text: `دعاء لروح (${recipientName}) • شاركنا بالدعاء وختمة القرآن: ${window.location.href}`
                 }).catch(() => {});
                 return;
             }
@@ -2028,7 +2124,9 @@ function shareDuaCardImage() {
 
 function fallbackWhatsAppShare() {
     const dua = getSelectedDuaText();
-    const text = encodeURIComponent(`🌿 صدقة جارية ودعاء لروح جدي الغالي عبدالمعبود أمين سعيد رحمه الله:\n\n"${dua}"\n\nشاركنا الأجر والدعاء وختمات القرآن والتسبيح عبر الرابط:\nhttps://abdomohaamed.github.io/sadqah-jaddi/`);
+    const recipientInput = document.getElementById("dua-card-recipient-input");
+    const recipientName = (recipientInput && recipientInput.value.trim()) || "فقيدنا الغالي";
+    const text = encodeURIComponent(`🌿 صدقة جارية ودعاء لروح (${recipientName}):\n\n"${dua}"\n\nشاركنا الأجر والدعاء وختمات القرآن والتسبيح عبر الرابط:\n${window.location.href}`);
     window.open(`https://api.whatsapp.com/send?text=${text}`, "_blank");
 }
 

@@ -91,9 +91,15 @@
          ========================================== -->
     <section id="hero" class="hero">
         <div class="container">
-            <div class="hero-badge">
-                <i class="fa-solid fa-moon"></i>
-                <span>بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ</span>
+            <div class="hero-badges-group">
+                <div class="hero-badge">
+                    <i class="fa-solid fa-moon"></i>
+                    <span>بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ</span>
+                </div>
+                <div class="hero-badge hero-hijri-badge" id="hero-hijri-date-badge">
+                    <i class="fa-solid fa-calendar-day text-gold"></i>
+                    <span id="hero-hijri-date-text">التقويم الهجري المبارك</span>
+                </div>
             </div>
 
             <h1 class="hero-title">
@@ -383,6 +389,11 @@
                             <option value="Madinah">المدينة المنورة (السعودية)</option>
                             <option value="Riyadh">الرياض (السعودية)</option>
                         </select>
+                    </div>
+
+                    <div class="prayer-hijri-badge" id="prayer-hijri-badge">
+                        <i class="fa-solid fa-moon text-gold"></i>
+                        <span id="prayer-hijri-text">التقويم الهجري المبارك</span>
                     </div>
 
                     <div class="prayer-next-countdown">
@@ -788,12 +799,28 @@
             <button class="modal-close-btn" id="btn-close-dua-card-modal" aria-label="إغلاق">&times;</button>
             <h3 class="modal-title">صانع بطاقات الأدعية للمشاركة 🖼️✨</h3>
             <p class="modal-desc">
-                اختر أو اكتب دعاءً لروح جدي الغالي، واحفظه كصورة إسلامية راقية لنشرها في حالات واتساب أو ستوري.
+                اختر أو اكتب دعاءً بالاسم الذي تريده لفقيدك الغالي، وصمّم بطاقة إسلامية راقية فوراً لنشرها في حالات واتساب ومواقع التواصل.
             </p>
 
             <div class="dua-card-creator-layout">
                 <!-- لوحة التحكم بالاختيارات -->
                 <div class="dua-creator-controls">
+                    <!-- اسم المهدى له الدعاء / المتوفى -->
+                    <div class="form-group">
+                        <div class="recipient-label-row">
+                            <label class="form-label" for="dua-card-recipient-input">إهداء الصدقة والدعاء باسم:</label>
+                            <span class="label-badge-hint"><i class="fa-solid fa-pen-nib"></i> يمكنك كتابة أي اسم مخصص</span>
+                        </div>
+                        <input type="text" id="dua-card-recipient-input" class="form-input" value="جدي الغالي (عبدالمعبود أمين سعيد)" placeholder="اكتب اسم المتوفى (مثال: أبي، أمي، أخي، فلان...)">
+                        <div class="recipient-quick-pills">
+                            <button type="button" class="recipient-pill active" data-name="جدي الغالي (عبدالمعبود أمين سعيد)">جدي عبدالمعبود ✦</button>
+                            <button type="button" class="recipient-pill" data-name="أبي الحبيب">أبي الحبيب</button>
+                            <button type="button" class="recipient-pill" data-name="أمي الغالية">أمي الغالية</button>
+                            <button type="button" class="recipient-pill" data-name="جدتي الغالية">جدتي الغالية</button>
+                            <button type="button" class="recipient-pill" data-name="موتانا وموتى جميع المسلمين">موتى المسلمين</button>
+                        </div>
+                    </div>
+
                     <div class="form-group">
                         <label class="form-label" for="dua-template-select">اختر دعاءً مأثوراً جاهزاً:</label>
                         <select id="dua-template-select" class="form-input">
