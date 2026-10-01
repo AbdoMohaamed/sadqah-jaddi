@@ -41,7 +41,7 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css">
 
     <!-- تنسيقات الموقع -->
-    <link rel="stylesheet" href="assets/css/style.css?v=60">
+    <link rel="stylesheet" href="assets/css/style.css?v=61">
 </head>
 <body>
 
@@ -411,32 +411,36 @@
             <!-- بطاقة التحكم والعد التنازلي لمواقيت الصلاة -->
             <div class="prayer-times-card">
                 <div class="prayer-times-meta">
-                    <div class="prayer-location-selector">
-                        <i class="fa-solid fa-location-dot text-gold"></i>
-                        <label for="select-prayer-city" class="sr-only">اختر المدينة:</label>
-                        <select id="select-prayer-city" class="prayer-city-select">
-                            <option value="Cairo" selected>القاهرة (مصر)</option>
-                            <option value="Alexandria">الإسكندرية (مصر)</option>
-                            <option value="Giza">الجيزة (مصر)</option>
-                            <option value="Mansoura">المنصورة (الدقهلية)</option>
-                            <option value="Tanta">طنطا (الغربية)</option>
-                            <option value="Zagazig">الزقازيق (الشرقية)</option>
-                            <option value="Assiut">أسيوط (مصر)</option>
-                            <option value="Makkah">مكة المكرمة (السعودية)</option>
-                            <option value="Madinah">المدينة المنورة (السعودية)</option>
-                            <option value="auto_gps" id="opt-auto-gps" style="display: none;">موقعي الحالي (GPS) 📍</option>
-                        </select>
+                    <div class="prayer-meta-group">
+                        <div class="prayer-location-selector">
+                            <i class="fa-solid fa-location-dot text-gold"></i>
+                            <label for="select-prayer-city" class="sr-only">اختر المدينة:</label>
+                            <select id="select-prayer-city" class="prayer-city-select">
+                                <option value="Cairo" selected>القاهرة (مصر)</option>
+                                <option value="Alexandria">الإسكندرية (مصر)</option>
+                                <option value="Giza">الجيزة (مصر)</option>
+                                <option value="Mansoura">المنصورة (الدقهلية)</option>
+                                <option value="Tanta">طنطا (الغربية)</option>
+                                <option value="Zagazig">الزقازيق (الشرقية)</option>
+                                <option value="Assiut">أسيوط (مصر)</option>
+                                <option value="Makkah">مكة المكرمة (السعودية)</option>
+                                <option value="Madinah">المدينة المنورة (السعودية)</option>
+                                <option value="gps" id="opt-auto-gps" style="display: none;">📍 موقعي الحالي (GPS)</option>
+                            </select>
+                        </div>
+
+                        <div class="prayer-action-buttons">
+                            <button type="button" class="btn btn-outline btn-sm btn-gps-location" id="btn-gps-location" title="تحديد مواقيت الصلاة بدقة لموقعك الحالي حول العالم">
+                                <i class="fa-solid fa-location-crosshairs text-gold"></i>
+                                <span>موقعي (GPS)</span>
+                            </button>
+
+                            <button type="button" class="btn btn-outline btn-sm btn-open-qibla" id="btn-open-qibla" title="تحديد اتجاه القبلة نحو الكعبة المشرفة">
+                                <i class="fa-solid fa-compass text-gold"></i>
+                                <span>اتجاه القبلة</span>
+                            </button>
+                        </div>
                     </div>
-
-                    <button type="button" class="btn btn-outline btn-sm btn-gps-location" id="btn-gps-location" title="تحديد مواقيت الصلاة بدقة لموقعك الحالي حول العالم">
-                        <i class="fa-solid fa-location-crosshairs text-gold"></i>
-                        <span>موقعي (GPS)</span>
-                    </button>
-
-                    <button type="button" class="btn btn-outline btn-sm btn-open-qibla" id="btn-open-qibla" title="تحديد اتجاه القبلة نحو الكعبة المشرفة">
-                        <i class="fa-solid fa-compass text-gold"></i>
-                        <span>اتجاه القبلة</span>
-                    </button>
 
                     <div class="prayer-hijri-badge" id="prayer-hijri-badge">
                         <i class="fa-solid fa-moon text-gold"></i>
@@ -1138,14 +1142,80 @@
             <img src="assets/icon.svg" alt="أيقونة التطبيق" width="44" height="44">
         </div>
         <div class="pwa-banner-text">
-            <strong>تطبيق صدقة جارية على هاتفك</strong>
-            <span>ثبّت الموقع كتطبيق للوصول السريع للأدعية والسبحة بدون إنترنت</span>
+            <strong>تطبيق زاد المسلم على هاتفك 📱</strong>
+            <span>ثبّت التطبيق للوصول السريع للقرآن ومواقيت الصلاة والأذكار بدون نت</span>
         </div>
         <div class="pwa-banner-actions">
             <button type="button" class="btn btn-gold btn-sm" id="btn-pwa-banner-install">
                 <span>تثبيت الآن</span>
             </button>
             <button type="button" class="pwa-close-btn" id="btn-pwa-banner-dismiss" aria-label="إغلاق">&times;</button>
+        </div>
+    </div>
+
+    <!-- ==========================================
+         نافذة إرشادات تثبيت التطبيق على هواتف الآيفون (iOS Safari Modal)
+         ========================================== -->
+    <div class="modal-overlay" id="ios-install-modal">
+        <div class="modal-card modal-card-ios-install">
+            <div class="modal-header-row">
+                <h3 class="modal-title">
+                    <i class="fa-brands fa-apple text-gold"></i>
+                    تثبيت التطبيق على جهاز الآيفون (iOS)
+                </h3>
+                <button class="modal-close-btn" id="btn-close-ios-install-modal" aria-label="إغلاق">&times;</button>
+            </div>
+            
+            <div class="ios-install-body">
+                <p class="ios-install-lead">
+                    يمكنك تشغيل تطبيق <strong>زاد المسلم</strong> كأي تطبيق رسمي من متجر أبل يعمل بدون إنترنت بخطوتين بسيطتين:
+                </p>
+
+                <div class="ios-steps-list">
+                    <div class="ios-step-card">
+                        <div class="ios-step-badge">1</div>
+                        <div class="ios-step-info">
+                            <span class="ios-step-main">اضغط على زر <strong>المشاركة</strong> (Share)</span>
+                            <span class="ios-step-desc">الأيقونة المربعة مع السهم المتجه لأعلى في شريط سفاري بالأسفل</span>
+                        </div>
+                        <div class="ios-step-glyph">
+                            <i class="fa-solid fa-arrow-up-from-bracket"></i>
+                        </div>
+                    </div>
+
+                    <div class="ios-step-card">
+                        <div class="ios-step-badge">2</div>
+                        <div class="ios-step-info">
+                            <span class="ios-step-main">اختر <strong>"إضافة إلى الصفحة الرئيسية"</strong></span>
+                            <span class="ios-step-desc">مرر قائمة الخيارات لأسفل واضغط (Add to Home Screen)</span>
+                        </div>
+                        <div class="ios-step-glyph">
+                            <i class="fa-regular fa-square-plus text-emerald"></i>
+                        </div>
+                    </div>
+
+                    <div class="ios-step-card">
+                        <div class="ios-step-badge">3</div>
+                        <div class="ios-step-info">
+                            <span class="ios-step-main">اضغط <strong>"إضافة" (Add)</strong> بأعلى اليمين</span>
+                            <span class="ios-step-desc">وسيظهر التطبيق فوراً على شاشة هاتفك مع سائر تطبيقاتك الأساسية</span>
+                        </div>
+                        <div class="ios-step-glyph">
+                            <i class="fa-solid fa-check text-gold"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="ios-install-feature-pill">
+                    <i class="fa-solid fa-shield-halved text-gold"></i>
+                    <span>يفتح التطبيق بضغطة زر، ويعمل بكفاءة 100% بدون اتصال بالإنترنت!</span>
+                </div>
+
+                <button type="button" class="btn btn-gold btn-block" id="btn-ios-install-understood">
+                    <i class="fa-solid fa-thumbs-up"></i>
+                    <span>فهمت، بارك الله فيكم</span>
+                </button>
+            </div>
         </div>
     </div>
 
@@ -1236,7 +1306,7 @@
     <script src="assets/js/data.js"></script>
     <script src="assets/js/azkar-data.js"></script>
     <script src="assets/js/firebase-config.js"></script>
-    <script src="assets/js/app.js?v=7"></script>
+    <script src="assets/js/app.js?v=8"></script>
     <script src="assets/js/quran.js"></script>
 </body>
 </html>

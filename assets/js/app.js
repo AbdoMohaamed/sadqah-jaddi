@@ -1521,6 +1521,11 @@ function initPWA() {
     const bannerInstallBtn = document.getElementById("btn-pwa-banner-install");
     const bannerDismissBtn = document.getElementById("btn-pwa-banner-dismiss");
 
+    // عناصر نافذة إرشادات الآيفون
+    const iosModal = document.getElementById("ios-install-modal");
+    const closeIosModalBtn = document.getElementById("btn-close-ios-install-modal");
+    const understoodIosBtn = document.getElementById("btn-ios-install-understood");
+
     // التحقق من تثبيت التطبيق مسبقاً (وضع Standalone)
     const isStandalone = window.matchMedia("(display-mode: standalone)").matches || window.navigator.standalone === true;
     if (isStandalone) {
@@ -1529,41 +1534,50 @@ function initPWA() {
         return;
     }
 
+    // إظهار زر التثبيت دائماً لجميع الأجهزة طالما لم يتم التثبيت بعد (بما في ذلك هواتف الآيفون iOS)
+    if (installBtn) {
+        installBtn.style.display = "inline-flex";
+    }
+
+    // إظهار بنر التثبيت التلقائي بعد قليل إن لم يغلقه الزائر
+    const isDismissed = sessionStorage.getItem("pwa_banner_dismissed");
+    if (!isDismissed && banner) {
+        setTimeout(() => {
+            banner.style.display = "flex";
+        }, 3000);
+    }
+
     // التقاط حدث التثبيت لمتصفحات أندرويد وكروم
     window.addEventListener("beforeinstallprompt", (e) => {
         e.preventDefault();
         deferredPrompt = e;
-
         if (installBtn) {
             installBtn.style.display = "inline-flex";
         }
-
-        const isDismissed = sessionStorage.getItem("pwa_banner_dismissed");
-        if (!isDismissed && banner) {
-            setTimeout(() => {
-                banner.style.display = "flex";
-            }, 3500);
-        }
     });
+
+    const openIosGuide = () => {
+        if (iosModal) {
+            iosModal.classList.add("open");
+        } else {
+            alert("لتثبيت التطبيق على هاتف الآيفون (iOS):\n\n1. اضغط على زر المشاركة ⎋ أسفل متصفح Safari.\n2. مرر القائمة للأسفل واختر 'إضافة إلى الصفحة الرئيسية ➕'.\n3. اضغط 'إضافة' بالأعلى وسيظهر التطبيق كأيقونة مستقلة على هاتفك.");
+        }
+    };
 
     const triggerInstall = () => {
         if (deferredPrompt) {
             deferredPrompt.prompt();
             deferredPrompt.userChoice.then((choiceResult) => {
                 if (choiceResult.outcome === "accepted") {
-                    showToast("جزاكم الله خيراً! تم تثبيت تطبيق صدقة جارية بنجاح 🌿📱");
+                    showToast("جزاكم الله خيراً! تم تثبيت تطبيق زاد المسلم بنجاح 🌿📱");
                 }
                 deferredPrompt = null;
                 if (banner) banner.style.display = "none";
                 if (installBtn) installBtn.style.display = "none";
             });
         } else {
-            const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
-            if (isIOS) {
-                alert("لتثبيت التطبيق على هاتف الآيفون (iOS):\n\n1. اضغط على زر المشاركة ⎋ أسفل متصفح Safari.\n2. مرر القائمة للأسفل واختر 'إضافة إلى الصفحة الرئيسية ➕'.\n3. اضغط 'إضافة' بالأعلى وسيظهر التطبيق كأيقونة مستقلة على هاتفك.");
-            } else {
-                showToast("يمكنك تثبيت الموقع من قائمة المتصفح (⋮) -> 'تثبيت التطبيق' أو 'إضافة للشاشة الرئيسية'");
-            }
+            // هواتف آيفون (iOS) أو المتصفحات التي لا تدعم قبل التثبيت التلقائي
+            openIosGuide();
         }
     };
 
@@ -1577,6 +1591,24 @@ function initPWA() {
         bannerDismissBtn.addEventListener("click", () => {
             banner.style.display = "none";
             sessionStorage.setItem("pwa_banner_dismissed", "true");
+        });
+    }
+
+    if (closeIosModalBtn && iosModal) {
+        closeIosModalBtn.addEventListener("click", () => {
+            iosModal.classList.remove("open");
+        });
+    }
+    if (understoodIosBtn && iosModal) {
+        understoodIosBtn.addEventListener("click", () => {
+            iosModal.classList.remove("open");
+        });
+    }
+    if (iosModal) {
+        iosModal.addEventListener("click", (e) => {
+            if (e.target === iosModal) {
+                iosModal.classList.remove("open");
+            }
         });
     }
 
@@ -2743,22 +2775,26 @@ window.copyTextToClipboard = function(text) {
    ========================================================================== */
 function initGPSLocation() {
     const btnGps = document.getElementById("btn-gps-location");
-    if (!btnGps) return;
 
-    btnGps.addEventListener("click", () => {
+    function requestGPSPosition(isSilent = false) {
         if (!navigator.geolocation) {
-            showToast("خاصية تحديد الموقع الجغرافي غير مدعومة في متصفحك ⚠️");
+            if (!isSilent) showToast("خاصية تحديد الموقع الجغرافي غير مدعومة في متصفحك ⚠️");
             return;
         }
 
-        const originalContent = btnGps.innerHTML;
-        btnGps.disabled = true;
-        btnGps.innerHTML = '<i class="fa-solid fa-spinner fa-spin text-gold"></i> <span>جارٍ التحديد...</span>';
+        let originalContent = "";
+        if (btnGps && !isSilent) {
+            originalContent = btnGps.innerHTML;
+            btnGps.disabled = true;
+            btnGps.innerHTML = '<i class="fa-solid fa-spinner fa-spin text-gold"></i> <span>جارٍ التحديد...</span>';
+        }
 
         navigator.geolocation.getCurrentPosition(
             (pos) => {
-                btnGps.disabled = false;
-                btnGps.innerHTML = originalContent;
+                if (btnGps && !isSilent) {
+                    btnGps.disabled = false;
+                    btnGps.innerHTML = originalContent;
+                }
 
                 const lat = pos.coords.latitude;
                 const lng = pos.coords.longitude;
@@ -2776,22 +2812,60 @@ function initGPSLocation() {
                         gpsOpt.textContent = "📍 موقعي الحالي (GPS)";
                         citySelect.insertBefore(gpsOpt, citySelect.firstChild);
                     }
+                    gpsOpt.style.display = "block";
                     citySelect.value = "gps";
                 }
 
-                showToast("تم تحديد موقعك بدقة 📍 وحساب مواقيت الصلاة والقبلة بنجاح");
+                if (!isSilent) {
+                    showToast("تم تحديد موقعك بدقة 📍 وحساب مواقيت الصلاة والقبلة بنجاح");
+                }
                 fetchPrayerTimes("gps");
             },
             (err) => {
-                btnGps.disabled = false;
-                btnGps.innerHTML = originalContent;
-                let msg = "تعذر الحصول على إحداثيات الموقع عبر GPS";
-                if (err.code === 1) msg = "يرجى منح الإذن للوصول إلى الموقع في المتصفح 📍";
-                showToast(msg);
+                if (btnGps && !isSilent) {
+                    btnGps.disabled = false;
+                    btnGps.innerHTML = originalContent;
+                }
+                if (!isSilent) {
+                    let msg = "تعذر الحصول على إحداثيات الموقع عبر GPS";
+                    if (err.code === 1) msg = "يرجى منح الإذن للوصول إلى الموقع في المتصفح 📍";
+                    showToast(msg);
+                }
             },
-            { timeout: 10000, enableHighAccuracy: true }
+            { timeout: 10000, enableHighAccuracy: false, maximumAge: 600000 }
         );
-    });
+    }
+
+    if (btnGps) {
+        btnGps.addEventListener("click", () => requestGPSPosition(false));
+    }
+
+    // الكشف التلقائي التام عن موقع GPS فور فتح التطبيق
+    const savedCity = localStorage.getItem("selected_prayer_city");
+
+    // إذا كان المستخدم قد اختار GPS مسبقاً أو كانت أول زيارة له
+    if (navigator.permissions && navigator.permissions.query) {
+        navigator.permissions.query({ name: "geolocation" }).then((perm) => {
+            if (perm.state === "granted") {
+                requestGPSPosition(true); // جلب فوري صامت للموقع الدقيق
+            } else if (perm.state === "prompt" && (!savedCity || savedCity === "gps")) {
+                requestGPSPosition(true);
+            }
+            perm.onchange = () => {
+                if (perm.state === "granted") {
+                    requestGPSPosition(false);
+                }
+            };
+        }).catch(() => {
+            if (!savedCity || savedCity === "gps") {
+                requestGPSPosition(true);
+            }
+        });
+    } else {
+        if (!savedCity || savedCity === "gps") {
+            requestGPSPosition(true);
+        }
+    }
 }
 
 /* ==========================================================================
