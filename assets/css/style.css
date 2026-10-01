@@ -96,6 +96,7 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  padding:0 15px;
 }
 
 .brand {
@@ -204,7 +205,7 @@ body {
    قسم البداية (Hero Section)
    ========================================================================== */
 .hero {
-    padding: 26px 3.5rem 0;
+    padding: 26px 3.5rem;
     position: relative;
     text-align: center;
 }
@@ -1594,7 +1595,7 @@ body {
    قسم المصحف الشريف وختمة القرآن الموحد (Unified Quran & Khatma Hub)
    ========================================================================== */
 .quran-khatma-section {
-  padding: 30px 0 50px;
+  padding: 25px 0 50px;
   position: relative;
   background: radial-gradient(circle at 50% 10%, rgba(16, 185, 129, 0.04) 0%, transparent 60%);
 }
@@ -2789,7 +2790,7 @@ body {
 
 /* قسم مواقيت الصلاة وساعة الاستجابة */
 .prayer-times-section {
-  padding: 4rem 0;
+  padding: 0px  0 25px;
   position: relative;
   background: radial-gradient(circle at 50% 10%, rgba(212, 175, 55, 0.04) 0%, transparent 60%);
 }
@@ -2970,7 +2971,7 @@ body {
 
 /* قسم دليل وآداب زيارة القبور */
 .cemetery-guide-section {
-  padding: 4.5rem 0;
+  padding: 0px  0 25px;
   background: radial-gradient(circle at 50% 10%, rgba(212, 175, 55, 0.03) 0%, transparent 60%);
 }
 
