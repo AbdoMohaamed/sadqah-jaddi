@@ -162,24 +162,42 @@ const RADIO_STATIONS = [
         id: "cairo",
         name: "إذاعة القرآن الكريم من القاهرة",
         desc: "بث مباشر رسمي على مدار 24 ساعة",
-        url: "https://stream.zeno.fm/f3wvbbqmdg8uv"
+        url: "https://stream.radiojar.com/8s5u5tpdtwzuv"
+    },
+    {
+        id: "tarateel",
+        name: "إذاعة تلاوات القرآن الكريم (تراتيل 24/7)",
+        desc: "بث تلاوات قرآنية عذبة متواصلة دون انقطاع",
+        url: "https://qurango.net/radio/tarateel"
     },
     {
         id: "minshawi",
         name: "تلاوات الشيخ محمد صديق المنشاوي",
-        desc: "تلاوات خاشعة نادرة",
+        desc: "المصحف المرتل برواية حفص عن عاصم",
         url: "https://qurango.net/radio/mohammed_siddiq_alminshawi"
     },
     {
         id: "hussary",
         name: "تلاوات الشيخ محمود خليل الحصري",
-        desc: "المصحف المرتل برواية حفص",
+        desc: "المصحف المرتل - شيخ عموم المقارئ المصرية",
         url: "https://qurango.net/radio/mahmoud_khalil_alhussary"
     },
     {
         id: "abdulbasit",
         name: "تلاوات الشيخ عبدالباسط عبدالصمد",
-        desc: "تلاوات ومصاحف مرتلة ومجودة",
+        desc: "تلاوات ومصاحف مرتلة ومجودة نادرة",
         url: "https://qurango.net/radio/abdulbasit_abdulsamad_mojawwad"
+    },
+    {
+        id: "alafasi",
+        name: "تلاوات الشيخ مشاري راشد العفاسي",
+        desc: "المصحف المرتل كامل بجودة نقية",
+        url: "https://backup.qurango.net/radio/mishary_alafasi"
+    },
+    {
+        id: "khushoo",
+        name: "إذاعة التلاوات الخاشعة والسكينة",
+        desc: "تلاوات خاشعة مؤثرة لراحة النفس والسكينة",
+        url: "https://backup.qurango.net/radio/salma"
     }
 ];

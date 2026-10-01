@@ -792,7 +792,6 @@ function initQuranKhatmaTabs() {
     const tabBtns = document.querySelectorAll(".quran-tab-btn");
     const mushafBlock = document.getElementById("subpart-mushaf");
     const khatmaBlock = document.getElementById("subpart-khatma");
-    const divider = document.querySelector(".islamic-section-divider");
 
     if (!tabBtns.length || !mushafBlock || !khatmaBlock) return;
 
@@ -805,31 +804,26 @@ function initQuranKhatmaTabs() {
             }
         });
 
-        if (targetTab === "all") {
-            mushafBlock.classList.remove("is-hidden");
-            khatmaBlock.classList.remove("is-hidden");
-            if (divider) divider.classList.remove("is-hidden");
-        } else if (targetTab === "mushaf") {
-            mushafBlock.classList.remove("is-hidden");
-            khatmaBlock.classList.add("is-hidden");
-            if (divider) divider.classList.add("is-hidden");
-        } else if (targetTab === "khatma") {
+        if (targetTab === "khatma") {
             mushafBlock.classList.add("is-hidden");
             khatmaBlock.classList.remove("is-hidden");
-            if (divider) divider.classList.add("is-hidden");
+        } else {
+            // الافتراضي هو المصحف الشريف
+            mushafBlock.classList.remove("is-hidden");
+            khatmaBlock.classList.add("is-hidden");
         }
     };
 
     tabBtns.forEach(btn => {
         btn.addEventListener("click", () => {
-            const targetTab = btn.dataset.tab || "all";
+            const targetTab = btn.dataset.tab || "mushaf";
             window.switchQuranKhatmaTab(targetTab);
         });
     });
 
     if (window.location.hash === "#khatma") {
         window.switchQuranKhatmaTab("khatma");
-    } else if (window.location.hash === "#quran-reader") {
+    } else {
         window.switchQuranKhatmaTab("mushaf");
     }
 }
@@ -1348,6 +1342,23 @@ function initLiveRadio() {
 
     const defaultStation = RADIO_STATIONS[0];
     radioAudio.src = defaultStation.url;
+    if (nameEl) nameEl.textContent = defaultStation.name;
+    if (descEl) descEl.textContent = defaultStation.desc;
+
+    // معالجة الأخطاء الذكية والتحويل التلقائي لمحطة قرآنية مضمونة
+    radioAudio.addEventListener("error", () => {
+        console.warn("Radio audio stream error, falling back to permanent stream...");
+        const fallback = RADIO_STATIONS.find(s => s.id === "tarateel") || RADIO_STATIONS[1];
+        if (fallback && radioAudio.src !== fallback.url) {
+            radioAudio.src = fallback.url;
+            if (nameEl) nameEl.textContent = fallback.name;
+            if (descEl) descEl.textContent = fallback.desc;
+            if (select) select.value = fallback.id;
+            if (isRadioPlaying) {
+                radioAudio.play().catch(e => console.warn(e));
+            }
+        }
+    });
 
     if (fabBtn && panel) {
         fabBtn.addEventListener("click", () => {
