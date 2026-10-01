@@ -65,7 +65,6 @@
                 <li><a href="#tasbeeh">السبحة</a></li>
                 <li><a href="#azkar">أذكار اليوم</a></li>
                 <li><a href="#prayers">أدعية الزوار</a></li>
-                <li><a href="#cemetery-guide">آداب المقابر</a></li>
             </ul>
 
             <div class="nav-actions">
@@ -76,11 +75,7 @@
                 <button id="btn-toggle-radio-nav" class="btn btn-outline" title="إذاعة القرآن الكريم">
                     <i class="fa-solid fa-tower-broadcast"></i>
                     <span>الإذاعة</span>
-                </button>
-                <button class="btn btn-gold btn-open-prayer-modal">
-                    <i class="fa-solid fa-hands-praying"></i>
-                    <span>ادعُ له الآن</span>
-                </button>
+                </button> 
             </div>
         </div>
     </nav>
@@ -126,8 +121,12 @@
             <div class="charity-memorial-banner">
                 <div class="charity-memorial-icon"><i class="fa-solid fa-hand-holding-heart text-gold"></i></div>
                 <div class="charity-memorial-text">
-                    تطبيق إسلامي وقفي متاح مجاناً لوجه الله تعالى • <strong>صدقة جارية على روح فقيدنا الغالي (عبدالمعبود أمين سعيد) رحمه الله</strong> — نسألكم الفاتحة وصالح الدعاء له ولكل موتى المسلمين.
+                    تطبيق إسلامي  متاح مجاناً لوجه الله تعالى • <strong>صدقة جارية على روح جدي الغالي (عبدالمعبود أمين سعيد) رحمه الله</strong> — نسألكم الفاتحة وصالح الدعاء له ولكل موتى المسلمين.
                 </div>
+                <button class="btn btn-gold btn-open-prayer-modal">
+                    <i class="fa-solid fa-hands-praying"></i>
+                    <span>ادعُ له الآن</span>
+                </button>
             </div>
 
             <!-- بطاقة الدعاء الكبرى البارزة -->
@@ -564,41 +563,6 @@
         </div>
     </section>
 
-    <!-- ==========================================
-         سلايدر أدعية الزوار (Swiper Slider Section)
-         ========================================== -->
-    <section id="prayers" class="prayers-section">
-        <div class="container">
-            <div class="section-header">
-                <span class="section-tag"><i class="fa-solid fa-heart"></i> في ميزان حسناته</span>
-                <h2 class="section-title">أدعية المحبين والزوار</h2>
-                <p class="section-desc">
-                    كل دعوة تؤمّن عليها أو تكتبها ترفع درجته وتؤنس وحشته وتثقل ميزانك بالأجر إن شاء الله.
-                </p>
-            </div>
-
-            <!-- حاوية Swiper -->
-            <div class="swiper-container-wrapper">
-                <div class="swiper swiper-prayers">
-                    <div class="swiper-wrapper" id="prayers-swiper-wrapper">
-                        <!-- تُنشأ شرائح الأدعية برمجياً من js/app.js -->
-                    </div>
-
-                    <!-- أزرار التنقل والترقيم -->
-                    <div class="swiper-pagination"></div>
-                    <div class="swiper-button-prev"></div>
-                    <div class="swiper-button-next"></div>
-                </div>
-            </div>
-
-            <div class="slider-bottom-actions">
-                <button class="btn btn-gold btn-open-prayer-modal">
-                    <i class="fa-solid fa-plus"></i>
-                    <span>أضف دعاءك ليظهر في السلايدر</span>
-                </button>
-            </div>
-        </div>
-    </section>
 
     <!-- ==========================================
          قسم السبحة الإلكترونية (Tasbeeh Section)
@@ -635,7 +599,7 @@
                     <!-- القرص الدائري للنقر -->
                     <div class="tasbeeh-click-area" id="tasbeeh-click-area" title="انقر هنا للتسبيح">
                         <svg class="progress-ring" viewBox="0 0 236 236">
-                            <circle class="progress-ring__circle" stroke-width="8" fill="transparent" r="110" cx="118" cy="118"/>
+                            <circle class="progress-ring__circle" stroke-width="8" fill="transparent" r="110" cx="118" cy="118" />
                         </svg>
 
                         <div class="counter-content">
@@ -745,9 +709,64 @@
         </div>
     </section>
 
+
     <!-- ==========================================
-         قسم جدول الورد والمهام الإيمانية اليومية (Daily Wird & Tracker)
-         ========================================== -->
+    قسم موسوعة الأدعية النبوية والقرآنية المبوبة (Categorized Duas Section)
+    ========================================== -->
+    <section id="categorized-duas" class="categorized-duas-section">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-tag"><i class="fa-solid fa-hands-praying"></i> جوامع الكلم وسؤال العظيم</span>
+                <h2 class="section-title">موسوعة الأدعية النبوية المبوبة</h2>
+                <p class="section-desc">
+                    أدعية مأثورة صحيحة من الكتاب والسنة مقسمة حسب حاجتك اليومية؛ لتفريج الكرب، والشفاء، والرزق، وصلاح الأهل والذرية.
+                </p>
+            </div>
+
+            <!-- أزرار تبويب فئات الأدعية -->
+            <div class="duas-categories-tabs" id="duas-categories-tabs">
+                <button type="button" class="duas-tab-btn active" data-cat="karb_debt">
+                    <i class="fa-solid fa-hand-holding-dollar"></i>
+                    <span>الكرب وقضاء الدين</span>
+                </button>
+                <button type="button" class="duas-tab-btn" data-cat="shifa_health">
+                    <i class="fa-solid fa-heart-pulse"></i>
+                    <span>الشفاء والعافية</span>
+                </button>
+                <button type="button" class="duas-tab-btn" data-cat="rizq_barakah">
+                    <i class="fa-solid fa-coins"></i>
+                    <span>الرزق والتيسير</span>
+                </button>
+                <button type="button" class="duas-tab-btn" data-cat="family_children">
+                    <i class="fa-solid fa-users"></i>
+                    <span>صلاح الأبناء والوالدين</span>
+                </button>
+                <button type="button" class="duas-tab-btn" data-cat="jawame_quran">
+                    <i class="fa-solid fa-star-and-crescent"></i>
+                    <span>جوامع دعاء القرآن</span>
+                </button>
+            </div>
+
+            <!-- شريط البحث السريع في موسوعة الأدعية -->
+            <div class="duas-search-filter-wrapper">
+                <div class="duas-search-box">
+                    <i class="fa-solid fa-magnifying-glass search-icon text-gold"></i>
+                    <input type="text" id="duas-search-input" class="form-input duas-search-input" placeholder="ابحث في نصوص وأسماء الأدعية (مثال: الشفاء، الرزق، الدين، الوالدين، الهم)...">
+                    <button type="button" class="btn btn-outline btn-sm btn-clear-duas-search" id="btn-clear-duas-search" style="display: none;" title="مسح البحث">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- شبكة عرض بطاقات الأدعية -->
+            <div class="categorized-duas-grid" id="categorized-duas-grid">
+                <!-- يُملأ برمجياً من js/azkar-data.js و js/app.js -->
+            </div>
+        </div>
+    </section>
+    <!-- ==========================================
+     قسم جدول الورد والمهام الإيمانية اليومية (Daily Wird & Tracker)
+     ========================================== -->
     <section id="daily-wird" class="daily-wird-section">
         <div class="container">
             <div class="section-header">
@@ -856,6 +875,41 @@
             </div>
         </div>
     </section>
+    <!-- ==========================================
+     سلايدر أدعية الزوار (Swiper Slider Section)
+     ========================================== -->
+    <section id="prayers" class="prayers-section">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-tag"><i class="fa-solid fa-heart"></i> في ميزان حسناته</span>
+                <h2 class="section-title">أدعية المحبين والزوار</h2>
+                <p class="section-desc">
+                    كل دعوة تؤمّن عليها أو تكتبها ترفع درجته وتؤنس وحشته وتثقل ميزانك بالأجر إن شاء الله.
+                </p>
+            </div>
+
+            <!-- حاوية Swiper -->
+            <div class="swiper-container-wrapper">
+                <div class="swiper swiper-prayers">
+                    <div class="swiper-wrapper" id="prayers-swiper-wrapper">
+                        <!-- تُنشأ شرائح الأدعية برمجياً من js/app.js -->
+                    </div>
+
+                    <!-- أزرار التنقل والترقيم -->
+                    <div class="swiper-pagination"></div>
+                    <div class="swiper-button-prev"></div>
+                    <div class="swiper-button-next"></div>
+                </div>
+            </div>
+
+            <div class="slider-bottom-actions">
+                <button class="btn btn-gold btn-open-prayer-modal">
+                    <i class="fa-solid fa-plus"></i>
+                    <span>أضف دعاءك ليظهر في السلايدر</span>
+                </button>
+            </div>
+        </div>
+    </section>
 
     <!-- ==========================================
          قسم آيات وأحاديث عن الدعاء للميت
@@ -901,64 +955,12 @@
                     </div>
                 </div>
             </div>
-    <!-- ==========================================
-         قسم موسوعة الأدعية النبوية والقرآنية المبوبة (Categorized Duas Section)
-         ========================================== -->
-    <section id="categorized-duas" class="categorized-duas-section">
-        <div class="container">
-            <div class="section-header">
-                <span class="section-tag"><i class="fa-solid fa-hands-praying"></i> جوامع الكلم وسؤال العظيم</span>
-                <h2 class="section-title">موسوعة الأدعية النبوية المبوبة</h2>
-                <p class="section-desc">
-                    أدعية مأثورة صحيحة من الكتاب والسنة مقسمة حسب حاجتك اليومية؛ لتفريج الكرب، والشفاء، والرزق، وصلاح الأهل والذرية.
-                </p>
-            </div>
-
-            <!-- أزرار تبويب فئات الأدعية -->
-            <div class="duas-categories-tabs" id="duas-categories-tabs">
-                <button type="button" class="duas-tab-btn active" data-cat="karb_debt">
-                    <i class="fa-solid fa-hand-holding-dollar"></i>
-                    <span>الكرب وقضاء الدين</span>
-                </button>
-                <button type="button" class="duas-tab-btn" data-cat="shifa_health">
-                    <i class="fa-solid fa-heart-pulse"></i>
-                    <span>الشفاء والعافية</span>
-                </button>
-                <button type="button" class="duas-tab-btn" data-cat="rizq_barakah">
-                    <i class="fa-solid fa-coins"></i>
-                    <span>الرزق والتيسير</span>
-                </button>
-                <button type="button" class="duas-tab-btn" data-cat="family_children">
-                    <i class="fa-solid fa-users"></i>
-                    <span>صلاح الأبناء والوالدين</span>
-                </button>
-                <button type="button" class="duas-tab-btn" data-cat="jawame_quran">
-                    <i class="fa-solid fa-star-and-crescent"></i>
-                    <span>جوامع دعاء القرآن</span>
-                </button>
-            </div>
-
-            <!-- شريط البحث السريع في موسوعة الأدعية -->
-            <div class="duas-search-filter-wrapper">
-                <div class="duas-search-box">
-                    <i class="fa-solid fa-magnifying-glass search-icon text-gold"></i>
-                    <input type="text" id="duas-search-input" class="form-input duas-search-input" placeholder="ابحث في نصوص وأسماء الأدعية (مثال: الشفاء، الرزق، الدين، الوالدين، الهم)...">
-                    <button type="button" class="btn btn-outline btn-sm btn-clear-duas-search" id="btn-clear-duas-search" style="display: none;" title="مسح البحث">
-                        <i class="fa-solid fa-xmark"></i>
-                    </button>
-                </div>
-            </div>
-
-            <!-- شبكة عرض بطاقات الأدعية -->
-            <div class="categorized-duas-grid" id="categorized-duas-grid">
-                <!-- يُملأ برمجياً من js/azkar-data.js و js/app.js -->
-            </div>
         </div>
     </section>
 
     <!-- ==========================================
-         قسم دليل وآداب زيارة القبور (Cemetery Etiquette & Sadaqah Guide)
-         ========================================== -->
+    قسم دليل وآداب زيارة القبور (Cemetery Etiquette & Sadaqah Guide)
+    ========================================== -->
     <section id="cemetery-guide" class="cemetery-guide-section">
         <div class="container">
             <div class="section-header">
@@ -1025,8 +1027,8 @@
     </section>
 
     <!-- ==========================================
-         نافذة كتابة دعاء (Modal Form)
-         ========================================== -->
+    نافذة كتابة دعاء (Modal Form)
+    ========================================== -->
     <div class="modal-overlay" id="add-prayer-modal">
         <div class="modal-card">
             <button class="modal-close-btn" id="btn-close-modal" aria-label="إغلاق">&times;</button>
@@ -1092,8 +1094,8 @@
     </div>
 
     <!-- ==========================================
-         نافذة صانع بطاقات الأدعية المصورة (Dua Card Generator Modal)
-         ========================================== -->
+    نافذة صانع بطاقات الأدعية المصورة (Dua Card Generator Modal)
+    ========================================== -->
     <div class="modal-overlay" id="dua-card-modal">
         <div class="modal-card modal-card-wide">
             <button class="modal-close-btn" id="btn-close-dua-card-modal" aria-label="إغلاق">&times;</button>
@@ -1180,8 +1182,8 @@
     </div>
 
     <!-- ==========================================
-         نافذة التفسير الميسر لصفحة المصحف (Tafsir Modal)
-         ========================================== -->
+    نافذة التفسير الميسر لصفحة المصحف (Tafsir Modal)
+    ========================================== -->
     <div class="modal-overlay" id="tafsir-modal">
         <div class="modal-card modal-card-wide">
             <div class="modal-header-row">
@@ -1203,8 +1205,8 @@
     </div>
 
     <!-- ==========================================
-         نافذة بوصلة القبلة التفاعلية (Qibla Compass Modal)
-         ========================================== -->
+    نافذة بوصلة القبلة التفاعلية (Qibla Compass Modal)
+    ========================================== -->
     <div class="modal-overlay" id="qibla-modal">
         <div class="modal-card modal-card-qibla">
             <div class="modal-header-row">
@@ -1216,14 +1218,14 @@
                     <span>المدينة: <strong id="qibla-city-name">القاهرة</strong></span>
                     <span class="qibla-angle-badge">زاوية الكعبة: <strong id="qibla-angle-value">136°</strong></span>
                 </div>
-                
+
                 <div class="compass-container">
                     <div class="compass-dial" id="compass-dial">
                         <div class="compass-cardinal compass-north">شمال (N)</div>
                         <div class="compass-cardinal compass-east">شرق (E)</div>
                         <div class="compass-cardinal compass-south">جنوب (S)</div>
                         <div class="compass-cardinal compass-west">غرب (W)</div>
-                        
+
                         <!-- مؤشر الكعبة المشرفة -->
                         <div class="compass-qibla-pointer" id="compass-qibla-pointer">
                             <div class="kaaba-icon-wrapper" title="اتجاه الكعبة المشرفة">
@@ -1257,8 +1259,8 @@
     </div>
 
     <!-- ==========================================
-         نافذة أدعية الصائم والإفطار (Fasting Dua Modal)
-         ========================================== -->
+    نافذة أدعية الصائم والإفطار (Fasting Dua Modal)
+    ========================================== -->
     <div class="modal-overlay" id="fasting-dua-modal">
         <div class="modal-card">
             <div class="modal-header-row">
@@ -1289,8 +1291,8 @@
     </div>
 
     <!-- ==========================================
-         نافذة إرشادات تثبيت التطبيق على هواتف الآيفون (iOS Safari Modal)
-         ========================================== -->
+    نافذة إرشادات تثبيت التطبيق على هواتف الآيفون (iOS Safari Modal)
+    ========================================== -->
     <div class="modal-overlay" id="ios-install-modal">
         <div class="modal-card modal-card-ios-install">
             <div class="modal-header-row">
@@ -1300,7 +1302,7 @@
                 </h3>
                 <button class="modal-close-btn" id="btn-close-ios-install-modal" aria-label="إغلاق">&times;</button>
             </div>
-            
+
             <div class="ios-install-body">
                 <p class="ios-install-lead">
                     يمكنك تشغيل تطبيق <strong>زاد المسلم</strong> كأي تطبيق رسمي من متجر أبل يعمل بدون إنترنت بخطوتين بسيطتين:
@@ -1353,10 +1355,9 @@
             </div>
         </div>
     </div>
-
     <!-- ==========================================
-         نافذة البحث الذكي في آيات القرآن الكريم (Quran Search Modal)
-         ========================================== -->
+    نافذة البحث الذكي في آيات القرآن الكريم (Quran Search Modal)
+    ========================================== -->
     <div class="modal-overlay" id="quran-search-modal">
         <div class="modal-card modal-card-wide modal-card-quran-search">
             <div class="modal-header-row">
@@ -1366,7 +1367,7 @@
                 </h3>
                 <button class="modal-close-btn" id="btn-close-quran-search-modal" aria-label="إغلاق">&times;</button>
             </div>
-            
+
             <div class="quran-search-body">
                 <div class="quran-search-input-box">
                     <i class="fa-solid fa-magnifying-glass search-field-icon"></i>
@@ -1386,10 +1387,9 @@
             </div>
         </div>
     </div>
-
     <!-- ==========================================
-         ويدجت إذاعة القرآن الكريم المباشرة (24/7 Live Radio)
-         ========================================== -->
+    ويدجت إذاعة القرآن الكريم المباشرة (24/7 Live Radio)
+    ========================================== -->
     <div class="live-radio-widget" id="live-radio-widget">
         <!-- الزر العائم المصغر -->
         <button class="radio-fab-btn" id="radio-fab-btn" title="إذاعة القرآن الكريم">
@@ -1438,10 +1438,9 @@
             <audio id="live-radio-audio" preload="none"></audio>
         </div>
     </div>
-
     <!-- تذييل الصفحة (Footer) -->
     <footer class="footer">
-        <div class="container">
+        <div class="container-fluid">
             <div class="footer-quote">
                 "اللهم اغفر لموتانا وموتى المسلمين، وارحمنا إذا صرنا إلى ما صاروا إليه"
             </div>
@@ -1462,7 +1461,6 @@
             </div>
         </div>
     </footer>
-
     <!-- سكريبت مكتبة Swiper -->
     <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
 
@@ -1476,5 +1474,7 @@
     <script src="assets/js/firebase-config.js"></script>
     <script src="assets/js/app.js?v=10"></script>
     <script src="assets/js/quran.js?v=10"></script>
+
+
 </body>
 </html>

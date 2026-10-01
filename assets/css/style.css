@@ -2231,11 +2231,9 @@ body {
 }
 
 .azkar-cards-container {
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
-  max-width: 860px;
-  margin: 0 auto;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(500px, 1fr));
+    gap: 1.4rem;
 }
 
 .azkar-card {
@@ -3878,7 +3876,8 @@ body {
 .charity-memorial-text {
   font-size: 0.95rem;
   line-height: 1.6;
-  color: var(--text-color);
+  color: #FFF;
+  width:80%;
 }
 
 .charity-memorial-text strong {
@@ -3913,7 +3912,7 @@ body {
    قسم جدول الورد والمهام الإيمانية اليومية (Daily Wird Checklist & Tracker)
    ========================================================================== */
 .daily-wird-section {
-  padding: 4.5rem 0;
+  padding: 25px 0;
   position: relative;
 }
 
@@ -4236,16 +4235,15 @@ body {
    1. بطاقة آية وحديث اليوم المتجددة (Daily Wisdom Card)
    ========================================================================== */
 .daily-wisdom-card {
-  background: rgba(14, 25, 43, 0.85);
-  border: 1px solid rgba(212, 175, 55, 0.4);
-  border-radius: var(--radius-lg);
-  padding: 1.8rem;
-  margin: 2.2rem auto 1rem;
-  max-width: 900px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35), inset 0 0 20px rgba(212, 175, 55, 0.06);
-  backdrop-filter: blur(12px);
-  position: relative;
-  overflow: hidden;
+    background: rgba(14, 25, 43, 0.85);
+    border: 1px solid rgba(212, 175, 55, 0.4);
+    border-radius: var(--radius-lg);
+    padding: 1.8rem;
+    margin: 25px auto ;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35), inset 0 0 20px rgba(212, 175, 55, 0.06);
+    backdrop-filter: blur(12px);
+    position: relative;
+    overflow: hidden;
 }
 
 .daily-wisdom-card::before {
@@ -4546,7 +4544,7 @@ body {
    5. موسوعة الأدعية النبوية المبوبة (Categorized Duas with Sheikh Recitation)
    ========================================================================== */
 .categorized-duas-section {
-  padding: 4.5rem 0;
+  padding:0 0  25px 0;
   position: relative;
 }
 
@@ -4583,7 +4581,7 @@ body {
 }
 
 .duas-tab-btn.active {
-  background: linear-gradient(135deg, var(--gold-600), var(--gold-500));
+  background: linear-gradient(135deg, var(--gold-500), var(--gold-500));
   border-color: var(--gold-300);
   color: #0b1523;
   font-weight: 700;
@@ -4643,23 +4641,23 @@ body {
 
 .categorized-duas-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(500px, 1fr));
   gap: 1.4rem;
 }
 
 .cat-dua-card {
-  background: var(--card-bg);
-  border: 1px solid var(--border-color);
-  border-radius: var(--radius-lg);
-  padding: 1.5rem;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  gap: 1.1rem;
-  box-shadow: var(--shadow-sm);
-  transition: all var(--transition-normal);
-  position: relative;
-  overflow: hidden;
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-lg);
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 1.1rem;
+    box-shadow: var(--shadow-sm);
+    transition: all var(--transition-normal);
+    position: relative;
+    overflow: hidden;
 }
 
 .cat-dua-card:hover {
@@ -4724,7 +4722,7 @@ body {
 .cat-dua-actions {
   display: flex;
   align-items: center;
-  justify-content: flex-end;
+  justify-content: space-between;
   flex-wrap: wrap;
   gap: 0.45rem;
 }
