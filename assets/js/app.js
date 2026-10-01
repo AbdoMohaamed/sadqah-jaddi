@@ -1204,6 +1204,14 @@ window.handleAzkarTap = function(itemId, totalCount) {
             if (btn) btn.textContent = "تم الذكر بنجاح";
             if (icon) icon.className = "fa-solid fa-check-double";
             playCompletionChime();
+
+            // انتقال سلس وتلقائي للذكر التالي
+            setTimeout(() => {
+                const nextCard = card.nextElementSibling;
+                if (nextCard && typeof nextCard.scrollIntoView === "function") {
+                    nextCard.scrollIntoView({ behavior: "smooth", inline: "center", block: "nearest" });
+                }
+            }, 450);
         }
     }
 
@@ -1457,4 +1465,15 @@ window.scrollKhatmaGrid = function(direction) {
     const delta = direction === "left" ? -scrollAmount : scrollAmount;
     grid.scrollBy({ left: delta, behavior: "smooth" });
 };
+
+// تمرير بطاقات الأذكار أفقياً في شاشات الجوال
+window.scrollAzkarContainer = function(direction) {
+    const container = document.getElementById("azkar-cards-container");
+    if (!container) return;
+    const card = container.querySelector(".azkar-card");
+    const scrollAmount = card ? (card.offsetWidth + 20) : 320;
+    const delta = direction === "left" ? -scrollAmount : scrollAmount;
+    container.scrollBy({ left: delta, behavior: "smooth" });
+};
+
 

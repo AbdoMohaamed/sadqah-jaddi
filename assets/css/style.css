@@ -2045,6 +2045,15 @@ body {
   box-shadow: 0 0 8px rgba(16, 185, 129, 0.4);
 }
 
+.azkar-cards-wrapper {
+  position: relative;
+  width: 100%;
+}
+
+.azkar-mobile-nav-bar {
+  display: none;
+}
+
 .azkar-cards-container {
   display: flex;
   flex-direction: column;
@@ -2136,6 +2145,100 @@ body {
   cursor: default;
   pointer-events: none;
 }
+
+@media (max-width: 768px) {
+  .azkar-mobile-nav-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.2rem;
+    padding: 0 0.25rem;
+    gap: 0.8rem;
+  }
+
+  .azkar-scroll-hint {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.85rem;
+    color: var(--gold-300);
+    background: rgba(212, 175, 55, 0.08);
+    border: 1px dashed rgba(212, 175, 55, 0.3);
+    padding: 0.4rem 0.9rem;
+    border-radius: var(--radius-full);
+  }
+
+  .azkar-scroll-arrows {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .btn-scroll-azkar {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: rgba(15, 28, 48, 0.9);
+    border: 1px solid var(--gold-500);
+    color: var(--gold-300);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 0.85rem;
+    transition: var(--transition-fast);
+  }
+
+  .btn-scroll-azkar:hover,
+  .btn-scroll-azkar:active {
+    background: var(--gold-500);
+    color: var(--bg-dark);
+  }
+
+  .azkar-cards-container {
+    display: flex !important;
+    flex-direction: row !important;
+    flex-wrap: nowrap !important;
+    overflow-x: auto !important;
+    overflow-y: hidden !important;
+    scroll-snap-type: x mandatory;
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
+    gap: 1.2rem !important;
+    padding: 0.5rem 0.3rem 1.5rem !important;
+    scrollbar-width: thin;
+    scrollbar-color: var(--gold-500) rgba(255, 255, 255, 0.08);
+  }
+
+  .azkar-cards-container::-webkit-scrollbar {
+    height: 6px;
+  }
+
+  .azkar-cards-container::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.06);
+    border-radius: var(--radius-full);
+  }
+
+  .azkar-cards-container::-webkit-scrollbar-thumb {
+    background: var(--gold-500);
+    border-radius: var(--radius-full);
+  }
+
+  .azkar-card {
+    min-width: 82vw !important;
+    max-width: 400px !important;
+    flex: 0 0 82vw !important;
+    scroll-snap-align: center;
+    padding: 1.5rem 1.1rem !important;
+    justify-content: space-between;
+  }
+
+  .azkar-text {
+    font-size: 1.2rem !important;
+    line-height: 1.9 !important;
+  }
+}
+
 
 /* ==========================================================================
    ويدجت إذاعة القرآن الكريم المباشرة 24/7 (Live Radio Widget)
@@ -2402,6 +2505,15 @@ body {
   }
   .verse-text {
     font-size: 1.15rem;
+  }
+  .azkar-card {
+    min-width: 88vw !important;
+    flex: 0 0 88vw !important;
+    padding: 1.3rem 0.9rem !important;
+  }
+  .azkar-text {
+    font-size: 1.12rem !important;
+  }
   .radio-panel {
     width: calc(100vw - 48px);
   }
