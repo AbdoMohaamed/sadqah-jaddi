@@ -50,13 +50,10 @@ document.addEventListener("DOMContentLoaded", () => {
     // 13. تهيئة موسوعة الأدعية النبوية المبوبة
     initCategorizedDuas();
 
-    // 14. تهيئة حاسبة الزكاة الذكية الشرعية
-    initZakatCalculator();
-
-    // 15. تهيئة صانع بطاقات الأدعية المصورة
+    // 14. تهيئة صانع بطاقات الأدعية المصورة
     initDuaCardGenerator();
 
-    // 16. تهيئة دليل وآداب زيارة القبور
+    // 15. تهيئة دليل وآداب زيارة القبور
     initCemeteryGuide();
 });
 
@@ -3263,26 +3260,81 @@ function playAdhanAudio() {
 }
 
 /* ==========================================================================
-   21. موسوعة الأدعية النبوية المبوبة (Categorized Duas Collection)
+   21. موسوعة الأدعية النبوية المبوبة (Categorized Duas with Sheikh Recitation)
    ========================================================================== */
 let currentDuaCategory = "karb_debt";
+let sheikhDuaAudioPlayer = new Audio();
+let currentlyPlayingDuaId = null;
 
 function initCategorizedDuas() {
     const tabContainer = document.getElementById("duas-categories-tabs");
     const gridContainer = document.getElementById("categorized-duas-grid");
+    const searchInput = document.getElementById("duas-search-input");
+    const clearSearchBtn = document.getElementById("btn-clear-duas-search");
+
     if (!tabContainer || !gridContainer || typeof CATEGORIZED_DUAS === "undefined") return;
 
+    // تهيئة مستمع انتهاء صوت الشيخ
+    sheikhDuaAudioPlayer.addEventListener("ended", () => {
+        resetAllSheikhAudioButtons();
+        currentlyPlayingDuaId = null;
+    });
+
+    sheikhDuaAudioPlayer.addEventListener("error", () => {
+        resetAllSheikhAudioButtons();
+        currentlyPlayingDuaId = null;
+        showToast("تعذر تشغيل التسجيل الصوتي، يرجى التحقق من اتصالك بالإنترنت ⚠️");
+    });
+
+    // التبديل بين التبويبات
     const tabs = tabContainer.querySelectorAll(".duas-tab-btn");
     tabs.forEach(tab => {
         tab.addEventListener("click", () => {
             tabs.forEach(t => t.classList.remove("active"));
             tab.classList.add("active");
             currentDuaCategory = tab.dataset.cat;
+            if (searchInput) searchInput.value = "";
+            if (clearSearchBtn) clearSearchBtn.style.display = "none";
             renderCategorizedDuasCards(currentDuaCategory);
         });
     });
 
+    // البحث اللحظي داخل الأدعية
+    if (searchInput) {
+        searchInput.addEventListener("input", (e) => {
+            const query = e.target.value.trim();
+            if (clearSearchBtn) {
+                clearSearchBtn.style.display = query ? "inline-flex" : "none";
+            }
+            if (query.length >= 1) {
+                searchAllCategorizedDuas(query);
+            } else {
+                renderCategorizedDuasCards(currentDuaCategory);
+            }
+        });
+    }
+
+    if (clearSearchBtn) {
+        clearSearchBtn.addEventListener("click", () => {
+            if (searchInput) {
+                searchInput.value = "";
+                clearSearchBtn.style.display = "none";
+                renderCategorizedDuasCards(currentDuaCategory);
+            }
+        });
+    }
+
     renderCategorizedDuasCards(currentDuaCategory);
+}
+
+function resetAllSheikhAudioButtons() {
+    document.querySelectorAll(".btn-sheikh-audio").forEach(btn => {
+        btn.classList.remove("is-playing");
+        btn.innerHTML = `<i class="fa-solid fa-circle-play text-gold"></i> <span>تلاوة الشيخ</span>`;
+    });
+    document.querySelectorAll(".cat-dua-card").forEach(card => {
+        card.classList.remove("is-audio-playing");
+    });
 }
 
 function renderCategorizedDuasCards(catKey) {
@@ -3292,33 +3344,85 @@ function renderCategorizedDuasCards(catKey) {
     const catData = CATEGORIZED_DUAS[catKey];
     const duasList = catData.duas || [];
 
+    renderDuasCardsList(duasList);
+}
+
+function searchAllCategorizedDuas(query) {
+    const gridContainer = document.getElementById("categorized-duas-grid");
+    if (!gridContainer || typeof CATEGORIZED_DUAS === "undefined") return;
+
+    const cleanQ = query.toLowerCase().trim();
+    let matches = [];
+
+    Object.keys(CATEGORIZED_DUAS).forEach(k => {
+        const list = CATEGORIZED_DUAS[k].duas || [];
+        list.forEach(d => {
+            const textMatch = d.text.toLowerCase().includes(cleanQ);
+            const titleMatch = d.title.toLowerCase().includes(cleanQ);
+            const sourceMatch = (d.source || "").toLowerCase().includes(cleanQ);
+            if (textMatch || titleMatch || sourceMatch) {
+                matches.push(d);
+            }
+        });
+    });
+
+    if (matches.length === 0) {
+        gridContainer.innerHTML = `
+            <div style="grid-column: 1 / -1; text-align: center; padding: 3rem 1rem; color: var(--text-muted);">
+                <i class="fa-solid fa-magnifying-glass fa-2x text-gold" style="margin-bottom: 0.8rem; opacity: 0.7;"></i>
+                <p style="color: #fff; font-weight: 700; font-size: 1.1rem; margin-bottom: 0.4rem;">لم نجد دعاءً مطابقاً لكلمة "${escapeHtml(query)}"</p>
+                <p style="font-size: 0.88rem;">جرب البحث بكلمة أخرى مثل (الكرب، الشفاء، الرزق، الأبناء، الاستغفار)</p>
+            </div>
+        `;
+        return;
+    }
+
+    renderDuasCardsList(matches);
+}
+
+function renderDuasCardsList(duasList) {
+    const gridContainer = document.getElementById("categorized-duas-grid");
+    if (!gridContainer) return;
+
     gridContainer.innerHTML = "";
 
     duasList.forEach((dua, idx) => {
         const card = document.createElement("div");
+        const duaId = dua.id || `dua_${idx}`;
         card.className = "cat-dua-card";
-        card.setAttribute("data-dua-idx", idx);
+        card.setAttribute("data-dua-id", duaId);
 
         const targetRepeat = dua.repeat || 1;
-        const currentCount = 0;
+        const reciterName = dua.reciter || "الشيخ مشاري راشد العفاسي";
+        const isPlayingThis = currentlyPlayingDuaId === duaId && !sheikhDuaAudioPlayer.paused;
+
+        if (isPlayingThis) {
+            card.classList.add("is-audio-playing");
+        }
 
         card.innerHTML = `
             <div>
                 <div class="cat-dua-header">
                     <h3 class="cat-dua-title">${dua.title}</h3>
-                    <span class="cat-dua-repeat-badge">التكرار: <strong class="repeat-counter-val">${targetRepeat}</strong> مرة</span>
+                    <span class="cat-dua-repeat-badge">التكرار: <strong class="repeat-counter-val">${targetRepeat}</strong> مرات</span>
                 </div>
                 <div class="cat-dua-body">" ${dua.text} "</div>
             </div>
             <div>
-                <div class="cat-dua-source">
-                    <i class="fa-solid fa-check text-gold"></i>
-                    <span>${dua.source}</span>
+                <div class="cat-dua-meta-row">
+                    <div class="cat-dua-source">
+                        <i class="fa-solid fa-check text-gold"></i>
+                        <span>${dua.source}</span>
+                    </div>
+                    <div class="cat-dua-reciter-tag">
+                        <i class="fa-solid fa-microphone-lines text-gold"></i>
+                        <span>${reciterName}</span>
+                    </div>
                 </div>
                 <div class="cat-dua-actions">
-                    <button type="button" class="btn btn-outline btn-sm btn-audio-read-dua" title="استماع قراءة صوتية للدعاء">
-                        <i class="fa-solid fa-volume-high text-gold"></i>
-                        <span>قراءة</span>
+                    <button type="button" class="btn btn-outline btn-sm btn-sheikh-audio ${isPlayingThis ? 'is-playing' : ''}" data-dua-id="${duaId}" title="استماع لتلاوة الدعاء بصوت الشيخ العذب">
+                        <i class="fa-solid ${isPlayingThis ? 'fa-pause' : 'fa-circle-play text-gold'}"></i>
+                        <span>${isPlayingThis ? 'إيقاف التلاوة' : 'تلاوة الشيخ'}</span>
                     </button>
                     <button type="button" class="btn btn-outline btn-sm btn-repeat-dua" data-remaining="${targetRepeat}" title="انقر لتكرار الدعاء ونيل الأجر">
                         <i class="fa-solid fa-hand-pointer text-gold"></i>
@@ -3335,7 +3439,15 @@ function renderCategorizedDuasCards(catKey) {
             </div>
         `;
 
-        // 1. زر النسخ
+        // 1. تشغيل صوت الشيخ
+        const sheikhBtn = card.querySelector(".btn-sheikh-audio");
+        if (sheikhBtn) {
+            sheikhBtn.addEventListener("click", () => {
+                handleSheikhAudioToggle(dua, duaId, card, sheikhBtn);
+            });
+        }
+
+        // 2. زر النسخ
         const copyBtn = card.querySelector(".btn-copy-cat-dua");
         if (copyBtn) {
             copyBtn.addEventListener("click", () => {
@@ -3344,7 +3456,7 @@ function renderCategorizedDuasCards(catKey) {
             });
         }
 
-        // 2. زر المشاركة لواتساب
+        // 3. زر المشاركة لواتساب
         const shareBtn = card.querySelector(".btn-share-cat-dua");
         if (shareBtn) {
             shareBtn.addEventListener("click", () => {
@@ -3355,7 +3467,7 @@ function renderCategorizedDuasCards(catKey) {
             });
         }
 
-        // 3. زر التكرار التفاعلي
+        // 4. زر التكرار التفاعلي
         const repeatBtn = card.querySelector(".btn-repeat-dua");
         const remCountEl = card.querySelector(".rem-count");
         if (repeatBtn && remCountEl) {
@@ -3383,25 +3495,45 @@ function renderCategorizedDuasCards(catKey) {
             });
         }
 
-        // 4. القراءة الصوتية (Speech Synthesis)
-        const audioReadBtn = card.querySelector(".btn-audio-read-dua");
-        if (audioReadBtn) {
-            audioReadBtn.addEventListener("click", () => {
+        gridContainer.appendChild(card);
+    });
+}
+
+function handleSheikhAudioToggle(dua, duaId, card, btn) {
+    if (currentlyPlayingDuaId === duaId && !sheikhDuaAudioPlayer.paused) {
+        // إيقاف مؤقت
+        sheikhDuaAudioPlayer.pause();
+        btn.classList.remove("is-playing");
+        card.classList.remove("is-audio-playing");
+        btn.innerHTML = `<i class="fa-solid fa-circle-play text-gold"></i> <span>تلاوة الشيخ</span>`;
+        currentlyPlayingDuaId = null;
+        showToast("تم إيقاف تلاوة الدعاء مؤقتاً ⏸️");
+    } else {
+        // إيقاف أي تلاوة أخرى قيد التشغيل
+        resetAllSheikhAudioButtons();
+
+        if (dua.audio) {
+            sheikhDuaAudioPlayer.src = dua.audio;
+            sheikhDuaAudioPlayer.play().then(() => {
+                currentlyPlayingDuaId = duaId;
+                btn.classList.add("is-playing");
+                card.classList.add("is-audio-playing");
+                btn.innerHTML = `<i class="fa-solid fa-pause"></i> <span>إيقاف التلاوة</span>`;
+                const reciter = dua.reciter || "الشيخ مشاري راشد العفاسي";
+                showToast(`جاري الاستماع لتلاوة الدعاء بصوت ${reciter} 🎙️`);
+            }).catch(() => {
+                // إذا فشل الصوت المباشر لأي سبب بالشبكة
+                showToast("جاري التلاوة عبر الصوت الرقمي 🔊");
                 if ("speechSynthesis" in window) {
                     window.speechSynthesis.cancel();
                     const utterance = new SpeechSynthesisUtterance(dua.text);
                     utterance.lang = "ar-SA";
-                    utterance.rate = 0.9;
+                    utterance.rate = 0.88;
                     window.speechSynthesis.speak(utterance);
-                    showToast("جاري تلاوة الدعاء صوتياً 🔊");
-                } else {
-                    showToast("خاصية القراءة الصوتية غير مدعومة في متصفحك الحالي");
                 }
             });
         }
-
-        gridContainer.appendChild(card);
-    });
+    }
 }
 
 function playTasbeehClickTone() {
@@ -3421,106 +3553,6 @@ function playTasbeehClickTone() {
         osc.start();
         osc.stop(ctx.currentTime + 0.3);
     } catch(e) {}
-}
-
-/* ==========================================================================
-   22. حاسبة الزكاة الذكية الشرعية (Zakat Calculator Modal)
-   ========================================================================== */
-function initZakatCalculator() {
-    const modal = document.getElementById("zakat-modal");
-    const btnOpen = document.getElementById("btn-open-zakat-modal");
-    const btnClose = document.getElementById("btn-close-zakat-modal");
-
-    const cashInput = document.getElementById("zakat-cash");
-    const goldPriceInput = document.getElementById("zakat-gold-price");
-    const gold24Input = document.getElementById("zakat-gold-24");
-    const gold21Input = document.getElementById("zakat-gold-21");
-    const tradeInput = document.getElementById("zakat-trade");
-    const debtsInput = document.getElementById("zakat-debts");
-
-    const totalWealthEl = document.getElementById("zakat-total-wealth");
-    const nisabValueEl = document.getElementById("zakat-nisab-value");
-    const statusBannerEl = document.getElementById("zakat-status-banner");
-    const statusTextEl = document.getElementById("zakat-status-text");
-    const finalValueEl = document.getElementById("zakat-final-value");
-
-    if (btnOpen && modal) {
-        btnOpen.addEventListener("click", () => {
-            modal.classList.add("open");
-            calculateZakat();
-        });
-    }
-
-    if (btnClose && modal) {
-        btnClose.addEventListener("click", () => {
-            modal.classList.remove("open");
-        });
-    }
-
-    if (modal) {
-        modal.addEventListener("click", (e) => {
-            if (e.target === modal) modal.classList.remove("open");
-        });
-    }
-
-    function calculateZakat() {
-        const cash = parseFloat(cashInput?.value) || 0;
-        const goldPrice24 = parseFloat(goldPriceInput?.value) || 4200;
-        const gold24Weight = parseFloat(gold24Input?.value) || 0;
-        const gold21Weight = parseFloat(gold21Input?.value) || 0;
-        const trade = parseFloat(tradeInput?.value) || 0;
-        const debts = parseFloat(debtsInput?.value) || 0;
-
-        // حساب قيمة الذهب
-        const gold24Val = gold24Weight * goldPrice24;
-        const gold21Price = (goldPrice24 * 21) / 24;
-        const gold21Val = gold21Weight * gold21Price;
-        const totalGoldVal = gold24Val + gold21Val;
-
-        // إجمالي الوعاء الزكوي الصافي
-        const grossWealth = cash + totalGoldVal + trade;
-        const netWealth = Math.max(0, grossWealth - debts);
-
-        // النصاب الشرعي (85 غرام ذهب عيار 24)
-        const nisabValue = 85 * goldPrice24;
-
-        if (totalWealthEl) totalWealthEl.textContent = `${netWealth.toLocaleString("ar-EG")} ج.م`;
-        if (nisabValueEl) nisabValueEl.textContent = `${nisabValue.toLocaleString("ar-EG")} ج.م`;
-
-        if (grossWealth === 0) {
-            if (statusBannerEl) {
-                statusBannerEl.className = "zakat-status-banner";
-                if (statusTextEl) statusTextEl.textContent = "أدخل مبالغك ومدخراتك أعلاه لتحديد وجوب الزكاة ومقدارها";
-            }
-            if (finalValueEl) finalValueEl.textContent = `0 ج.م`;
-            return;
-        }
-
-        if (netWealth >= nisabValue) {
-            const zakatAmount = netWealth * 0.025;
-            if (statusBannerEl) {
-                statusBannerEl.className = "zakat-status-banner is-due";
-                if (statusTextEl) statusTextEl.innerHTML = `<i class="fa-solid fa-circle-check"></i> بلغ النصاب الشرعي بحمد الله • تجب الزكاة بنسبة 2.5% بعد مرور الحول (عام هجري)`;
-            }
-            if (finalValueEl) finalValueEl.textContent = `${zakatAmount.toLocaleString("ar-EG", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ج.م`;
-        } else {
-            const remaining = nisabValue - netWealth;
-            if (statusBannerEl) {
-                statusBannerEl.className = "zakat-status-banner not-due";
-                if (statusTextEl) statusTextEl.innerHTML = `<i class="fa-solid fa-circle-info"></i> لم يبلغ النصاب الشرعي بعد (متبقي ${remaining.toLocaleString("ar-EG")} ج.م لبلوغ النصاب) • لا زكاة واجبة وتستحب الصدقة التطوعية`;
-            }
-            if (finalValueEl) finalValueEl.textContent = `0 ج.م`;
-        }
-    }
-
-    const allInputs = [cashInput, goldPriceInput, gold24Input, gold21Input, tradeInput, debtsInput];
-    allInputs.forEach(input => {
-        if (input) {
-            input.addEventListener("input", calculateZakat);
-        }
-    });
-
-    calculateZakat();
 }
 
 

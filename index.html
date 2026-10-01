@@ -41,7 +41,7 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css">
 
     <!-- تنسيقات الموقع -->
-    <link rel="stylesheet" href="assets/css/style.css?v=62">
+    <link rel="stylesheet" href="assets/css/style.css?v=63">
 </head>
 <body>
 
@@ -72,10 +72,6 @@
                 <button id="btn-install-app" class="btn btn-install-pwa" style="display: none;" title="تثبيت التطبيق على جهازك">
                     <i class="fa-solid fa-mobile-screen-button"></i>
                     <span>تثبيت التطبيق</span>
-                </button>
-                <button type="button" id="btn-open-zakat-modal" class="btn btn-outline" title="حاسبة الزكاة الذكية الشرعية">
-                    <i class="fa-solid fa-calculator text-gold"></i>
-                    <span>الزكاة</span>
                 </button>
                 <button id="btn-toggle-radio-nav" class="btn btn-outline" title="إذاعة القرآن الكريم">
                     <i class="fa-solid fa-tower-broadcast"></i>
@@ -942,6 +938,17 @@
                 </button>
             </div>
 
+            <!-- شريط البحث السريع في موسوعة الأدعية -->
+            <div class="duas-search-filter-wrapper">
+                <div class="duas-search-box">
+                    <i class="fa-solid fa-magnifying-glass search-icon text-gold"></i>
+                    <input type="text" id="duas-search-input" class="form-input duas-search-input" placeholder="ابحث في نصوص وأسماء الأدعية (مثال: الشفاء، الرزق، الدين، الوالدين، الهم)...">
+                    <button type="button" class="btn btn-outline btn-sm btn-clear-duas-search" id="btn-clear-duas-search" style="display: none;" title="مسح البحث">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+                </div>
+            </div>
+
             <!-- شبكة عرض بطاقات الأدعية -->
             <div class="categorized-duas-grid" id="categorized-duas-grid">
                 <!-- يُملأ برمجياً من js/azkar-data.js و js/app.js -->
@@ -1381,112 +1388,6 @@
     </div>
 
     <!-- ==========================================
-         نافذة حاسبة الزكاة الذكية الشرعية (Zakat Calculator Modal)
-         ========================================== -->
-    <div class="modal-overlay" id="zakat-modal">
-        <div class="modal-card modal-card-wide modal-card-zakat">
-            <div class="modal-header-row">
-                <h3 class="modal-title">
-                    <i class="fa-solid fa-calculator text-gold"></i>
-                    حاسبة الزكاة الشرعية الذكية
-                </h3>
-                <button class="modal-close-btn" id="btn-close-zakat-modal" aria-label="إغلاق">&times;</button>
-            </div>
-
-            <div class="zakat-modal-body">
-                <p class="zakat-intro">
-                    احسب زكاة أموالك ومدخراتك بدقة ويسر وفق الضوابط الشرعية المعتمدة (النصاب = 85 غرام ذهب عيار 24، ونسبة الزكاة 2.5% بعد مرور الحول).
-                </p>
-
-                <div class="zakat-form-grid">
-                    <!-- المدخرات النقدية -->
-                    <div class="zakat-field-group">
-                        <label for="zakat-cash" class="zakat-label">
-                            <i class="fa-solid fa-money-bill-wave text-gold"></i>
-                            النقد والمدخرات البنكية (بالعملة المحلية)
-                        </label>
-                        <input type="number" id="zakat-cash" class="form-input zakat-input" placeholder="0" min="0">
-                    </div>
-
-                    <!-- سعر غرام الذهب عيار 24 الحالي -->
-                    <div class="zakat-field-group">
-                        <label for="zakat-gold-price" class="zakat-label">
-                            <i class="fa-solid fa-scale-balanced text-gold"></i>
-                            سعر غرام الذهب عيار 24 الحالي
-                        </label>
-                        <input type="number" id="zakat-gold-price" class="form-input zakat-input" value="4200" min="1">
-                    </div>
-
-                    <!-- الذهب عيار 24 -->
-                    <div class="zakat-field-group">
-                        <label for="zakat-gold-24" class="zakat-label">
-                            <i class="fa-solid fa-coins text-gold"></i>
-                            وزن الذهب عيار 24 (بالغرام)
-                        </label>
-                        <input type="number" id="zakat-gold-24" class="form-input zakat-input" placeholder="0" min="0">
-                    </div>
-
-                    <!-- الذهب عيار 21 -->
-                    <div class="zakat-field-group">
-                        <label for="zakat-gold-21" class="zakat-label">
-                            <i class="fa-solid fa-ring text-gold"></i>
-                            وزن الذهب عيار 21 (بالغرام)
-                        </label>
-                        <input type="number" id="zakat-gold-21" class="form-input zakat-input" placeholder="0" min="0">
-                    </div>
-
-                    <!-- عروض التجارة والبضائع -->
-                    <div class="zakat-field-group">
-                        <label for="zakat-trade" class="zakat-label">
-                            <i class="fa-solid fa-boxes-stacked text-gold"></i>
-                            عروض التجارة والبضائع المعدة للبيع
-                        </label>
-                        <input type="number" id="zakat-trade" class="form-input zakat-input" placeholder="0" min="0">
-                    </div>
-
-                    <!-- الديون المستحقة للدفع -->
-                    <div class="zakat-field-group">
-                        <label for="zakat-debts" class="zakat-label">
-                            <i class="fa-solid fa-hand-holding-dollar text-gold"></i>
-                            ديون والتزامات واجبة السداد فوراً (تُخصم)
-                        </label>
-                        <input type="number" id="zakat-debts" class="form-input zakat-input" placeholder="0" min="0">
-                    </div>
-                </div>
-
-                <!-- لوحة الحساب الفورية للزكاة -->
-                <div class="zakat-summary-card">
-                    <div class="zakat-summary-row">
-                        <span>إجمالي الوعاء الزكوي الصافي:</span>
-                        <strong id="zakat-total-wealth">0 ج.م</strong>
-                    </div>
-                    <div class="zakat-summary-row">
-                        <span>حد النصاب الشرعي الحالي (85 غرام ذهب 24):</span>
-                        <strong id="zakat-nisab-value">357,000 ج.م</strong>
-                    </div>
-                    <div class="zakat-status-banner" id="zakat-status-banner">
-                        <i class="fa-solid fa-circle-info"></i>
-                        <span id="zakat-status-text">أدخل مبالغك ومدخراتك أعلاه لتحديد وجوب الزكاة ومقدارها</span>
-                    </div>
-                    <div class="zakat-final-amount-box">
-                        <span class="zakat-final-label">مقدار الزكاة الواجب إخراجها (2.5%):</span>
-                        <span class="zakat-final-value" id="zakat-final-value">0 ج.م</span>
-                    </div>
-                </div>
-
-                <div class="zakat-dua-box">
-                    <div class="zakat-dua-title"><i class="fa-solid fa-hands-praying text-gold"></i> دعاء إخراج الزكاة والصدقة المسنون:</div>
-                    <div class="zakat-dua-text">"اللَّهُمَّ اجْعَلْهَا مَغْنَمًا وَلَا تَجْعَلْهَا مَغْرَمًا • رَبَّنَا تَقَبَّلْ مِنَّا إِنَّكَ أَنتَ السَّمِيعُ الْعَلِيمُ"</div>
-                    <button type="button" class="btn btn-outline btn-sm btn-copy-dua" onclick="copyTextToClipboard('اللَّهُمَّ اجْعَلْهَا مَغْنَمًا وَلَا تَجْعَلْهَا مَغْرَمًا • رَبَّنَا تَقَبَّلْ مِنَّا إِنَّكَ أَنتَ السَّمِيعُ الْعَلِيمُ')">
-                        <i class="fa-solid fa-copy"></i>
-                        <span>نسخ دعاء الزكاة</span>
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- ==========================================
          ويدجت إذاعة القرآن الكريم المباشرة (24/7 Live Radio)
          ========================================== -->
     <div class="live-radio-widget" id="live-radio-widget">
@@ -1571,9 +1472,9 @@
 
     <!-- ملف البيانات وإعدادات السحابة والمنطق البرمجي وقارئ القرآن -->
     <script src="assets/js/data.js"></script>
-    <script src="assets/js/azkar-data.js"></script>
+    <script src="assets/js/azkar-data.js?v=10"></script>
     <script src="assets/js/firebase-config.js"></script>
-    <script src="assets/js/app.js?v=9"></script>
-    <script src="assets/js/quran.js?v=9"></script>
+    <script src="assets/js/app.js?v=10"></script>
+    <script src="assets/js/quran.js?v=10"></script>
 </body>
 </html>
