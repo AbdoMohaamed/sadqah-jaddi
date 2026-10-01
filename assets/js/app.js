@@ -45,6 +45,134 @@ let allPrayers = [];
 let firebaseDb = null;
 let prayersRef = null;
 
+/**
+ * تحويل الطابع الزمني (Timestamp) إلى نص نسبي عربي بليغ ودقيق
+ * (الآن، منذ دقيقة، منذ دقيقتين، منذ 5 دقائق، منذ ساعتين، منذ يوم، إلخ)
+ */
+function formatArabicRelativeTime(timestamp) {
+    if (!timestamp || isNaN(timestamp)) return null;
+    const now = Date.now();
+    const diff = Math.max(0, now - Number(timestamp));
+
+    const seconds = Math.floor(diff / 1000);
+    const minutes = Math.floor(seconds / 60);
+    const hours = Math.floor(minutes / 60);
+    const days = Math.floor(hours / 24);
+    const months = Math.floor(days / 30);
+    const years = Math.floor(days / 365);
+
+    if (seconds < 60) {
+        return "الآن";
+    } else if (minutes === 1) {
+        return "منذ دقيقة";
+    } else if (minutes === 2) {
+        return "منذ دقيقتين";
+    } else if (minutes >= 3 && minutes <= 10) {
+        return `منذ ${minutes} دقائق`;
+    } else if (minutes < 60) {
+        return `منذ ${minutes} دقيقة`;
+    } else if (hours === 1) {
+        return "منذ ساعة";
+    } else if (hours === 2) {
+        return "منذ ساعتين";
+    } else if (hours >= 3 && hours <= 10) {
+        return `منذ ${hours} ساعات`;
+    } else if (hours < 24) {
+        return `منذ ${hours} ساعة`;
+    } else if (days === 1) {
+        return "منذ يوم";
+    } else if (days === 2) {
+        return "منذ يومين";
+    } else if (days >= 3 && days <= 10) {
+        return `منذ ${days} أيام`;
+    } else if (days < 30) {
+        return `منذ ${days} يوماً`;
+    } else if (months === 1) {
+        return "منذ شهر";
+    } else if (months === 2) {
+        return "منذ شهرين";
+    } else if (months >= 3 && months <= 10) {
+        return `منذ ${months} أشهر`;
+    } else if (months < 12) {
+        return `منذ ${months} شهراً`;
+    } else if (years === 1) {
+        return "منذ عام";
+    } else if (years === 2) {
+        return "منذ عامين";
+    } else {
+        return `منذ ${years} أعوام`;
+    }
+}
+
+/**
+ * فك تشفير الطابع الزمني من معرف Firebase Push ID تلقائياً
+ */
+function decodeFirebasePushIdTimestamp(id) {
+    if (!id || typeof id !== 'string' || id.length < 8) return 0;
+    const PUSH_CHARS = "-0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ_abcdefghijklmnopqrstuvwxyz";
+    let time = 0;
+    for (let i = 0; i < 8; i++) {
+        const c = id.charAt(i);
+        const idx = PUSH_CHARS.indexOf(c);
+        if (idx === -1) return 0;
+        time = (time * 64) + idx;
+    }
+    return time;
+}
+
+/**
+ * استخراج الطابع الزمني وتحديد النص المعروض لتاريخ الدعاء
+ */
+function getPrayerDisplayDate(prayer) {
+    let ts = prayer.timestamp;
+
+    // استخراج الطابع الزمني من user_TIMESTAMP للأدعية المحلية السابقة
+    if (!ts && typeof prayer.id === "string" && prayer.id.startsWith("user_")) {
+        const extracted = parseInt(prayer.id.replace("user_", ""), 10);
+        if (!isNaN(extracted) && extracted > 1600000000000) {
+            ts = extracted;
+            prayer.timestamp = ts;
+        }
+    }
+
+    // استخراج الطابع الزمني من معرف فيربيز push id إن لم يكن مسجلاً كخاصية
+    if (!ts && typeof prayer.id === "string" && prayer.id.startsWith("-")) {
+        const decoded = decodeFirebasePushIdTimestamp(prayer.id);
+        if (decoded > 1600000000000) {
+            ts = decoded;
+            prayer.timestamp = ts;
+        }
+    }
+
+    if (ts) {
+        const formatted = formatArabicRelativeTime(ts);
+        if (formatted) return formatted;
+    }
+
+    // إذا كان محفوظاً كنص "الآن" قديماً ولا يوجد وقت محدد
+    if (prayer.date === "الآن") {
+        return "منذ قليل";
+    }
+
+    return prayer.date || "مؤخراً";
+}
+
+/**
+ * تحديث تواريخ الأدعية المعروضة تلقائياً كل 30 ثانية لتتحول "الآن" إلى "منذ دقيقة" ثم "منذ 5 دقائق" وهكذا
+ */
+function updateAllPrayerRelativeDates() {
+    const dateElements = document.querySelectorAll(".prayer-date[data-timestamp]");
+    dateElements.forEach(el => {
+        const ts = Number(el.getAttribute("data-timestamp"));
+        if (ts && !isNaN(ts)) {
+            const formatted = formatArabicRelativeTime(ts);
+            if (formatted && el.textContent !== formatted) {
+                el.textContent = formatted;
+            }
+        }
+    });
+}
+
 function initPrayersSwiper() {
     // 1. تحميل الأدعية المحلية أو الافتراضية أولاً لضمان سرعة الفتح الفوري
     const storedPrayers = localStorage.getItem("user_prayers_list");
@@ -91,6 +219,9 @@ function initPrayersSwiper() {
         }
     });
 
+    // تحديث التواريخ النسبية للأدعية تلقائياً كل 30 ثانية
+    setInterval(updateAllPrayerRelativeDates, 30000);
+
     // 2. إذا تم تفعيل Firebase، ابدأ المزامنة السحابية اللحظية مع جميع الزوار في العالم
     initFirebaseRealtimeSync();
 }
@@ -114,14 +245,18 @@ function initFirebaseRealtimeSync() {
             if (data) {
                 const cloudPrayers = [];
                 Object.keys(data).forEach((key) => {
+                    let ts = data[key].timestamp || 0;
+                    if (!ts && typeof key === "string" && key.startsWith("-")) {
+                        ts = decodeFirebasePushIdTimestamp(key);
+                    }
                     cloudPrayers.push({
                         id: key,
                         isCloud: true,
                         author: data[key].author || "فاعل خير",
                         text: data[key].text || "",
-                        date: data[key].date || "مؤخراً",
+                        date: data[key].date || "",
                         amenCount: data[key].amenCount || 0,
-                        timestamp: data[key].timestamp || 0
+                        timestamp: ts
                     });
                 });
 
@@ -157,6 +292,8 @@ function renderPrayerSlides() {
         slide.className = "swiper-slide";
 
         const hasVoted = !!amenState[prayer.id];
+        const displayDate = getPrayerDisplayDate(prayer);
+        const tsAttr = prayer.timestamp ? ` data-timestamp="${prayer.timestamp}"` : "";
 
         slide.innerHTML = `
             <div class="prayer-card">
@@ -167,7 +304,7 @@ function renderPrayerSlides() {
                         </div>
                         <span class="author-name">${escapeHTML(prayer.author)}</span>
                     </div>
-                    <span class="prayer-date">${escapeHTML(prayer.date)}</span>
+                    <span class="prayer-date"${tsAttr}>${escapeHTML(displayDate)}</span>
                 </div>
                 <div class="prayer-body">
                     "${escapeHTML(prayer.text)}"
@@ -425,11 +562,12 @@ function initAddPrayerModal() {
                 return;
             }
 
+            const now = Date.now();
             const newPrayer = {
-                id: "user_" + Date.now(),
+                id: "user_" + now,
                 author: author,
                 text: text,
-                date: "الآن",
+                timestamp: now,
                 amenCount: 1
             };
 
@@ -439,8 +577,7 @@ function initAddPrayerModal() {
                     prayersRef.push({
                         author: author,
                         text: text,
-                        date: "الآن",
-                        timestamp: (typeof firebase !== 'undefined' && firebase.database && firebase.database.ServerValue) ? firebase.database.ServerValue.TIMESTAMP : Date.now(),
+                        timestamp: (typeof firebase !== 'undefined' && firebase.database && firebase.database.ServerValue) ? firebase.database.ServerValue.TIMESTAMP : now,
                         amenCount: 1
                     }).then(() => {
                         console.log("Prayer published to cloud successfully!");
