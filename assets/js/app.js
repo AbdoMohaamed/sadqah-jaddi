@@ -3260,11 +3260,9 @@ function playAdhanAudio() {
 }
 
 /* ==========================================================================
-   21. موسوعة الأدعية النبوية المبوبة (Categorized Duas with Sheikh Recitation)
+   21. موسوعة الأدعية النبوية المبوبة (Categorized Duas Collection)
    ========================================================================== */
 let currentDuaCategory = "karb_debt";
-let sheikhDuaAudioPlayer = new Audio();
-let currentlyPlayingDuaId = null;
 
 function initCategorizedDuas() {
     const tabContainer = document.getElementById("duas-categories-tabs");
@@ -3273,18 +3271,6 @@ function initCategorizedDuas() {
     const clearSearchBtn = document.getElementById("btn-clear-duas-search");
 
     if (!tabContainer || !gridContainer || typeof CATEGORIZED_DUAS === "undefined") return;
-
-    // تهيئة مستمع انتهاء صوت الشيخ
-    sheikhDuaAudioPlayer.addEventListener("ended", () => {
-        resetAllSheikhAudioButtons();
-        currentlyPlayingDuaId = null;
-    });
-
-    sheikhDuaAudioPlayer.addEventListener("error", () => {
-        resetAllSheikhAudioButtons();
-        currentlyPlayingDuaId = null;
-        showToast("تعذر تشغيل التسجيل الصوتي، يرجى التحقق من اتصالك بالإنترنت ⚠️");
-    });
 
     // التبديل بين التبويبات
     const tabs = tabContainer.querySelectorAll(".duas-tab-btn");
@@ -3325,16 +3311,6 @@ function initCategorizedDuas() {
     }
 
     renderCategorizedDuasCards(currentDuaCategory);
-}
-
-function resetAllSheikhAudioButtons() {
-    document.querySelectorAll(".btn-sheikh-audio").forEach(btn => {
-        btn.classList.remove("is-playing");
-        btn.innerHTML = `<i class="fa-solid fa-circle-play text-gold"></i> <span>تلاوة الشيخ</span>`;
-    });
-    document.querySelectorAll(".cat-dua-card").forEach(card => {
-        card.classList.remove("is-audio-playing");
-    });
 }
 
 function renderCategorizedDuasCards(catKey) {
@@ -3393,12 +3369,6 @@ function renderDuasCardsList(duasList) {
         card.setAttribute("data-dua-id", duaId);
 
         const targetRepeat = dua.repeat || 1;
-        const reciterName = dua.reciter || "الشيخ مشاري راشد العفاسي";
-        const isPlayingThis = currentlyPlayingDuaId === duaId && !sheikhDuaAudioPlayer.paused;
-
-        if (isPlayingThis) {
-            card.classList.add("is-audio-playing");
-        }
 
         card.innerHTML = `
             <div>
@@ -3414,16 +3384,8 @@ function renderDuasCardsList(duasList) {
                         <i class="fa-solid fa-check text-gold"></i>
                         <span>${dua.source}</span>
                     </div>
-                    <div class="cat-dua-reciter-tag">
-                        <i class="fa-solid fa-microphone-lines text-gold"></i>
-                        <span>${reciterName}</span>
-                    </div>
                 </div>
                 <div class="cat-dua-actions">
-                    <button type="button" class="btn btn-outline btn-sm btn-sheikh-audio ${isPlayingThis ? 'is-playing' : ''}" data-dua-id="${duaId}" title="استماع لتلاوة الدعاء بصوت الشيخ العذب">
-                        <i class="fa-solid ${isPlayingThis ? 'fa-pause' : 'fa-circle-play text-gold'}"></i>
-                        <span>${isPlayingThis ? 'إيقاف التلاوة' : 'تلاوة الشيخ'}</span>
-                    </button>
                     <button type="button" class="btn btn-outline btn-sm btn-repeat-dua" data-remaining="${targetRepeat}" title="انقر لتكرار الدعاء ونيل الأجر">
                         <i class="fa-solid fa-hand-pointer text-gold"></i>
                         <span class="btn-repeat-text">تكرار (<span class="rem-count">${targetRepeat}</span>)</span>
@@ -3439,15 +3401,7 @@ function renderDuasCardsList(duasList) {
             </div>
         `;
 
-        // 1. تشغيل صوت الشيخ
-        const sheikhBtn = card.querySelector(".btn-sheikh-audio");
-        if (sheikhBtn) {
-            sheikhBtn.addEventListener("click", () => {
-                handleSheikhAudioToggle(dua, duaId, card, sheikhBtn);
-            });
-        }
-
-        // 2. زر النسخ
+        // 1. زر النسخ
         const copyBtn = card.querySelector(".btn-copy-cat-dua");
         if (copyBtn) {
             copyBtn.addEventListener("click", () => {
@@ -3456,7 +3410,7 @@ function renderDuasCardsList(duasList) {
             });
         }
 
-        // 3. زر المشاركة لواتساب
+        // 2. زر المشاركة لواتساب
         const shareBtn = card.querySelector(".btn-share-cat-dua");
         if (shareBtn) {
             shareBtn.addEventListener("click", () => {
@@ -3467,7 +3421,7 @@ function renderDuasCardsList(duasList) {
             });
         }
 
-        // 4. زر التكرار التفاعلي
+        // 3. زر التكرار التفاعلي
         const repeatBtn = card.querySelector(".btn-repeat-dua");
         const remCountEl = card.querySelector(".rem-count");
         if (repeatBtn && remCountEl) {
@@ -3497,43 +3451,6 @@ function renderDuasCardsList(duasList) {
 
         gridContainer.appendChild(card);
     });
-}
-
-function handleSheikhAudioToggle(dua, duaId, card, btn) {
-    if (currentlyPlayingDuaId === duaId && !sheikhDuaAudioPlayer.paused) {
-        // إيقاف مؤقت
-        sheikhDuaAudioPlayer.pause();
-        btn.classList.remove("is-playing");
-        card.classList.remove("is-audio-playing");
-        btn.innerHTML = `<i class="fa-solid fa-circle-play text-gold"></i> <span>تلاوة الشيخ</span>`;
-        currentlyPlayingDuaId = null;
-        showToast("تم إيقاف تلاوة الدعاء مؤقتاً ⏸️");
-    } else {
-        // إيقاف أي تلاوة أخرى قيد التشغيل
-        resetAllSheikhAudioButtons();
-
-        if (dua.audio) {
-            sheikhDuaAudioPlayer.src = dua.audio;
-            sheikhDuaAudioPlayer.play().then(() => {
-                currentlyPlayingDuaId = duaId;
-                btn.classList.add("is-playing");
-                card.classList.add("is-audio-playing");
-                btn.innerHTML = `<i class="fa-solid fa-pause"></i> <span>إيقاف التلاوة</span>`;
-                const reciter = dua.reciter || "الشيخ مشاري راشد العفاسي";
-                showToast(`جاري الاستماع لتلاوة الدعاء بصوت ${reciter} 🎙️`);
-            }).catch(() => {
-                // إذا فشل الصوت المباشر لأي سبب بالشبكة
-                showToast("جاري التلاوة عبر الصوت الرقمي 🔊");
-                if ("speechSynthesis" in window) {
-                    window.speechSynthesis.cancel();
-                    const utterance = new SpeechSynthesisUtterance(dua.text);
-                    utterance.lang = "ar-SA";
-                    utterance.rate = 0.88;
-                    window.speechSynthesis.speak(utterance);
-                }
-            });
-        }
-    }
 }
 
 function playTasbeehClickTone() {

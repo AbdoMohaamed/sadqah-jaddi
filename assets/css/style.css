@@ -4668,28 +4668,6 @@ body {
   box-shadow: var(--shadow-md);
 }
 
-.cat-dua-card.is-audio-playing {
-  border-color: var(--gold-400);
-  box-shadow: 0 0 25px rgba(212, 175, 55, 0.35);
-  background: linear-gradient(180deg, rgba(14, 25, 43, 0.95), rgba(212, 175, 55, 0.08));
-}
-
-.cat-dua-card.is-audio-playing::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 3px;
-  background: linear-gradient(90deg, #10b981, var(--gold-400), #10b981);
-  animation: pulseHeader 2s infinite ease-in-out;
-}
-
-@keyframes pulseHeader {
-  0%, 100% { opacity: 0.6; }
-  50% { opacity: 1; }
-}
-
 .cat-dua-header {
   display: flex;
   justify-content: space-between;
@@ -4727,7 +4705,8 @@ body {
 
 .cat-dua-meta-row {
   display: flex;
-  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
   gap: 0.4rem;
   border-top: 1px dashed rgba(255, 255, 255, 0.08);
   padding-top: 0.65rem;
@@ -4742,40 +4721,12 @@ body {
   gap: 0.4rem;
 }
 
-.cat-dua-reciter-tag {
-  font-size: 0.78rem;
-  color: var(--gold-400);
-  display: flex;
-  align-items: center;
-  gap: 0.4rem;
-  font-weight: 600;
-}
-
 .cat-dua-actions {
   display: flex;
   align-items: center;
   justify-content: flex-end;
   flex-wrap: wrap;
   gap: 0.45rem;
-}
-
-.btn-sheikh-audio {
-  background: rgba(212, 175, 55, 0.12);
-  border-color: rgba(212, 175, 55, 0.4);
-  font-weight: 600;
-}
-
-.btn-sheikh-audio:hover {
-  background: rgba(212, 175, 55, 0.25);
-  border-color: var(--gold-300);
-}
-
-.btn-sheikh-audio.is-playing {
-  background: linear-gradient(135deg, var(--gold-600), var(--gold-500));
-  color: #0b1523 !important;
-  border-color: var(--gold-300);
-  box-shadow: 0 0 10px rgba(212, 175, 55, 0.5);
-  font-weight: 700;
 }
 
 /* ==========================================================================
