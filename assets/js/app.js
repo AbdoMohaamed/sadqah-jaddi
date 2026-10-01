@@ -3,9 +3,11 @@
  */
 
 document.addEventListener("DOMContentLoaded", () => {
-    // 1. تهيئة اسم الجد والمعلومات الرئيسية والتقويم الهجري
+    // 1. تهيئة اسم الجد والمعلومات الرئيسية والتقويم الهجري ونية الإهداء
     initDeceasedInfo();
     initHijriDate();
+    initDedicationSystem();
+    initOfflineIndicator();
 
     // 2. تهيئة الأدعية وسلايدر Swiper
     initPrayersSwiper();
@@ -17,7 +19,7 @@ document.addEventListener("DOMContentLoaded", () => {
     initQuranKhatmaTabs();
     initKhatma();
 
-    // 5. تهيئة أذكار الصباح والمساء التفاعلية
+    // 5. تهيئة أذكار اليوم وحصن المسلم التفاعلية
     initSmartAzkar();
 
     // 6. تهيئة نافذة إضافة دعاء
@@ -33,8 +35,10 @@ document.addEventListener("DOMContentLoaded", () => {
     // 9. تهيئة تطبيق الهاتف التقدمي (PWA)
     initPWA();
 
-    // 10. تهيئة مواقيت الصلاة وساعة الاستجابة
+    // 10. تهيئة مواقيت الصلاة وساعة الاستجابة ومواسم الصيام وبوصلة القبلة
     initPrayerTimes();
+    initFastingTracker();
+    initQiblaCompass();
 
     // 11. تهيئة صانع بطاقات الأدعية المصورة
     initDuaCardGenerator();
@@ -1200,47 +1204,68 @@ window.markPartCompleted = function(partId) {
 let currentAzkarMode = "morning";
 let azkarProgressMap = {};
 
+const AZKAR_MODE_HINTS = {
+    morning: "حان الآن وقت أذكار الصباح وسؤال العافية ☀️",
+    evening: "حان الآن وقت أذكار المساء وحفظ الليل 🌙",
+    sleep: "أذكار النوم والاضطجاع وسكينة الروح 🛏️",
+    post_prayer: "أذكار دبر الصلوات المكتوبة والاستغفار 🕌",
+    roqya: "آيات وسور الرقية الشرعية والشفاء والتحصين النبوي 🛡️"
+};
+
+function getAzkarListByMode(mode) {
+    switch (mode) {
+        case "morning":
+            return (typeof MORNING_AZKAR !== "undefined") ? MORNING_AZKAR : [];
+        case "evening":
+            return (typeof EVENING_AZKAR !== "undefined") ? EVENING_AZKAR : [];
+        case "sleep":
+            return (typeof SLEEP_AZKAR !== "undefined") ? SLEEP_AZKAR : [];
+        case "post_prayer":
+            return (typeof POST_PRAYER_AZKAR !== "undefined") ? POST_PRAYER_AZKAR : [];
+        case "roqya":
+            return (typeof ROQYA_AZKAR !== "undefined") ? ROQYA_AZKAR : [];
+        default:
+            return (typeof MORNING_AZKAR !== "undefined") ? MORNING_AZKAR : [];
+    }
+}
+
 function initSmartAzkar() {
     const currentHour = new Date().getHours();
     if (currentHour >= 3 && currentHour < 12) {
         currentAzkarMode = "morning";
-    } else {
+    } else if (currentHour >= 12 && currentHour < 21) {
         currentAzkarMode = "evening";
+    } else {
+        currentAzkarMode = "sleep";
     }
 
     updateAzkarModeUI();
 
-    const morningBtn = document.getElementById("tab-morning");
-    const eveningBtn = document.getElementById("tab-evening");
-
-    if (morningBtn) {
-        morningBtn.addEventListener("click", () => {
-            currentAzkarMode = "morning";
-            updateAzkarModeUI();
+    const azkarTabs = document.querySelectorAll(".azkar-tab-btn");
+    azkarTabs.forEach(btn => {
+        btn.addEventListener("click", () => {
+            const mode = btn.dataset.mode;
+            if (mode) {
+                currentAzkarMode = mode;
+                updateAzkarModeUI();
+            }
         });
-    }
-
-    if (eveningBtn) {
-        eveningBtn.addEventListener("click", () => {
-            currentAzkarMode = "evening";
-            updateAzkarModeUI();
-        });
-    }
+    });
 }
 
 function updateAzkarModeUI() {
-    const morningBtn = document.getElementById("tab-morning");
-    const eveningBtn = document.getElementById("tab-evening");
-    const hintText = document.getElementById("azkar-time-hint-text");
+    const azkarTabs = document.querySelectorAll(".azkar-tab-btn");
+    azkarTabs.forEach(btn => {
+        if (btn.dataset.mode === currentAzkarMode) {
+            btn.classList.add("active");
+        } else {
+            btn.classList.remove("active");
+        }
+    });
 
-    if (currentAzkarMode === "morning") {
-        if (morningBtn) morningBtn.classList.add("active");
-        if (eveningBtn) eveningBtn.classList.remove("active");
-        if (hintText) hintText.textContent = "حان الآن وقت أذكار الصباح وسؤال العافية ☀️";
-    } else {
-        if (eveningBtn) eveningBtn.classList.add("active");
-        if (morningBtn) morningBtn.classList.remove("active");
-        if (hintText) hintText.textContent = "حان الآن وقت أذكار المساء وحفظ الليل 🌙";
+    const hintText = document.getElementById("azkar-time-hint-text");
+    if (hintText && AZKAR_MODE_HINTS[currentAzkarMode]) {
+        hintText.textContent = AZKAR_MODE_HINTS[currentAzkarMode];
     }
 
     renderAzkarCards();
@@ -1248,9 +1273,9 @@ function updateAzkarModeUI() {
 
 function renderAzkarCards() {
     const container = document.getElementById("azkar-cards-container");
-    if (!container || typeof MORNING_AZKAR === "undefined") return;
+    if (!container) return;
 
-    const list = currentAzkarMode === "morning" ? MORNING_AZKAR : EVENING_AZKAR;
+    const list = getAzkarListByMode(currentAzkarMode);
     container.innerHTML = "";
 
     const cacheKey = `azkar_progress_${currentAzkarMode}_${new Date().toDateString()}`;
@@ -1291,8 +1316,7 @@ function renderAzkarCards() {
 }
 
 window.handleAzkarTap = function(itemId, totalCount) {
-    if (typeof MORNING_AZKAR === "undefined") return;
-    const list = currentAzkarMode === "morning" ? MORNING_AZKAR : EVENING_AZKAR;
+    const list = getAzkarListByMode(currentAzkarMode);
     const cacheKey = `azkar_progress_${currentAzkarMode}_${new Date().toDateString()}`;
 
     let remaining = (typeof azkarProgressMap[itemId] === "number") ? azkarProgressMap[itemId] : totalCount;
@@ -1335,7 +1359,7 @@ window.handleAzkarTap = function(itemId, totalCount) {
     updateAzkarSummary(completedCount, list.length);
 
     if (completedCount === list.length) {
-        showToast("هنيئاً لك! أتممت أذكار يومك كاملة، جعله الله حصناً لك ونوراً لروح فقيدنا 🌿✨");
+        showToast("هنيئاً لك! أتممت أذكار هذه الباقة كاملة، جعله الله حصناً لك ونوراً لروح فقيدنا 🌿✨");
     }
 };
 
@@ -2263,6 +2287,455 @@ window.scrollAzkarContainer = function(direction) {
     const scrollAmount = card ? (card.offsetWidth + 20) : 320;
     const delta = direction === "left" ? -scrollAmount : scrollAmount;
     container.scrollBy({ left: delta, behavior: "smooth" });
+};
+
+/* ==========================================================================
+   13. شريط وحالة الاتصال بالإنترنت (Offline Mode & PWA Status)
+   ========================================================================== */
+function initOfflineIndicator() {
+    const banner = document.getElementById("offline-status-banner");
+    const updateStatus = () => {
+        if (!navigator.onLine) {
+            if (banner) banner.style.display = "flex";
+            showToast("أنت الآن في وضع عدم الاتصال • جميع الميزات الأساسية والقرآن تعمل بدون إنترنت 📴");
+        } else {
+            if (banner) banner.style.display = "none";
+        }
+    };
+
+    window.addEventListener("online", () => {
+        if (banner) banner.style.display = "none";
+        showToast("عادت شبكة الإنترنت! تم تحديث الاتصال بنجاح 🌐✨");
+    });
+    window.addEventListener("offline", updateStatus);
+
+    if (!navigator.onLine && banner) {
+        banner.style.display = "flex";
+    }
+}
+
+/* ==========================================================================
+   14. نظام الإهداء المزدوج والنية والتتابع اليومي (Dual Dedication & Daily Streak)
+   ========================================================================== */
+function initDedicationSystem() {
+    const targetNameEl = document.getElementById("dedication-target-name");
+    const modal = document.getElementById("dedication-modal");
+    const editBtn = document.getElementById("btn-edit-dedication");
+    const closeBtn = document.getElementById("btn-close-dedication-modal");
+    const saveBtn = document.getElementById("btn-save-dedication");
+    const resetBtn = document.getElementById("btn-reset-dedication");
+    const customInput = document.getElementById("custom-dedication-input");
+    const presetBtns = document.querySelectorAll(".dedication-preset-btn");
+    const streakCountEl = document.getElementById("streak-days-count");
+
+    const defaultTarget = (typeof DECEASED_INFO !== "undefined" && DECEASED_INFO.name) 
+        ? DECEASED_INFO.name 
+        : "جدي الغالي (عبدالمعبود أمين سعيد)";
+
+    let currentTarget = localStorage.getItem("user_dedication_intent") || defaultTarget;
+
+    const renderTarget = () => {
+        if (targetNameEl) {
+            targetNameEl.textContent = currentTarget;
+        }
+    };
+    renderTarget();
+
+    // تحديث التتابع اليومي (Daily Streak)
+    try {
+        const todayStr = new Date().toDateString();
+        const lastVisit = localStorage.getItem("user_last_visit_date");
+        let streak = parseInt(localStorage.getItem("user_streak_days") || "1", 10);
+
+        if (lastVisit) {
+            const lastDate = new Date(lastVisit);
+            const todayDate = new Date(todayStr);
+            const diffDays = Math.round((todayDate - lastDate) / (1000 * 60 * 60 * 24));
+
+            if (diffDays === 1) {
+                streak += 1;
+            } else if (diffDays > 1) {
+                streak = 1;
+            }
+        }
+        localStorage.setItem("user_last_visit_date", todayStr);
+        localStorage.setItem("user_streak_days", streak.toString());
+        if (streakCountEl) streakCountEl.textContent = streak;
+    } catch (e) {
+        console.warn("Streak calculation error:", e);
+    }
+
+    if (editBtn && modal) {
+        editBtn.addEventListener("click", () => {
+            if (customInput) customInput.value = (currentTarget !== defaultTarget) ? currentTarget : "";
+            modal.classList.add("open");
+        });
+    }
+
+    if (closeBtn && modal) {
+        closeBtn.addEventListener("click", () => modal.classList.remove("open"));
+    }
+
+    if (modal) {
+        modal.addEventListener("click", (e) => {
+            if (e.target === modal) modal.classList.remove("open");
+        });
+    }
+
+    presetBtns.forEach(btn => {
+        btn.addEventListener("click", () => {
+            const val = btn.dataset.preset;
+            if (customInput && val) {
+                customInput.value = val;
+            }
+        });
+    });
+
+    if (saveBtn) {
+        saveBtn.addEventListener("click", () => {
+            const inputVal = customInput ? customInput.value.trim() : "";
+            currentTarget = inputVal || defaultTarget;
+            localStorage.setItem("user_dedication_intent", currentTarget);
+            renderTarget();
+            if (modal) modal.classList.remove("open");
+            showToast("تم تثبيت نية الإهداء بنجاح، تقبل الله طاعتكم 🤲✨");
+        });
+    }
+
+    if (resetBtn) {
+        resetBtn.addEventListener("click", () => {
+            currentTarget = defaultTarget;
+            localStorage.removeItem("user_dedication_intent");
+            if (customInput) customInput.value = "";
+            renderTarget();
+            if (modal) modal.classList.remove("open");
+            showToast("تمت استعادة نية الصدقة لروح جدي الغالي 🤍");
+        });
+    }
+}
+
+/* ==========================================================================
+   15. مواسم الصيام المستحب والعد التنازلي للإفطار (Fasting Tracker & Duas)
+   ========================================================================== */
+let fastingCountdownInterval = null;
+
+function initFastingTracker() {
+    const banner = document.getElementById("fasting-tracker-banner");
+    const tagEl = document.getElementById("fasting-season-tag");
+    const titleEl = document.getElementById("fasting-banner-title");
+    const descEl = document.getElementById("fasting-banner-desc");
+    const timerLabel = document.getElementById("fasting-timer-label");
+    const timerVal = document.getElementById("fasting-timer-value");
+    const showDuaBtn = document.getElementById("btn-show-fasting-dua");
+    const fastingModal = document.getElementById("fasting-dua-modal");
+    const closeFastingModalBtn = document.getElementById("btn-close-fasting-modal");
+    const duasListEl = document.getElementById("fasting-duas-list");
+
+    if (!banner) return;
+
+    // فحص يوم الصيام الهجري والميلادي
+    const now = new Date();
+    const dayOfWeek = now.getDay(); // 1 = الاثنين, 4 = الخميس
+    let hijriDay = null;
+    let hijriMonth = null;
+
+    try {
+        const parts = new Intl.DateTimeFormat('en-u-ca-islamic-umalqura', {
+            day: 'numeric',
+            month: 'numeric'
+        }).formatToParts(now);
+
+        parts.forEach(p => {
+            if (p.type === 'day') hijriDay = parseInt(p.value, 10);
+            if (p.type === 'month') hijriMonth = parseInt(p.value, 10);
+        });
+    } catch (e) {
+        // احتياطي
+    }
+
+    let isFastingDay = false;
+    let seasonTag = "سنة صيام مستحبة 🌙";
+    let seasonTitle = "صيام اليوم: سنة مباركة";
+    let seasonDesc = '"للصائم عند فطره دعوة لا تُرد"... اغتنم هذه اللحظات بالدعاء لفقيدنا الحبيب.';
+
+    // 1. شهر رمضان المبارك
+    if (hijriMonth === 9) {
+        isFastingDay = true;
+        seasonTag = "شهر رمضان المبارك 🌙";
+        seasonTitle = "صيام فريضة شهر رمضان";
+        seasonDesc = "أيام النفحات والبركات والقرآن، نسأل الله أن يرحم فقيدنا ويجعل صيامه وقيامه نوراً في قبره.";
+    }
+    // 2. الأيام البيض (13، 14، 15 من الشهر الهجري)
+    else if (hijriDay === 13 || hijriDay === 14 || hijriDay === 15) {
+        isFastingDay = true;
+        seasonTag = "صيام الأيام البيض المباركة 🌕";
+        seasonTitle = `اليوم ${hijriDay} من الشهر الهجري (الأيام البيض)`;
+        seasonDesc = "صيام ثلاثة أيام من كل شهر تعدل صيام الدهر كله كما أخبر النبي ﷺ.";
+    }
+    // 3. يوم عرفة (9 ذو الحجة)
+    else if (hijriMonth === 12 && hijriDay === 9) {
+        isFastingDay = true;
+        seasonTag = "يوم عرفة المبارك 🕋";
+        seasonTitle = "صيام يوم عرفة";
+        seasonDesc = "يكفر السنة الماضية والباقية، وأعظم أيام الدعاء والرجاء.";
+    }
+    // 4. عاشوراء وتاسوعاء (9 و 10 محرم)
+    else if (hijriMonth === 1 && (hijriDay === 9 || hijriDay === 10)) {
+        isFastingDay = true;
+        seasonTag = "عاشوراء المبارك 🌊";
+        seasonTitle = `صيام يوم ${hijriDay === 10 ? 'عاشوراء' : 'تاسوعاء'}`;
+        seasonDesc = "صيام يوم عاشوراء يكفر ذنوب سنة ماضية، نسأل الله القبول لفقيدنا ولكم.";
+    }
+    // 5. الاثنين أو الخميس
+    else if (dayOfWeek === 1 || dayOfWeek === 4) {
+        isFastingDay = true;
+        seasonTag = dayOfWeek === 1 ? "سنة صيام يوم الاثنين 🌿" : "سنة صيام يوم الخميس 🌿";
+        seasonTitle = "تعرض الأعمال على الله اليوم";
+        seasonDesc = "قال ﷺ: 'تُعرض الأعمال يوم الاثنين والخميس، فأحب أن يُعرض عملي وأنا صائم'.";
+    }
+
+    if (isFastingDay) {
+        banner.style.display = "flex";
+        if (tagEl) tagEl.textContent = seasonTag;
+        if (titleEl) titleEl.textContent = seasonTitle;
+        if (descEl) descEl.textContent = seasonDesc;
+
+        // بدء العد التنازلي للإفطار أو الإمساك
+        startFastingCountdown();
+    } else {
+        // إظهار البنر قبل يوم الصيام أيضاً للتذكير والنية!
+        const tomorrowDay = (dayOfWeek + 1) % 7;
+        const tomorrowHijriDay = hijriDay ? hijriDay + 1 : 0;
+        if (tomorrowDay === 1 || tomorrowDay === 4 || tomorrowHijriDay === 13) {
+            banner.style.display = "flex";
+            if (tagEl) tagEl.textContent = "تذكير بسنة الصيام غداً 🌙";
+            if (titleEl) titleEl.textContent = "صيام الغد مستحب، انوِ الصيام والأجر";
+            if (descEl) descEl.textContent = "قال ﷺ: 'من صام يوماً في سبيل الله باعد الله وجهه عن النار سبعين خريفاً'.";
+            if (timerLabel) timerLabel.textContent = "الاستعداد لأذان الفجر والإمساك:";
+            startFastingCountdown();
+        } else {
+            banner.style.display = "none";
+        }
+    }
+
+    // إعداد نافذة أدعية الصائم
+    if (duasListEl && typeof FASTING_DUAS !== "undefined") {
+        duasListEl.innerHTML = "";
+        FASTING_DUAS.forEach(d => {
+            const card = document.createElement("div");
+            card.className = "fasting-dua-card";
+            card.innerHTML = `
+                <div class="fasting-dua-title"><i class="fa-solid fa-moon text-gold"></i> ${escapeHTML(d.title)}</div>
+                <div class="fasting-dua-text">"${escapeHTML(d.text)}"</div>
+                <div class="fasting-dua-footer">
+                    <span>${escapeHTML(d.source)}</span>
+                    <button type="button" class="btn-copy-dua" onclick="copyTextToClipboard('${escapeHTML(d.text)}')">
+                        <i class="fa-solid fa-copy"></i>
+                        <span>نسخ</span>
+                    </button>
+                </div>
+            `;
+            duasListEl.appendChild(card);
+        });
+    }
+
+    if (showDuaBtn && fastingModal) {
+        showDuaBtn.addEventListener("click", () => fastingModal.classList.add("open"));
+    }
+    if (closeFastingModalBtn && fastingModal) {
+        closeFastingModalBtn.addEventListener("click", () => fastingModal.classList.remove("open"));
+    }
+    if (fastingModal) {
+        fastingModal.addEventListener("click", (e) => {
+            if (e.target === fastingModal) fastingModal.classList.remove("open");
+        });
+    }
+}
+
+function startFastingCountdown() {
+    if (fastingCountdownInterval) clearInterval(fastingCountdownInterval);
+
+    const update = () => {
+        const timerLabel = document.getElementById("fasting-timer-label");
+        const timerVal = document.getElementById("fasting-timer-value");
+        if (!timerVal || !prayerTimings) return;
+
+        const now = new Date();
+        const maghribStr = prayerTimings.Maghrib ? prayerTimings.Maghrib.split(" ")[0] : "18:00";
+        const fajrStr = prayerTimings.Fajr ? prayerTimings.Fajr.split(" ")[0] : "04:30";
+
+        const [mH, mM] = maghribStr.split(":").map(Number);
+        const [fH, fM] = fajrStr.split(":").map(Number);
+
+        const maghribDate = new Date(now.getFullYear(), now.getMonth(), now.getDate(), mH, mM, 0);
+        const fajrDate = new Date(now.getFullYear(), now.getMonth(), now.getDate(), fH, fM, 0);
+
+        if (now < maghribDate && now >= fajrDate) {
+            // وقت الصيام نهاراً -> العد التنازلي للمغرب (الإفطار)
+            if (timerLabel) timerLabel.textContent = "المتبقي على أذان المغرب والإفطار 🌅:";
+            const diff = maghribDate - now;
+            timerVal.textContent = formatDuration(diff);
+        } else {
+            // ليلاً -> العد التنازلي للإمساك وأذان الفجر
+            if (timerLabel) timerLabel.textContent = "المتبقي على أذان الفجر وبدء الصيام 🌙:";
+            let targetFajr = fajrDate;
+            if (now >= maghribDate) {
+                targetFajr = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1, fH, fM, 0);
+            }
+            const diff = targetFajr - now;
+            timerVal.textContent = formatDuration(diff);
+        }
+    };
+
+    update();
+    fastingCountdownInterval = setInterval(update, 1000);
+}
+
+function formatDuration(ms) {
+    if (ms <= 0) return "00:00:00";
+    const totalSec = Math.floor(ms / 1000);
+    const h = Math.floor(totalSec / 3600);
+    const m = Math.floor((totalSec % 3600) / 60);
+    const s = totalSec % 60;
+    return `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`;
+}
+
+/* ==========================================================================
+   16. بوصلة القبلة التفاعلية الذكية (Interactive Qibla Compass)
+   ========================================================================== */
+function initQiblaCompass() {
+    const modal = document.getElementById("qibla-modal");
+    const openBtn = document.getElementById("btn-open-qibla");
+    const closeBtn = document.getElementById("btn-close-qibla-modal");
+    const cityNameEl = document.getElementById("qibla-city-name");
+    const angleValEl = document.getElementById("qibla-angle-value");
+    const pointerEl = document.getElementById("compass-qibla-pointer");
+    const dialEl = document.getElementById("compass-dial");
+    const calibrateBtn = document.getElementById("btn-calibrate-compass");
+    const sensorText = document.getElementById("compass-sensor-text");
+
+    let currentQiblaAngle = 136; // افتراضي للقاهرة
+
+    function calculateBearing(lat, lng) {
+        const kaabaLat = 21.4225 * Math.PI / 180;
+        const kaabaLng = 39.8262 * Math.PI / 180;
+        const phi = lat * Math.PI / 180;
+        const lambda = lng * Math.PI / 180;
+
+        const y = Math.sin(kaabaLng - lambda);
+        const x = Math.cos(phi) * Math.tan(kaabaLat) - Math.sin(phi) * Math.cos(kaabaLng - lambda);
+        let qibla = Math.atan2(y, x) * 180 / Math.PI;
+        return Math.round((qibla + 360) % 360);
+    }
+
+    function refreshQiblaData() {
+        const cityKey = localStorage.getItem("selected_prayer_city") || "Cairo";
+        const coords = (typeof QIBLA_CITIES_COORDS !== "undefined" && QIBLA_CITIES_COORDS[cityKey])
+            ? QIBLA_CITIES_COORDS[cityKey]
+            : { name: "القاهرة", lat: 30.0444, lng: 31.2357 };
+
+        currentQiblaAngle = calculateBearing(coords.lat, coords.lng);
+
+        if (cityNameEl) cityNameEl.textContent = coords.name;
+        if (angleValEl) angleValEl.textContent = `${currentQiblaAngle}°`;
+
+        if (pointerEl) {
+            pointerEl.style.transform = `rotate(${currentQiblaAngle}deg)`;
+        }
+    }
+
+    function handleOrientation(e) {
+        let heading = null;
+
+        // أجهزة iOS Safari
+        if (typeof e.webkitCompassHeading !== "undefined") {
+            heading = e.webkitCompassHeading;
+        } 
+        // أجهزة أندرويد
+        else if (e.alpha !== null) {
+            heading = 360 - e.alpha;
+        }
+
+        if (heading !== null && dialEl) {
+            dialEl.style.transform = `rotate(${-heading}deg)`;
+            if (sensorText) {
+                const diffToQibla = Math.abs((heading - currentQiblaAngle + 360) % 360);
+                if (diffToQibla < 6 || diffToQibla > 354) {
+                    sensorText.innerHTML = '<span style="color: #34d399; font-weight: 700;">✦ أنت باتجاه القبلة الشريفة الآن تماماً ✦</span>';
+                    if ("vibrate" in navigator) navigator.vibrate(40);
+                } else {
+                    sensorText.textContent = "وجّه أعلى الهاتف نحو علامة الكعبة الذهبية";
+                }
+            }
+        }
+    }
+
+    function setupSensor() {
+        if (typeof DeviceOrientationEvent !== "undefined" && typeof DeviceOrientationEvent.requestPermission === "function") {
+            DeviceOrientationEvent.requestPermission()
+                .then(response => {
+                    if (response === "granted") {
+                        window.addEventListener("deviceorientation", handleOrientation, true);
+                        if (sensorText) sensorText.textContent = "حساس الحركة يعمل بنجاح 🧭";
+                    } else {
+                        if (sensorText) sensorText.textContent = "تم رفض إذن الحساس. استعن بالزاوية المعروضة.";
+                    }
+                })
+                .catch(() => {
+                    window.addEventListener("deviceorientation", handleOrientation, true);
+                });
+        } else if (window.DeviceOrientationEvent) {
+            window.addEventListener("deviceorientation", handleOrientation, true);
+        }
+    }
+
+    if (openBtn && modal) {
+        openBtn.addEventListener("click", () => {
+            refreshQiblaData();
+            modal.classList.add("open");
+            setupSensor();
+        });
+    }
+
+    if (closeBtn && modal) {
+        closeBtn.addEventListener("click", () => {
+            modal.classList.remove("open");
+            window.removeEventListener("deviceorientation", handleOrientation);
+        });
+    }
+
+    if (modal) {
+        modal.addEventListener("click", (e) => {
+            if (e.target === modal) {
+                modal.classList.remove("open");
+                window.removeEventListener("deviceorientation", handleOrientation);
+            }
+        });
+    }
+
+    if (calibrateBtn) {
+        calibrateBtn.addEventListener("click", () => {
+            setupSensor();
+            showToast("تم إعادة تفعيل حساس اتجاه القبلة 🧭");
+        });
+    }
+}
+
+// دالة مساعدة لنسخ النصوص للحافظة
+window.copyTextToClipboard = function(text) {
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(() => {
+            showToast("تم نسخ الدعاء بنجاح للحافظة 📋");
+        });
+    } else {
+        const textarea = document.createElement("textarea");
+        textarea.value = text;
+        document.body.appendChild(textarea);
+        textarea.select();
+        document.execCommand("copy");
+        textarea.remove();
+        showToast("تم نسخ الدعاء بنجاح للحافظة 📋");
+    }
 };
 
 

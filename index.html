@@ -41,7 +41,7 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css">
 
     <!-- تنسيقات الموقع -->
-    <link rel="stylesheet" href="assets/css/style.css?v=57">
+    <link rel="stylesheet" href="assets/css/style.css?v=58">
 </head>
 <body>
 
@@ -80,6 +80,29 @@
             </div>
         </div>
     </nav>
+
+    <!-- شريط التنبيه عند انقطاع الإنترنت (Offline Banner) -->
+    <div class="offline-status-banner" id="offline-status-banner" style="display: none;">
+        <i class="fa-solid fa-wifi-slash"></i>
+        <span>أنت تتصفح بدون إنترنت • تم تفعيل وضع الأوفلاين (القرآن، الأذكار، والسبحة تعمل بنجاح 100%)</span>
+    </div>
+
+    <!-- شريط الإهداء والنية الشخصية (Dual Dedication Bar) -->
+    <div class="dedication-top-bar" id="dedication-top-bar">
+        <div class="container dedication-bar-inner">
+            <div class="dedication-info">
+                <span class="dedication-label"><i class="fa-solid fa-heart text-gold"></i> نية الأجر والصدقة:</span>
+                <span class="dedication-current-target" id="dedication-target-name">جدي الغالي (عبدالمعبود أمين سعيد)</span>
+                <span class="dedication-streak-badge" id="user-streak-badge" title="أيام متتالية من الذكر والدعاء">
+                    <i class="fa-solid fa-fire text-gold"></i> <span id="streak-days-count">1</span> يوم تتابع
+                </span>
+            </div>
+            <button type="button" class="btn-edit-dedication" id="btn-edit-dedication" title="تخصيص نية الإهداء أو إشراك والديك">
+                <i class="fa-solid fa-pen-to-square"></i>
+                <span>تخصيص النية</span>
+            </button>
+        </div>
+    </div>
 
     <!-- مشغل صوتي لتلاوة خاشعة هادئة (سورة الملك / الفاتحة) -->
     <audio id="quran-audio" preload="none" loop>
@@ -371,6 +394,30 @@
                 </div>
             </div>
 
+            <!-- بنر مواسم الصيام المستحب والعد التنازلي للإفطار والإمساك (Fasting Tracker) -->
+            <div class="fasting-tracker-banner" id="fasting-tracker-banner" style="display: none;">
+                <div class="fasting-banner-main">
+                    <div class="fasting-badge-icon">
+                        <i class="fa-solid fa-cloud-moon text-gold"></i>
+                    </div>
+                    <div class="fasting-banner-info">
+                        <div class="fasting-season-tag" id="fasting-season-tag">موسم صيام مستحب 🌙</div>
+                        <h4 class="fasting-banner-title" id="fasting-banner-title">صيام اليوم: سنة مباركة</h4>
+                        <p class="fasting-banner-desc" id="fasting-banner-desc">"للصائم عند فطره دعوة لا تُرد"... اغتنم هذه النفحات بالدعاء لفقيدنا الحبيب.</p>
+                    </div>
+                </div>
+                <div class="fasting-banner-stats">
+                    <div class="fasting-countdown-box">
+                        <span class="fasting-timer-label" id="fasting-timer-label">المتبقي على أذان المغرب والإفطار:</span>
+                        <span class="fasting-timer-value" id="fasting-timer-value">--:--:--</span>
+                    </div>
+                    <button type="button" class="btn btn-gold btn-sm" id="btn-show-fasting-dua">
+                        <i class="fa-solid fa-hands-praying"></i>
+                        <span>دعاء الصائم والإفطار</span>
+                    </button>
+                </div>
+            </div>
+
             <!-- بطاقة التحكم والعد التنازلي لمواقيت الصلاة -->
             <div class="prayer-times-card">
                 <div class="prayer-times-meta">
@@ -390,6 +437,11 @@
                             <option value="Riyadh">الرياض (السعودية)</option>
                         </select>
                     </div>
+
+                    <button type="button" class="btn btn-outline btn-sm btn-open-qibla" id="btn-open-qibla" title="تحديد اتجاه القبلة نحو الكعبة المشرفة">
+                        <i class="fa-solid fa-compass text-gold"></i>
+                        <span>اتجاه القبلة</span>
+                    </button>
 
                     <div class="prayer-hijri-badge" id="prayer-hijri-badge">
                         <i class="fa-solid fa-moon text-gold"></i>
@@ -551,14 +603,14 @@
         <div class="container">
             <div class="section-header">
                 <span class="section-tag"><i class="fa-solid fa-sun"></i> حصن المسلم اليومي</span>
-                <h2 class="section-title">أذكار الصباح والمساء</h2>
+                <h2 class="section-title">أذكار اليوم وحصن المسلم</h2>
                 <p class="section-desc">
                     داوم على أذكار يومك وانوِ بركتها وأجرها لروحه الطاهرة، فالذكر حصن منيع وسكينة للقلوب وبركة في العمر والعمل.
                 </p>
             </div>
 
-            <!-- شريط التبديل بين الصباح والمساء -->
-            <div class="azkar-tab-controls">
+            <!-- شريط التبديل بين باقات الأذكار المتنوعة -->
+            <div class="azkar-tab-controls" id="azkar-tab-controls">
                 <button type="button" class="azkar-tab-btn active" id="tab-morning" data-mode="morning">
                     <i class="fa-solid fa-sun"></i>
                     <span>أذكار الصباح</span>
@@ -566,6 +618,18 @@
                 <button type="button" class="azkar-tab-btn" id="tab-evening" data-mode="evening">
                     <i class="fa-solid fa-moon"></i>
                     <span>أذكار المساء</span>
+                </button>
+                <button type="button" class="azkar-tab-btn" id="tab-sleep" data-mode="sleep">
+                    <i class="fa-solid fa-bed"></i>
+                    <span>أذكار النوم</span>
+                </button>
+                <button type="button" class="azkar-tab-btn" id="tab-post_prayer" data-mode="post_prayer">
+                    <i class="fa-solid fa-mosque"></i>
+                    <span>بعد الصلاة</span>
+                </button>
+                <button type="button" class="azkar-tab-btn" id="tab-roqya" data-mode="roqya">
+                    <i class="fa-solid fa-shield-halved"></i>
+                    <span>الرقية الشرعية</span>
                 </button>
             </div>
 
@@ -902,6 +966,109 @@
         </div>
     </div>
 
+    <!-- ==========================================
+         نافذة تخصيص نية الإهداء (Dedication Modal)
+         ========================================== -->
+    <div class="modal-overlay" id="dedication-modal">
+        <div class="modal-card">
+            <div class="modal-header-row">
+                <h3 class="modal-title"><i class="fa-solid fa-hand-holding-heart text-gold"></i> تخصيص نية الإهداء والأجر</h3>
+                <button class="modal-close-btn" id="btn-close-dedication-modal" aria-label="إغلاق">&times;</button>
+            </div>
+            <p class="modal-desc">
+                يبقى الأجر واصلاً بإذن الله لروح <strong>جدي الغالي (عبدالمعبود أمين سعيد)</strong>، ويمكنك إشراك نيتك الخاصة لتهدي ثواب قراءتك وتسبيحك لمن تحب (لوالديك، لأحبابك، أو لنفسك):
+            </p>
+            <div class="dedication-presets">
+                <button type="button" class="dedication-preset-btn" data-preset="جدي الغالي (عبدالمعبود أمين سعيد) ووالديّ">لجدي ولوالديّ الكريمين 🤍</button>
+                <button type="button" class="dedication-preset-btn" data-preset="جدي الغالي (عبدالمعبود أمين سعيد) وجميع موتى المسلمين">لجدي ولموتى المسلمين جميعاً 🤲</button>
+                <button type="button" class="dedication-preset-btn" data-preset="جدي الغالي (عبدالمعبود أمين سعيد) ونفسي وأهلي">لجدي ولنفسي وأهل بيتي 🌿</button>
+            </div>
+            <div class="form-group" style="margin-top: 15px;">
+                <label for="custom-dedication-input">أو اكتب اسماً أو صيغة مخصصة:</label>
+                <input type="text" id="custom-dedication-input" class="form-input" placeholder="مثال: لروح أمي الغالية، أو لأبي وجدي..." maxlength="80">
+            </div>
+            <div class="modal-actions-row">
+                <button type="button" class="btn btn-gold" id="btn-save-dedication">
+                    <i class="fa-solid fa-check"></i>
+                    <span>حفظ وتثبيت النية</span>
+                </button>
+                <button type="button" class="btn btn-outline" id="btn-reset-dedication">
+                    <i class="fa-solid fa-rotate-left"></i>
+                    <span>إعادة للأصل (جدي الغالي)</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==========================================
+         نافذة بوصلة القبلة التفاعلية (Qibla Compass Modal)
+         ========================================== -->
+    <div class="modal-overlay" id="qibla-modal">
+        <div class="modal-card modal-card-qibla">
+            <div class="modal-header-row">
+                <h3 class="modal-title"><i class="fa-solid fa-compass text-gold"></i> بوصلة اتجاه القبلة الشريفة</h3>
+                <button class="modal-close-btn" id="btn-close-qibla-modal" aria-label="إغلاق">&times;</button>
+            </div>
+            <div class="qibla-modal-body">
+                <div class="qibla-city-status">
+                    <span>المدينة: <strong id="qibla-city-name">القاهرة</strong></span>
+                    <span class="qibla-angle-badge">زاوية الكعبة: <strong id="qibla-angle-value">136°</strong></span>
+                </div>
+                
+                <div class="compass-container">
+                    <div class="compass-dial" id="compass-dial">
+                        <div class="compass-cardinal compass-north">شمال (N)</div>
+                        <div class="compass-cardinal compass-east">شرق (E)</div>
+                        <div class="compass-cardinal compass-south">جنوب (S)</div>
+                        <div class="compass-cardinal compass-west">غرب (W)</div>
+                        
+                        <!-- مؤشر الكعبة المشرفة -->
+                        <div class="compass-qibla-pointer" id="compass-qibla-pointer">
+                            <div class="kaaba-icon-wrapper" title="اتجاه الكعبة المشرفة">
+                                <i class="fa-solid fa-kaaba"></i>
+                                <span>القبلة</span>
+                            </div>
+                        </div>
+
+                        <!-- إبرة البوصلة الشمالية -->
+                        <div class="compass-needle" id="compass-needle">
+                            <div class="needle-north"></div>
+                            <div class="needle-south"></div>
+                            <div class="needle-center-pin"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="compass-sensor-status" id="compass-sensor-status">
+                    <i class="fa-solid fa-mobile-screen"></i>
+                    <span id="compass-sensor-text">قم بتوجيه أعلى الهاتف باتجاه علامة الكعبة الذهبية</span>
+                </div>
+
+                <div class="compass-actions">
+                    <button type="button" class="btn btn-outline btn-sm" id="btn-calibrate-compass">
+                        <i class="fa-solid fa-location-crosshairs"></i>
+                        <span>تفعيل حساس الحركة</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==========================================
+         نافذة أدعية الصائم والإفطار (Fasting Dua Modal)
+         ========================================== -->
+    <div class="modal-overlay" id="fasting-dua-modal">
+        <div class="modal-card">
+            <div class="modal-header-row">
+                <h3 class="modal-title"><i class="fa-solid fa-cloud-moon text-gold"></i> أدعية الصائم عند الفطر والسحر</h3>
+                <button class="modal-close-btn" id="btn-close-fasting-modal" aria-label="إغلاق">&times;</button>
+            </div>
+            <div class="fasting-duas-list" id="fasting-duas-list">
+                <!-- يُملأ برمجياً من FASTING_DUAS -->
+            </div>
+        </div>
+    </div>
+
     <!-- بنر تثبيت التطبيق الذكي للهواتف (PWA Install Banner) -->
     <div class="pwa-install-banner" id="pwa-install-banner" style="display: none;">
         <div class="pwa-banner-icon">
@@ -1006,7 +1173,7 @@
     <script src="assets/js/data.js"></script>
     <script src="assets/js/azkar-data.js"></script>
     <script src="assets/js/firebase-config.js"></script>
-    <script src="assets/js/app.js?v=3"></script>
+    <script src="assets/js/app.js?v=4"></script>
     <script src="assets/js/quran.js"></script>
 </body>
 </html>

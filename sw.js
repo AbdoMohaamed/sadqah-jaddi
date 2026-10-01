@@ -3,19 +3,25 @@
  * يوفر سرعة تحميل فورية ودعم التثبيت كـ PWA
  */
 
-const CACHE_NAME = "sadqah-jaddi-v2";
+const CACHE_NAME = "sadqah-jaddi-v3";
 const ASSETS_TO_CACHE = [
   "./",
   "./index.html",
+  "./assets/css/style.css?v=58",
   "./assets/css/style.css",
   "./assets/js/data.js",
   "./assets/js/azkar-data.js",
   "./assets/js/firebase-config.js",
+  "./assets/js/app.js?v=4",
   "./assets/js/app.js",
   "./assets/js/quran.js",
   "./assets/icon.svg",
   "./assets/share-preview.jpg",
-  "./manifest.json"
+  "./manifest.json",
+  "https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&family=Tajawal:wght@300;400;500;700;800;900&family=UthmanicHafs:wght@400;700&display=swap",
+  "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css",
+  "https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css",
+  "https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"
 ];
 
 // مرحلة التثبيت وتخزين الملفات الأساسية
@@ -46,7 +52,7 @@ self.addEventListener("activate", (event) => {
   self.clients.claim();
 });
 
-// استراتيجية جلب البيانات (Network First with Cache Fallback)
+// استراتيجية جلب البيانات (Network First مع Cache Fallback الذكي لكافة الأصول)
 self.addEventListener("fetch", (event) => {
   // تجاهل طلبات الفيربيز والبث المباشر
   if (
@@ -58,26 +64,27 @@ self.addEventListener("fetch", (event) => {
     return;
   }
 
+  // التخزين المؤقت الذكي لملفات المصحف والأدعية والخطوط
   event.respondWith(
-    fetch(event.request)
-      .then((networkResponse) => {
-        if (networkResponse && networkResponse.status === 200 && event.request.method === "GET") {
-          const responseToCache = networkResponse.clone();
-          caches.open(CACHE_NAME).then((cache) => {
-            cache.put(event.request, responseToCache);
-          });
-        }
-        return networkResponse;
-      })
-      .catch(() => {
-        return caches.match(event.request).then((cachedResponse) => {
-          if (cachedResponse) {
-            return cachedResponse;
+    caches.match(event.request).then((cachedResponse) => {
+      const fetchPromise = fetch(event.request)
+        .then((networkResponse) => {
+          if (networkResponse && networkResponse.status === 200 && event.request.method === "GET") {
+            const responseToCache = networkResponse.clone();
+            caches.open(CACHE_NAME).then((cache) => {
+              cache.put(event.request, responseToCache);
+            });
           }
-          if (event.request.headers.get("accept").includes("text/html")) {
+          return networkResponse;
+        })
+        .catch(() => {
+          if (cachedResponse) return cachedResponse;
+          if (event.request.headers.get("accept") && event.request.headers.get("accept").includes("text/html")) {
             return caches.match("./index.html");
           }
         });
-      })
+
+      return cachedResponse || fetchPromise;
+    })
   );
 });
