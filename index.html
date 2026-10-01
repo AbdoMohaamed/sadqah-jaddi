@@ -41,7 +41,7 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css">
 
     <!-- تنسيقات الموقع -->
-    <link rel="stylesheet" href="assets/css/style.css?v=61">
+    <link rel="stylesheet" href="assets/css/style.css?v=62">
 </head>
 <body>
 
@@ -61,6 +61,7 @@
                 <li><a href="#quran-khatma">المصحف والختمة</a></li>
                 <li><a href="#prayer-times">مواقيت الصلاة</a></li>
                 <li><a href="#daily-wird">الورد اليومي</a></li>
+                <li><a href="#categorized-duas">الأدعية النبوية</a></li>
                 <li><a href="#tasbeeh">السبحة</a></li>
                 <li><a href="#azkar">أذكار اليوم</a></li>
                 <li><a href="#prayers">أدعية الزوار</a></li>
@@ -71,6 +72,10 @@
                 <button id="btn-install-app" class="btn btn-install-pwa" style="display: none;" title="تثبيت التطبيق على جهازك">
                     <i class="fa-solid fa-mobile-screen-button"></i>
                     <span>تثبيت التطبيق</span>
+                </button>
+                <button type="button" id="btn-open-zakat-modal" class="btn btn-outline" title="حاسبة الزكاة الذكية الشرعية">
+                    <i class="fa-solid fa-calculator text-gold"></i>
+                    <span>الزكاة</span>
                 </button>
                 <button id="btn-toggle-radio-nav" class="btn btn-outline" title="إذاعة القرآن الكريم">
                     <i class="fa-solid fa-tower-broadcast"></i>
@@ -93,6 +98,11 @@
     <!-- مشغل صوتي لتلاوة خاشعة هادئة (سورة الملك / الفاتحة) -->
     <audio id="quran-audio" preload="none" loop>
         <source src="https://server8.mp3quran.net/afs/001.mp3" type="audio/mpeg">
+    </audio>
+
+    <!-- مشغل صوتي لأذان الحرم المكي الشريف عند مواقيت الصلاة -->
+    <audio id="audio-adhan" preload="none">
+        <source src="https://cdn.islamic.network/adhan/makkah.mp3" type="audio/mpeg">
     </audio>
 
     <!-- ==========================================
@@ -180,6 +190,41 @@
                     </div>
                 </div>
             </div>
+
+            <!-- بطاقة آية وحديث اليوم المتجددة مع زر مشاركة ستوري -->
+            <div class="daily-wisdom-card" id="daily-wisdom-card">
+                <div class="wisdom-card-header">
+                    <div class="wisdom-title-group">
+                        <i class="fa-solid fa-sun text-gold"></i>
+                        <span class="wisdom-badge">قبس اليوم الإيماني</span>
+                        <span class="wisdom-date-tag" id="wisdom-date-tag">متجدد كل يوم ☀️</span>
+                    </div>
+                    <button type="button" class="btn btn-outline btn-sm btn-share-story" id="btn-share-wisdom-story" title="مشاركة الحكمة الإيمانية كحالة / ستوري على واتساب">
+                        <i class="fa-solid fa-share-nodes text-gold"></i>
+                        <span>مشاركة كـ ستوري / حالة</span>
+                    </button>
+                </div>
+
+                <div class="wisdom-card-body">
+                    <div class="wisdom-item wisdom-ayah-box">
+                        <div class="wisdom-item-header">
+                            <span class="wisdom-item-tag"><i class="fa-solid fa-quran text-gold"></i> آية وتدبر</span>
+                            <span class="wisdom-source" id="wisdom-ayah-surah">سورة الطلاق: 2-3</span>
+                        </div>
+                        <div class="wisdom-quote-text" id="wisdom-ayah-text">"وَمَن يَتَّقِ اللَّهَ يَجْعَل لَّهُ مَخْرَجًا وَيَرْزُقْهُ مِنْ حَيْثُ لَا يَحْتَسِبُ"</div>
+                        <div class="wisdom-reflection" id="wisdom-ayah-tadabbur">التقوى هي مفتاح كل باب مغلق، والرزق لا يأتي بالحيلة وحدها وإنما ببركة التوكل وحسن الظن بالله.</div>
+                    </div>
+
+                    <div class="wisdom-item wisdom-hadith-box">
+                        <div class="wisdom-item-header">
+                            <span class="wisdom-item-tag"><i class="fa-solid fa-feather-pointed text-gold"></i> حديث نبوي شريف</span>
+                            <span class="wisdom-source" id="wisdom-hadith-source">صحيح مسلم</span>
+                        </div>
+                        <div class="wisdom-quote-text wisdom-hadith-text" id="wisdom-hadith-text">قَالَ ﷺ: 'عَجَبًا لِأَمْرِ الْمُؤْمِنِ، إِنَّ أَمْرَهُ كُلَّهُ خَيْرٌ، وَلَيْسَ ذَاكَ لِأَحَدٍ إِلَّا لِلْمُؤْمِنِ...'</div>
+                        <div class="wisdom-reflection" id="wisdom-hadith-lesson">المؤمن رابح في جميع أحواله؛ شاكر في الرخاء، صابر في البلاء، وقلبه موصول بالرضا.</div>
+                    </div>
+                </div>
+            </div>
         </div>
     </section>
 
@@ -240,16 +285,44 @@
 
                 <!-- بطاقة صفحة المصحف الشريف الحقيقية الكبرى -->
                 <div class="quran-mushaf-card real-mushaf-card">
-                    <!-- إطار ترويسة السورة والجزء -->
+                    <!-- إطار ترويسة السورة والجزء وأدوات القراءة والبحث -->
                     <div class="mushaf-header-frame">
-                        <div class="mushaf-surah-title" id="quran-surah-title">سُورَةُ المُلْكِ</div>
-                        <div class="mushaf-verses-count" id="quran-verses-count">الجزء ٢٩ • صفحة ٥٦٢ من ٦٠٤</div>
-                        <div class="mushaf-audio-control">
-                            <button type="button" class="btn btn-outline" id="btn-page-tafsir" title="تفسير الصفحة الحالية">
+                        <div class="mushaf-header-top-row">
+                            <div class="mushaf-surah-title" id="quran-surah-title">سُورَةُ المُلْكِ</div>
+                            <div class="mushaf-verses-count" id="quran-verses-count">الجزء ٢٩ • صفحة ٥٦٢ من ٦٠٤</div>
+                        </div>
+
+                        <!-- شريط أدوات القراءة: البحث، الوضع المريح، التكبير، وحفظ العلامة -->
+                        <div class="mushaf-reading-toolbar">
+                            <button type="button" class="btn btn-outline btn-sm" id="btn-open-quran-search" title="البحث السريع في آيات القرآن الكريم">
+                                <i class="fa-solid fa-magnifying-glass text-gold"></i>
+                                <span>بحث بالقرآن</span>
+                            </button>
+                            <button type="button" class="btn btn-outline btn-sm" id="btn-mushaf-theme" title="تبديل وضع القراءة المريح للعين (الورق القديم Sepia)">
+                                <i class="fa-solid fa-eye text-gold"></i>
+                                <span>الوضع المريح</span>
+                            </button>
+                            <div class="mushaf-zoom-group">
+                                <button type="button" class="btn btn-outline btn-sm btn-icon" id="btn-mushaf-zoom-in" title="تكبير الصفحة">
+                                    <i class="fa-solid fa-magnifying-glass-plus"></i>
+                                </button>
+                                <button type="button" class="btn btn-outline btn-sm btn-icon" id="btn-mushaf-zoom-out" title="تصغير الصفحة">
+                                    <i class="fa-solid fa-magnifying-glass-minus"></i>
+                                </button>
+                            </div>
+                            <button type="button" class="btn btn-outline btn-sm" id="btn-mushaf-bookmark" title="حفظ الصفحة الحالية كعلامة قراءة">
+                                <i class="fa-solid fa-bookmark text-gold"></i>
+                                <span>حفظ علامة</span>
+                            </button>
+                            <button type="button" class="btn btn-outline btn-sm" id="btn-mushaf-goto-bookmark" style="display: none;" title="الانتقال إلى علامتك المحفوظة">
+                                <i class="fa-solid fa-book-bookmark text-emerald"></i>
+                                <span id="bookmark-label-text">العلامة</span>
+                            </button>
+                            <button type="button" class="btn btn-outline btn-sm" id="btn-page-tafsir" title="تفسير الصفحة الحالية">
                                 <i class="fa-solid fa-book-open text-gold"></i>
                                 <span>تفسير الصفحة</span>
                             </button>
-                            <button type="button" class="btn btn-outline" id="btn-surah-audio">
+                            <button type="button" class="btn btn-outline btn-sm" id="btn-surah-audio">
                                 <i class="fa-solid fa-volume-high"></i>
                                 <span>استماع للتلاوة</span>
                             </button>
@@ -438,6 +511,11 @@
                             <button type="button" class="btn btn-outline btn-sm btn-open-qibla" id="btn-open-qibla" title="تحديد اتجاه القبلة نحو الكعبة المشرفة">
                                 <i class="fa-solid fa-compass text-gold"></i>
                                 <span>اتجاه القبلة</span>
+                            </button>
+
+                            <button type="button" class="btn btn-outline btn-sm btn-toggle-adhan" id="btn-toggle-adhan" title="تشغيل أو كتم صوت الأذان عند مواقيت الصلاة">
+                                <i class="fa-solid fa-volume-high text-gold"></i>
+                                <span id="adhan-status-label">الأذان: مفعّل</span>
                             </button>
                         </div>
                     </div>
@@ -686,6 +764,15 @@
 
             <div class="daily-wird-card">
                 <div class="wird-header-bar">
+                    <div class="wird-streak-header-row">
+                        <div class="wird-streak-info">
+                            <span class="wird-streak-icon"><i class="fa-solid fa-fire-flame-curved text-gold"></i></span>
+                            <span class="wird-streak-text">أنت ملتزم بالورد لـ <strong id="wird-streak-count">1</strong> يوم متتالي 🔥</span>
+                        </div>
+                        <div class="wird-weekly-tracker" id="wird-weekly-tracker" title="متابعة الأيام المكتملة هذا الأسبوع">
+                            <!-- يُملأ برمجياً من app.js -->
+                        </div>
+                    </div>
                     <div class="wird-progress-info">
                         <span class="wird-progress-title">إنجازك الإيماني اليوم:</span>
                         <span class="wird-progress-badge" id="wird-progress-badge">0 من 8 مهام (0%)</span>
@@ -817,6 +904,47 @@
                         <span>رواه ابن ماجه وأحمد بإسناد حسن</span>
                     </div>
                 </div>
+            </div>
+    <!-- ==========================================
+         قسم موسوعة الأدعية النبوية والقرآنية المبوبة (Categorized Duas Section)
+         ========================================== -->
+    <section id="categorized-duas" class="categorized-duas-section">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-tag"><i class="fa-solid fa-hands-praying"></i> جوامع الكلم وسؤال العظيم</span>
+                <h2 class="section-title">موسوعة الأدعية النبوية المبوبة</h2>
+                <p class="section-desc">
+                    أدعية مأثورة صحيحة من الكتاب والسنة مقسمة حسب حاجتك اليومية؛ لتفريج الكرب، والشفاء، والرزق، وصلاح الأهل والذرية.
+                </p>
+            </div>
+
+            <!-- أزرار تبويب فئات الأدعية -->
+            <div class="duas-categories-tabs" id="duas-categories-tabs">
+                <button type="button" class="duas-tab-btn active" data-cat="karb_debt">
+                    <i class="fa-solid fa-hand-holding-dollar"></i>
+                    <span>الكرب وقضاء الدين</span>
+                </button>
+                <button type="button" class="duas-tab-btn" data-cat="shifa_health">
+                    <i class="fa-solid fa-heart-pulse"></i>
+                    <span>الشفاء والعافية</span>
+                </button>
+                <button type="button" class="duas-tab-btn" data-cat="rizq_barakah">
+                    <i class="fa-solid fa-coins"></i>
+                    <span>الرزق والتيسير</span>
+                </button>
+                <button type="button" class="duas-tab-btn" data-cat="family_children">
+                    <i class="fa-solid fa-users"></i>
+                    <span>صلاح الأبناء والوالدين</span>
+                </button>
+                <button type="button" class="duas-tab-btn" data-cat="jawame_quran">
+                    <i class="fa-solid fa-star-and-crescent"></i>
+                    <span>جوامع دعاء القرآن</span>
+                </button>
+            </div>
+
+            <!-- شبكة عرض بطاقات الأدعية -->
+            <div class="categorized-duas-grid" id="categorized-duas-grid">
+                <!-- يُملأ برمجياً من js/azkar-data.js و js/app.js -->
             </div>
         </div>
     </section>
@@ -1220,6 +1348,145 @@
     </div>
 
     <!-- ==========================================
+         نافذة البحث الذكي في آيات القرآن الكريم (Quran Search Modal)
+         ========================================== -->
+    <div class="modal-overlay" id="quran-search-modal">
+        <div class="modal-card modal-card-wide modal-card-quran-search">
+            <div class="modal-header-row">
+                <h3 class="modal-title">
+                    <i class="fa-solid fa-magnifying-glass text-gold"></i>
+                    البحث الفوري في آيات القرآن الكريم
+                </h3>
+                <button class="modal-close-btn" id="btn-close-quran-search-modal" aria-label="إغلاق">&times;</button>
+            </div>
+            
+            <div class="quran-search-body">
+                <div class="quran-search-input-box">
+                    <i class="fa-solid fa-magnifying-glass search-field-icon"></i>
+                    <input type="text" id="quran-search-input" class="form-input quran-search-input" placeholder="اكتب كلمة أو نصاً من الآية (مثال: الصابرين، الرحمن، الجنة، الفردوس)..." autocomplete="off">
+                    <button type="button" class="btn btn-gold btn-sm" id="btn-submit-quran-search">
+                        <span>بحث</span>
+                    </button>
+                </div>
+
+                <div class="quran-search-status" id="quran-search-status">
+                    <span>اكتب كلمة للبحث في المصحف الشريف الشامل (604 صفحات)</span>
+                </div>
+
+                <div class="quran-search-results" id="quran-search-results">
+                    <!-- نتائج البحث تتولد برمجياً -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==========================================
+         نافذة حاسبة الزكاة الذكية الشرعية (Zakat Calculator Modal)
+         ========================================== -->
+    <div class="modal-overlay" id="zakat-modal">
+        <div class="modal-card modal-card-wide modal-card-zakat">
+            <div class="modal-header-row">
+                <h3 class="modal-title">
+                    <i class="fa-solid fa-calculator text-gold"></i>
+                    حاسبة الزكاة الشرعية الذكية
+                </h3>
+                <button class="modal-close-btn" id="btn-close-zakat-modal" aria-label="إغلاق">&times;</button>
+            </div>
+
+            <div class="zakat-modal-body">
+                <p class="zakat-intro">
+                    احسب زكاة أموالك ومدخراتك بدقة ويسر وفق الضوابط الشرعية المعتمدة (النصاب = 85 غرام ذهب عيار 24، ونسبة الزكاة 2.5% بعد مرور الحول).
+                </p>
+
+                <div class="zakat-form-grid">
+                    <!-- المدخرات النقدية -->
+                    <div class="zakat-field-group">
+                        <label for="zakat-cash" class="zakat-label">
+                            <i class="fa-solid fa-money-bill-wave text-gold"></i>
+                            النقد والمدخرات البنكية (بالعملة المحلية)
+                        </label>
+                        <input type="number" id="zakat-cash" class="form-input zakat-input" placeholder="0" min="0">
+                    </div>
+
+                    <!-- سعر غرام الذهب عيار 24 الحالي -->
+                    <div class="zakat-field-group">
+                        <label for="zakat-gold-price" class="zakat-label">
+                            <i class="fa-solid fa-scale-balanced text-gold"></i>
+                            سعر غرام الذهب عيار 24 الحالي
+                        </label>
+                        <input type="number" id="zakat-gold-price" class="form-input zakat-input" value="4200" min="1">
+                    </div>
+
+                    <!-- الذهب عيار 24 -->
+                    <div class="zakat-field-group">
+                        <label for="zakat-gold-24" class="zakat-label">
+                            <i class="fa-solid fa-coins text-gold"></i>
+                            وزن الذهب عيار 24 (بالغرام)
+                        </label>
+                        <input type="number" id="zakat-gold-24" class="form-input zakat-input" placeholder="0" min="0">
+                    </div>
+
+                    <!-- الذهب عيار 21 -->
+                    <div class="zakat-field-group">
+                        <label for="zakat-gold-21" class="zakat-label">
+                            <i class="fa-solid fa-ring text-gold"></i>
+                            وزن الذهب عيار 21 (بالغرام)
+                        </label>
+                        <input type="number" id="zakat-gold-21" class="form-input zakat-input" placeholder="0" min="0">
+                    </div>
+
+                    <!-- عروض التجارة والبضائع -->
+                    <div class="zakat-field-group">
+                        <label for="zakat-trade" class="zakat-label">
+                            <i class="fa-solid fa-boxes-stacked text-gold"></i>
+                            عروض التجارة والبضائع المعدة للبيع
+                        </label>
+                        <input type="number" id="zakat-trade" class="form-input zakat-input" placeholder="0" min="0">
+                    </div>
+
+                    <!-- الديون المستحقة للدفع -->
+                    <div class="zakat-field-group">
+                        <label for="zakat-debts" class="zakat-label">
+                            <i class="fa-solid fa-hand-holding-dollar text-gold"></i>
+                            ديون والتزامات واجبة السداد فوراً (تُخصم)
+                        </label>
+                        <input type="number" id="zakat-debts" class="form-input zakat-input" placeholder="0" min="0">
+                    </div>
+                </div>
+
+                <!-- لوحة الحساب الفورية للزكاة -->
+                <div class="zakat-summary-card">
+                    <div class="zakat-summary-row">
+                        <span>إجمالي الوعاء الزكوي الصافي:</span>
+                        <strong id="zakat-total-wealth">0 ج.م</strong>
+                    </div>
+                    <div class="zakat-summary-row">
+                        <span>حد النصاب الشرعي الحالي (85 غرام ذهب 24):</span>
+                        <strong id="zakat-nisab-value">357,000 ج.م</strong>
+                    </div>
+                    <div class="zakat-status-banner" id="zakat-status-banner">
+                        <i class="fa-solid fa-circle-info"></i>
+                        <span id="zakat-status-text">أدخل مبالغك ومدخراتك أعلاه لتحديد وجوب الزكاة ومقدارها</span>
+                    </div>
+                    <div class="zakat-final-amount-box">
+                        <span class="zakat-final-label">مقدار الزكاة الواجب إخراجها (2.5%):</span>
+                        <span class="zakat-final-value" id="zakat-final-value">0 ج.م</span>
+                    </div>
+                </div>
+
+                <div class="zakat-dua-box">
+                    <div class="zakat-dua-title"><i class="fa-solid fa-hands-praying text-gold"></i> دعاء إخراج الزكاة والصدقة المسنون:</div>
+                    <div class="zakat-dua-text">"اللَّهُمَّ اجْعَلْهَا مَغْنَمًا وَلَا تَجْعَلْهَا مَغْرَمًا • رَبَّنَا تَقَبَّلْ مِنَّا إِنَّكَ أَنتَ السَّمِيعُ الْعَلِيمُ"</div>
+                    <button type="button" class="btn btn-outline btn-sm btn-copy-dua" onclick="copyTextToClipboard('اللَّهُمَّ اجْعَلْهَا مَغْنَمًا وَلَا تَجْعَلْهَا مَغْرَمًا • رَبَّنَا تَقَبَّلْ مِنَّا إِنَّكَ أَنتَ السَّمِيعُ الْعَلِيمُ')">
+                        <i class="fa-solid fa-copy"></i>
+                        <span>نسخ دعاء الزكاة</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==========================================
          ويدجت إذاعة القرآن الكريم المباشرة (24/7 Live Radio)
          ========================================== -->
     <div class="live-radio-widget" id="live-radio-widget">
@@ -1306,7 +1573,7 @@
     <script src="assets/js/data.js"></script>
     <script src="assets/js/azkar-data.js"></script>
     <script src="assets/js/firebase-config.js"></script>
-    <script src="assets/js/app.js?v=8"></script>
-    <script src="assets/js/quran.js"></script>
+    <script src="assets/js/app.js?v=9"></script>
+    <script src="assets/js/quran.js?v=9"></script>
 </body>
 </html>

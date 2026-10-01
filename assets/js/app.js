@@ -34,19 +34,29 @@ document.addEventListener("DOMContentLoaded", () => {
     // 9. تهيئة تطبيق الهاتف التقدمي (PWA)
     initPWA();
 
-    // 10. تهيئة مواقيت الصلاة وساعة الاستجابة ومواسم الصيام وبوصلة القبلة وتحديد الموقع GPS
+    // 10. تهيئة مواقيت الصلاة وساعة الاستجابة ومواسم الصيام وبوصلة القبلة وتحديد الموقع GPS وصوت الأذان
     initPrayerTimes();
     initGPSLocation();
     initFastingTracker();
     initQiblaCompass();
+    initAdhanNotifications();
 
-    // 11. تهيئة جدول الورد والمهام الإيمانية اليومية
+    // 11. تهيئة جدول الورد والمهام الإيمانية وتتابع الإنجاز (Streak)
     initDailyWird();
 
-    // 12. تهيئة صانع بطاقات الأدعية المصورة
+    // 12. تهيئة بطاقة قبس اليوم (آية وحديث اليوم ومشاركة الستوري)
+    initDailyWisdom();
+
+    // 13. تهيئة موسوعة الأدعية النبوية المبوبة
+    initCategorizedDuas();
+
+    // 14. تهيئة حاسبة الزكاة الذكية الشرعية
+    initZakatCalculator();
+
+    // 15. تهيئة صانع بطاقات الأدعية المصورة
     initDuaCardGenerator();
 
-    // 13. تهيئة دليل وآداب زيارة القبور
+    // 16. تهيئة دليل وآداب زيارة القبور
     initCemeteryGuide();
 });
 
@@ -1851,6 +1861,15 @@ function startPrayerCountdown() {
         if (timerEl) {
             timerEl.textContent = `${String(hours).padStart(2, "0")}:${String(mins).padStart(2, "0")}:${String(secs).padStart(2, "0")}`;
         }
+
+        // إطلاق الأذان الصوتي وإشعار المتصفح عند حلول وقت الصلاة
+        if (totalSecs === 0 && nextPrayer.key !== "sunrise") {
+            const prayerMomentKey = `${nextPrayer.key}_${now.getFullYear()}_${now.getMonth()}_${now.getDate()}_${now.getHours()}_${now.getMinutes()}`;
+            if (window._lastAdhanTriggeredKey !== prayerMomentKey) {
+                window._lastAdhanTriggeredKey = prayerMomentKey;
+                triggerPrayerAdhanNotification(nextPrayer.name, nextPrayer.key);
+            }
+        }
     };
 
     updateCountdown();
@@ -2879,8 +2898,11 @@ function initDailyWird() {
     const progressBadge = document.getElementById("wird-progress-badge");
     const progressFill = document.getElementById("wird-progress-fill");
     const resetBtn = document.getElementById("btn-reset-wird");
+    const streakCountEl = document.getElementById("wird-streak-count");
+    const weeklyTrackerEl = document.getElementById("wird-weekly-tracker");
 
-    const todayKey = `daily_wird_${new Date().toISOString().slice(0, 10)}`;
+    const todayStr = new Date().toISOString().slice(0, 10);
+    const todayKey = `daily_wird_${todayStr}`;
     let completedTasks = [];
 
     try {
@@ -2888,6 +2910,90 @@ function initDailyWird() {
         if (saved) completedTasks = JSON.parse(saved);
     } catch(e) {
         completedTasks = [];
+    }
+
+    function updateStreakAndWeekly() {
+        // تحديث سجل الأيام في localStorage
+        let history = {};
+        try {
+            const h = localStorage.getItem("wird_streak_history");
+            if (h) history = JSON.parse(h);
+        } catch(e) {
+            history = {};
+        }
+
+        const isTodayDone = completedTasks.length >= 4; // يُعتبر اليوم منجزاً عند إتمام 4 مهام فأكثر
+        if (isTodayDone) {
+            history[todayStr] = true;
+        } else {
+            delete history[todayStr];
+        }
+
+        try {
+            localStorage.setItem("wird_streak_history", JSON.stringify(history));
+        } catch(e) {}
+
+        // 1. حساب الـ Streak المتتالي
+        let streak = 0;
+        let checkDate = new Date();
+        
+        // فحص اليوم الحالي أولاً
+        const checkTodayStr = checkDate.toISOString().slice(0, 10);
+        if (history[checkTodayStr]) {
+            streak++;
+            checkDate.setDate(checkDate.getDate() - 1);
+        } else {
+            // فحص إذا كان الأمس مكتمل
+            checkDate.setDate(checkDate.getDate() - 1);
+        }
+
+        while (true) {
+            const dateStr = checkDate.toISOString().slice(0, 10);
+            if (history[dateStr]) {
+                streak++;
+                checkDate.setDate(checkDate.getDate() - 1);
+            } else {
+                break;
+            }
+        }
+
+        // إذا لم يكن هناك أيام سابقة، ضع 1 كبداية تشجيعية إذا كان هناك أي مهمة منجزة اليوم
+        const displayStreak = Math.max(streak, completedTasks.length > 0 ? 1 : 0);
+        if (streakCountEl) {
+            streakCountEl.textContent = displayStreak;
+        }
+
+        // 2. رسم شريط الإنجاز الأسبوعي (السبت إلى الجمعة)
+        if (weeklyTrackerEl) {
+            weeklyTrackerEl.innerHTML = "";
+            const daysNames = ["سبت", "أحد", "اثنين", "ثلاثاء", "أربعاء", "خميس", "جمعة"];
+            const currDate = new Date();
+            const currDayIndex = currDate.getDay(); // 0 = Sunday, 6 = Saturday
+            // في التقويم الإسلامي/العربي: السبت = 0
+            const arabicOffset = (currDayIndex + 1) % 7;
+
+            // حساب تاريخ بداية الأسبوع (السبت)
+            const weekStart = new Date(currDate);
+            weekStart.setDate(currDate.getDate() - arabicOffset);
+
+            for (let i = 0; i < 7; i++) {
+                const dayDate = new Date(weekStart);
+                dayDate.setDate(weekStart.getDate() + i);
+                const dayStr = dayDate.toISOString().slice(0, 10);
+                const isDayDone = !!history[dayStr];
+                const isToday = dayStr === todayStr;
+
+                const dayPill = document.createElement("div");
+                dayPill.className = "weekly-day-pill";
+                dayPill.innerHTML = `
+                    <span class="weekly-day-label">${daysNames[i]}</span>
+                    <div class="weekly-day-dot ${isDayDone ? 'done' : ''} ${isToday ? 'today' : ''}" title="${isDayDone ? 'تم إتمام الورد بفضل الله' : (isToday ? 'اليوم' : '')}">
+                        ${isDayDone ? '<i class="fa-solid fa-check"></i>' : ''}
+                    </div>
+                `;
+                weeklyTrackerEl.appendChild(dayPill);
+            }
+        }
     }
 
     function updateUI() {
@@ -2914,6 +3020,8 @@ function initDailyWird() {
             progressFill.style.width = `${pct}%`;
             progressFill.classList.toggle("all-done", count === total && total > 0);
         }
+
+        updateStreakAndWeekly();
     }
 
     checkboxes.forEach(cb => {
@@ -2997,6 +3105,422 @@ function initDailyWird() {
 
     // التهيئة الأولى
     updateUI();
+}
+
+/* ==========================================================================
+   19. بطاقة آية وحديث اليوم ومشاركة الستوري (Daily Wisdom & Story Share)
+   ========================================================================== */
+function initDailyWisdom() {
+    const card = document.getElementById("daily-wisdom-card");
+    if (!card || typeof DAILY_WISDOM_LIST === "undefined" || DAILY_WISDOM_LIST.length === 0) return;
+
+    // حساب العنصر اليومي بناءً على يوم السنة ليتغير تلقائياً كل 24 ساعة
+    const now = new Date();
+    const start = new Date(now.getFullYear(), 0, 0);
+    const diff = now - start;
+    const oneDay = 1000 * 60 * 60 * 24;
+    const dayOfYear = Math.floor(diff / oneDay);
+    const wisdomIndex = dayOfYear % DAILY_WISDOM_LIST.length;
+    const item = DAILY_WISDOM_LIST[wisdomIndex] || DAILY_WISDOM_LIST[0];
+
+    const ayahSurahEl = document.getElementById("wisdom-ayah-surah");
+    const ayahTextEl = document.getElementById("wisdom-ayah-text");
+    const ayahTadabburEl = document.getElementById("wisdom-ayah-tadabbur");
+    const hadithSourceEl = document.getElementById("wisdom-hadith-source");
+    const hadithTextEl = document.getElementById("wisdom-hadith-text");
+    const hadithLessonEl = document.getElementById("wisdom-hadith-lesson");
+    const dateTagEl = document.getElementById("wisdom-date-tag");
+    const shareStoryBtn = document.getElementById("btn-share-wisdom-story");
+
+    if (ayahSurahEl) ayahSurahEl.textContent = item.ayahSurah;
+    if (ayahTextEl) ayahTextEl.textContent = `"${item.ayah}"`;
+    if (ayahTadabburEl) ayahTadabburEl.textContent = item.ayahTadabbur;
+
+    if (hadithSourceEl) hadithSourceEl.textContent = item.hadithSource;
+    if (hadithTextEl) hadithTextEl.textContent = item.hadith;
+    if (hadithLessonEl) hadithLessonEl.textContent = item.hadithLesson;
+
+    if (dateTagEl) {
+        try {
+            const arDate = new Intl.DateTimeFormat("ar-EG", { weekday: "long", day: "numeric", month: "long" }).format(now);
+            dateTagEl.textContent = `قبس يوم ${arDate} ☀️`;
+        } catch(e) {}
+    }
+
+    if (shareStoryBtn) {
+        shareStoryBtn.addEventListener("click", () => {
+            const deceasedName = (typeof DECEASED_INFO !== "undefined" && DECEASED_INFO.name) ? DECEASED_INFO.name : "فقيدنا الغالي";
+            const storyText = 
+`✨ *قَبَسُ اليَوْمِ الإِيمَانِيّ* 🌿
+━━━━━━━━━━━━━━
+📖 *آيَةٌ وَتَدَبُّر*:
+"${item.ayah}"
+📍 ${item.ayahSurah}
+💡 *وقفة تدبرية*: ${item.ayahTadabbur}
+
+━━━━━━━━━━━━━━
+📜 *حَدِيثٌ نَبَوِيٌّ شَرِيف*:
+${item.hadith}
+📍 [${item.hadithSource}]
+💡 *فائدة*: ${item.hadithLesson}
+
+━━━━━━━━━━━━━━
+🤲 *صدقة جارية على روح*: ${deceasedName} رحمه الله
+📲 تابع أذكارك ووردك اليومي: https://abdomohaamed.github.io/sadqah-jaddi/`;
+
+            if (navigator.share) {
+                navigator.share({
+                    title: "قبس اليوم الإيماني - زاد المسلم",
+                    text: storyText
+                }).then(() => {
+                    showToast("تم فتح نافذة المشاركة بنجاح 🌟");
+                }).catch(() => {
+                    copyTextToClipboard(storyText);
+                });
+            } else {
+                copyTextToClipboard(storyText);
+            }
+        });
+    }
+}
+
+/* ==========================================================================
+   20. صوت الأذان وتنبيهات مواقيت الصلاة (Adhan Audio & Web Notifications)
+   ========================================================================== */
+let isAdhanAudioEnabled = true;
+
+function initAdhanNotifications() {
+    const toggleBtn = document.getElementById("btn-toggle-adhan");
+    const label = document.getElementById("adhan-status-label");
+
+    // استعادة حالة الأذان المحفوظة
+    const saved = localStorage.getItem("adhan_sound_enabled");
+    if (saved !== null) {
+        isAdhanAudioEnabled = saved === "1";
+    }
+
+    function updateAdhanButtonUI() {
+        if (!toggleBtn) return;
+        toggleBtn.classList.toggle("is-muted", !isAdhanAudioEnabled);
+        if (label) {
+            label.textContent = isAdhanAudioEnabled ? "الأذان: مفعّل" : "الأذان: صامت";
+        }
+        const icon = toggleBtn.querySelector("i");
+        if (icon) {
+            icon.className = isAdhanAudioEnabled ? "fa-solid fa-volume-high text-gold" : "fa-solid fa-volume-xmark";
+        }
+    }
+
+    if (toggleBtn) {
+        toggleBtn.addEventListener("click", () => {
+            isAdhanAudioEnabled = !isAdhanAudioEnabled;
+            localStorage.setItem("adhan_sound_enabled", isAdhanAudioEnabled ? "1" : "0");
+            updateAdhanButtonUI();
+
+            // طلب إذن الإشعارات عند التفعيل
+            if (isAdhanAudioEnabled && ("Notification" in window) && Notification.permission === "default") {
+                Notification.requestPermission();
+            }
+
+            showToast(isAdhanAudioEnabled ? "تم تفعيل صوت الأذان وتنبيهات الصلوات 🕌" : "تم كتم صوت الأذان 🔇");
+        });
+    }
+
+    updateAdhanButtonUI();
+}
+
+function triggerPrayerAdhanNotification(prayerName, prayerKey) {
+    if (prayerKey === "sunrise") return;
+
+    // 1. تشغيل صوت الأذان إذا كان مفعلاً
+    if (isAdhanAudioEnabled) {
+        playAdhanAudio();
+    }
+
+    // 2. إرسال إشعار المتصفح
+    if ("Notification" in window && Notification.permission === "granted") {
+        try {
+            new Notification(`🕌 حان الآن وقت ${prayerName}`, {
+                body: `الله أكبر، الله أكبر.. حان الآن موعد ${prayerName} حسب التوقيت المحلي. لا تنسَ صالح الدعاء.`,
+                icon: "assets/icon.svg",
+                tag: `prayer_${prayerKey}`
+            });
+        } catch(e) {}
+    }
+
+    // 3. عرض Toast داخل التطبيق
+    showToast(`🕌 حان الآن موعد ${prayerName}.. حيّ على الصلاة، حيّ على الفلاح`);
+}
+
+function playAdhanAudio() {
+    const audioEl = document.getElementById("audio-adhan");
+    if (audioEl) {
+        audioEl.currentTime = 0;
+        audioEl.play().catch(() => {
+            // قد تمنع بعض المتصفحات التشغيل التلقائي بدون تفاعل مسبق
+        });
+    }
+}
+
+/* ==========================================================================
+   21. موسوعة الأدعية النبوية المبوبة (Categorized Duas Collection)
+   ========================================================================== */
+let currentDuaCategory = "karb_debt";
+
+function initCategorizedDuas() {
+    const tabContainer = document.getElementById("duas-categories-tabs");
+    const gridContainer = document.getElementById("categorized-duas-grid");
+    if (!tabContainer || !gridContainer || typeof CATEGORIZED_DUAS === "undefined") return;
+
+    const tabs = tabContainer.querySelectorAll(".duas-tab-btn");
+    tabs.forEach(tab => {
+        tab.addEventListener("click", () => {
+            tabs.forEach(t => t.classList.remove("active"));
+            tab.classList.add("active");
+            currentDuaCategory = tab.dataset.cat;
+            renderCategorizedDuasCards(currentDuaCategory);
+        });
+    });
+
+    renderCategorizedDuasCards(currentDuaCategory);
+}
+
+function renderCategorizedDuasCards(catKey) {
+    const gridContainer = document.getElementById("categorized-duas-grid");
+    if (!gridContainer || !CATEGORIZED_DUAS[catKey]) return;
+
+    const catData = CATEGORIZED_DUAS[catKey];
+    const duasList = catData.duas || [];
+
+    gridContainer.innerHTML = "";
+
+    duasList.forEach((dua, idx) => {
+        const card = document.createElement("div");
+        card.className = "cat-dua-card";
+        card.setAttribute("data-dua-idx", idx);
+
+        const targetRepeat = dua.repeat || 1;
+        const currentCount = 0;
+
+        card.innerHTML = `
+            <div>
+                <div class="cat-dua-header">
+                    <h3 class="cat-dua-title">${dua.title}</h3>
+                    <span class="cat-dua-repeat-badge">التكرار: <strong class="repeat-counter-val">${targetRepeat}</strong> مرة</span>
+                </div>
+                <div class="cat-dua-body">" ${dua.text} "</div>
+            </div>
+            <div>
+                <div class="cat-dua-source">
+                    <i class="fa-solid fa-check text-gold"></i>
+                    <span>${dua.source}</span>
+                </div>
+                <div class="cat-dua-actions">
+                    <button type="button" class="btn btn-outline btn-sm btn-audio-read-dua" title="استماع قراءة صوتية للدعاء">
+                        <i class="fa-solid fa-volume-high text-gold"></i>
+                        <span>قراءة</span>
+                    </button>
+                    <button type="button" class="btn btn-outline btn-sm btn-repeat-dua" data-remaining="${targetRepeat}" title="انقر لتكرار الدعاء ونيل الأجر">
+                        <i class="fa-solid fa-hand-pointer text-gold"></i>
+                        <span class="btn-repeat-text">تكرار (<span class="rem-count">${targetRepeat}</span>)</span>
+                    </button>
+                    <button type="button" class="btn btn-outline btn-sm btn-copy-cat-dua" title="نسخ الدعاء">
+                        <i class="fa-solid fa-copy"></i>
+                        <span>نسخ</span>
+                    </button>
+                    <button type="button" class="btn btn-outline btn-sm btn-share-cat-dua" title="مشاركة الدعاء لواتساب">
+                        <i class="fa-brands fa-whatsapp" style="color: #25D366;"></i>
+                    </button>
+                </div>
+            </div>
+        `;
+
+        // 1. زر النسخ
+        const copyBtn = card.querySelector(".btn-copy-cat-dua");
+        if (copyBtn) {
+            copyBtn.addEventListener("click", () => {
+                const textToCopy = `🤲 *${dua.title}*\n"${dua.text}"\n📍 [${dua.source}]\n\n🕊️ صدقة جارية: https://abdomohaamed.github.io/sadqah-jaddi/`;
+                copyTextToClipboard(textToCopy);
+            });
+        }
+
+        // 2. زر المشاركة لواتساب
+        const shareBtn = card.querySelector(".btn-share-cat-dua");
+        if (shareBtn) {
+            shareBtn.addEventListener("click", () => {
+                const deceasedName = (typeof DECEASED_INFO !== "undefined" && DECEASED_INFO.name) ? DECEASED_INFO.name : "فقيدنا الغالي";
+                const msg = `🤲 *${dua.title}*\n"${dua.text}"\n📍 [${dua.source}]\n\n🤍 صدقة جارية لروح (${deceasedName})\n📲 زاد المسلم: https://abdomohaamed.github.io/sadqah-jaddi/`;
+                const url = `https://api.whatsapp.com/send?text=${encodeURIComponent(msg)}`;
+                window.open(url, "_blank");
+            });
+        }
+
+        // 3. زر التكرار التفاعلي
+        const repeatBtn = card.querySelector(".btn-repeat-dua");
+        const remCountEl = card.querySelector(".rem-count");
+        if (repeatBtn && remCountEl) {
+            repeatBtn.addEventListener("click", () => {
+                let rem = parseInt(repeatBtn.getAttribute("data-remaining"), 10);
+                if (rem > 1) {
+                    rem--;
+                    repeatBtn.setAttribute("data-remaining", rem);
+                    remCountEl.textContent = rem;
+                    playTasbeehClickTone();
+                } else if (rem === 1) {
+                    rem = 0;
+                    repeatBtn.setAttribute("data-remaining", 0);
+                    remCountEl.textContent = "0";
+                    repeatBtn.classList.add("all-done");
+                    repeatBtn.innerHTML = '<i class="fa-solid fa-check text-emerald"></i> <span>تمت القراءة</span>';
+                    playCompletionChime();
+                    showToast(`تقبل الله دعاءك وذكرك، وجعله في ميزان حسناتك 🌿🤲`);
+                } else {
+                    // إعادة التعيين
+                    repeatBtn.setAttribute("data-remaining", targetRepeat);
+                    repeatBtn.classList.remove("all-done");
+                    repeatBtn.innerHTML = `<i class="fa-solid fa-hand-pointer text-gold"></i> <span class="btn-repeat-text">تكرار (<span class="rem-count">${targetRepeat}</span>)</span>`;
+                }
+            });
+        }
+
+        // 4. القراءة الصوتية (Speech Synthesis)
+        const audioReadBtn = card.querySelector(".btn-audio-read-dua");
+        if (audioReadBtn) {
+            audioReadBtn.addEventListener("click", () => {
+                if ("speechSynthesis" in window) {
+                    window.speechSynthesis.cancel();
+                    const utterance = new SpeechSynthesisUtterance(dua.text);
+                    utterance.lang = "ar-SA";
+                    utterance.rate = 0.9;
+                    window.speechSynthesis.speak(utterance);
+                    showToast("جاري تلاوة الدعاء صوتياً 🔊");
+                } else {
+                    showToast("خاصية القراءة الصوتية غير مدعومة في متصفحك الحالي");
+                }
+            });
+        }
+
+        gridContainer.appendChild(card);
+    });
+}
+
+function playTasbeehClickTone() {
+    try {
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        if (!AudioContext) return;
+        const ctx = new AudioContext();
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = "sine";
+        osc.frequency.setValueAtTime(659.25, ctx.currentTime);
+        gain.gain.setValueAtTime(0.001, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.12, ctx.currentTime + 0.02);
+        gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.25);
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start();
+        osc.stop(ctx.currentTime + 0.3);
+    } catch(e) {}
+}
+
+/* ==========================================================================
+   22. حاسبة الزكاة الذكية الشرعية (Zakat Calculator Modal)
+   ========================================================================== */
+function initZakatCalculator() {
+    const modal = document.getElementById("zakat-modal");
+    const btnOpen = document.getElementById("btn-open-zakat-modal");
+    const btnClose = document.getElementById("btn-close-zakat-modal");
+
+    const cashInput = document.getElementById("zakat-cash");
+    const goldPriceInput = document.getElementById("zakat-gold-price");
+    const gold24Input = document.getElementById("zakat-gold-24");
+    const gold21Input = document.getElementById("zakat-gold-21");
+    const tradeInput = document.getElementById("zakat-trade");
+    const debtsInput = document.getElementById("zakat-debts");
+
+    const totalWealthEl = document.getElementById("zakat-total-wealth");
+    const nisabValueEl = document.getElementById("zakat-nisab-value");
+    const statusBannerEl = document.getElementById("zakat-status-banner");
+    const statusTextEl = document.getElementById("zakat-status-text");
+    const finalValueEl = document.getElementById("zakat-final-value");
+
+    if (btnOpen && modal) {
+        btnOpen.addEventListener("click", () => {
+            modal.classList.add("open");
+            calculateZakat();
+        });
+    }
+
+    if (btnClose && modal) {
+        btnClose.addEventListener("click", () => {
+            modal.classList.remove("open");
+        });
+    }
+
+    if (modal) {
+        modal.addEventListener("click", (e) => {
+            if (e.target === modal) modal.classList.remove("open");
+        });
+    }
+
+    function calculateZakat() {
+        const cash = parseFloat(cashInput?.value) || 0;
+        const goldPrice24 = parseFloat(goldPriceInput?.value) || 4200;
+        const gold24Weight = parseFloat(gold24Input?.value) || 0;
+        const gold21Weight = parseFloat(gold21Input?.value) || 0;
+        const trade = parseFloat(tradeInput?.value) || 0;
+        const debts = parseFloat(debtsInput?.value) || 0;
+
+        // حساب قيمة الذهب
+        const gold24Val = gold24Weight * goldPrice24;
+        const gold21Price = (goldPrice24 * 21) / 24;
+        const gold21Val = gold21Weight * gold21Price;
+        const totalGoldVal = gold24Val + gold21Val;
+
+        // إجمالي الوعاء الزكوي الصافي
+        const grossWealth = cash + totalGoldVal + trade;
+        const netWealth = Math.max(0, grossWealth - debts);
+
+        // النصاب الشرعي (85 غرام ذهب عيار 24)
+        const nisabValue = 85 * goldPrice24;
+
+        if (totalWealthEl) totalWealthEl.textContent = `${netWealth.toLocaleString("ar-EG")} ج.م`;
+        if (nisabValueEl) nisabValueEl.textContent = `${nisabValue.toLocaleString("ar-EG")} ج.م`;
+
+        if (grossWealth === 0) {
+            if (statusBannerEl) {
+                statusBannerEl.className = "zakat-status-banner";
+                if (statusTextEl) statusTextEl.textContent = "أدخل مبالغك ومدخراتك أعلاه لتحديد وجوب الزكاة ومقدارها";
+            }
+            if (finalValueEl) finalValueEl.textContent = `0 ج.م`;
+            return;
+        }
+
+        if (netWealth >= nisabValue) {
+            const zakatAmount = netWealth * 0.025;
+            if (statusBannerEl) {
+                statusBannerEl.className = "zakat-status-banner is-due";
+                if (statusTextEl) statusTextEl.innerHTML = `<i class="fa-solid fa-circle-check"></i> بلغ النصاب الشرعي بحمد الله • تجب الزكاة بنسبة 2.5% بعد مرور الحول (عام هجري)`;
+            }
+            if (finalValueEl) finalValueEl.textContent = `${zakatAmount.toLocaleString("ar-EG", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ج.م`;
+        } else {
+            const remaining = nisabValue - netWealth;
+            if (statusBannerEl) {
+                statusBannerEl.className = "zakat-status-banner not-due";
+                if (statusTextEl) statusTextEl.innerHTML = `<i class="fa-solid fa-circle-info"></i> لم يبلغ النصاب الشرعي بعد (متبقي ${remaining.toLocaleString("ar-EG")} ج.م لبلوغ النصاب) • لا زكاة واجبة وتستحب الصدقة التطوعية`;
+            }
+            if (finalValueEl) finalValueEl.textContent = `0 ج.م`;
+        }
+    }
+
+    const allInputs = [cashInput, goldPriceInput, gold24Input, gold21Input, tradeInput, debtsInput];
+    allInputs.forEach(input => {
+        if (input) {
+            input.addEventListener("input", calculateZakat);
+        }
+    });
+
+    calculateZakat();
 }
 
 

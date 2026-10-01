@@ -4232,4 +4232,661 @@ body {
   }
 }
 
+/* ==========================================================================
+   1. بطاقة آية وحديث اليوم المتجددة (Daily Wisdom Card)
+   ========================================================================== */
+.daily-wisdom-card {
+  background: rgba(14, 25, 43, 0.85);
+  border: 1px solid rgba(212, 175, 55, 0.4);
+  border-radius: var(--radius-lg);
+  padding: 1.8rem;
+  margin: 2.2rem auto 1rem;
+  max-width: 900px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35), inset 0 0 20px rgba(212, 175, 55, 0.06);
+  backdrop-filter: blur(12px);
+  position: relative;
+  overflow: hidden;
+}
+
+.daily-wisdom-card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, transparent, var(--gold-500), transparent);
+}
+
+.wisdom-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-bottom: 1.4rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.wisdom-title-group {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+}
+
+.wisdom-badge {
+  font-family: var(--font-arabic-heading, inherit);
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--gold-300);
+}
+
+.wisdom-date-tag {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  background: rgba(255, 255, 255, 0.05);
+  padding: 0.2rem 0.6rem;
+  border-radius: var(--radius-full);
+}
+
+.btn-share-story {
+  border-color: rgba(212, 175, 55, 0.4);
+  font-size: 0.85rem;
+  padding: 0.4rem 0.9rem;
+}
+
+.wisdom-card-body {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.2rem;
+}
+
+.wisdom-item {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: var(--radius-md);
+  padding: 1.2rem 1.4rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+  transition: all var(--transition-normal);
+}
+
+.wisdom-item:hover {
+  background: rgba(212, 175, 55, 0.04);
+  border-color: rgba(212, 175, 55, 0.25);
+  transform: translateY(-2px);
+}
+
+.wisdom-item-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.wisdom-item-tag {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--gold-400);
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.wisdom-source {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+}
+
+.wisdom-quote-text {
+  font-family: var(--font-quran, serif);
+  font-size: 1.15rem;
+  line-height: 1.8;
+  color: #fff;
+  text-align: justify;
+}
+
+.wisdom-reflection {
+  font-size: 0.86rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  border-top: 1px dashed rgba(255, 255, 255, 0.08);
+  padding-top: 0.6rem;
+}
+
+@media (max-width: 768px) {
+  .wisdom-card-body {
+    grid-template-columns: 1fr;
+  }
+  .daily-wisdom-card {
+    padding: 1.3rem 1.1rem;
+  }
+}
+
+/* ==========================================================================
+   2. شريط أدوات القراءة للمصحف الشريف (Mushaf Reading Toolbar & Comfort)
+   ========================================================================== */
+.mushaf-header-top-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  margin-bottom: 0.75rem;
+}
+
+.mushaf-reading-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  width: 100%;
+  padding-top: 0.75rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.mushaf-zoom-group {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.2rem;
+  background: rgba(14, 25, 43, 0.7);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-full);
+  padding: 0.15rem 0.35rem;
+}
+
+.mushaf-zoom-group .btn-icon {
+  border: none;
+  background: transparent;
+  padding: 0.35rem 0.55rem;
+  font-size: 0.85rem;
+  color: var(--gold-300);
+}
+
+.mushaf-zoom-group .btn-icon:hover {
+  color: #fff;
+}
+
+/* نمط القراءة المريح للعين (الورق القديم Sepia) */
+.quran-mushaf-card.theme-sepia {
+  background: #fbf0d9 !important;
+  color: #2c2214 !important;
+  border-color: #d1b580 !important;
+}
+
+.quran-mushaf-card.theme-sepia .mushaf-surah-title,
+.quran-mushaf-card.theme-sepia .mushaf-verses-count {
+  color: #5c3e17 !important;
+}
+
+.quran-mushaf-card.theme-sepia .mushaf-real-page-wrapper {
+  background: #fdf6e7 !important;
+  box-shadow: inset 0 0 30px rgba(120, 80, 20, 0.15) !important;
+}
+
+.quran-mushaf-card.theme-sepia .mushaf-real-page-img {
+  filter: sepia(0.3) contrast(1.05) brightness(0.96);
+}
+
+.quran-mushaf-card.theme-sepia .btn {
+  background: #f4e4c2 !important;
+  color: #4a3416 !important;
+  border-color: #caa867 !important;
+}
+
+/* ==========================================================================
+   3. زر الأذان الصوتي (Adhan Button)
+   ========================================================================== */
+.btn-toggle-adhan {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.82rem;
+  padding: 0.4rem 0.85rem;
+  border-radius: var(--radius-full);
+  transition: all var(--transition-fast);
+}
+
+.btn-toggle-adhan.is-muted {
+  opacity: 0.65;
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+.btn-toggle-adhan.is-muted i {
+  color: var(--text-muted) !important;
+}
+
+/* ==========================================================================
+   4. مؤشر التتابع الإيماني والأسبوعي (Spiritual Streak Tracker)
+   ========================================================================== */
+.wird-streak-header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.85rem;
+  padding-bottom: 0.85rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.wird-streak-info {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.wird-streak-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: rgba(212, 175, 55, 0.15);
+  border: 1px solid rgba(212, 175, 55, 0.35);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.95rem;
+}
+
+.wird-streak-text {
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: var(--text-color);
+}
+
+.wird-streak-text strong {
+  color: var(--gold-400);
+  font-size: 1.1rem;
+}
+
+.wird-weekly-tracker {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+.weekly-day-pill {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.2rem;
+}
+
+.weekly-day-label {
+  font-size: 0.68rem;
+  color: var(--text-muted);
+}
+
+.weekly-day-dot {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.65rem;
+  color: transparent;
+  transition: all var(--transition-fast);
+}
+
+.weekly-day-dot.done {
+  background: #10b981;
+  border-color: #10b981;
+  color: #fff;
+  box-shadow: 0 0 8px rgba(16, 185, 129, 0.4);
+}
+
+.weekly-day-dot.today {
+  border-color: var(--gold-400);
+}
+
+/* ==========================================================================
+   5. موسوعة الأدعية النبوية المبوبة (Categorized Duas Section)
+   ========================================================================== */
+.categorized-duas-section {
+  padding: 4.5rem 0;
+  position: relative;
+}
+
+.duas-categories-tabs {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.65rem;
+  margin-bottom: 2.2rem;
+}
+
+.duas-tab-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  padding: 0.6rem 1.25rem;
+  background: rgba(15, 28, 48, 0.7);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-full);
+  color: var(--text-secondary);
+  font-family: var(--font-body);
+  font-size: 0.92rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition-normal);
+}
+
+.duas-tab-btn:hover {
+  background: rgba(212, 175, 55, 0.12);
+  border-color: var(--gold-400);
+  color: #fff;
+  transform: translateY(-2px);
+}
+
+.duas-tab-btn.active {
+  background: linear-gradient(135deg, var(--gold-600), var(--gold-500));
+  border-color: var(--gold-300);
+  color: #0b1523;
+  font-weight: 700;
+  box-shadow: 0 0 15px rgba(212, 175, 55, 0.4);
+}
+
+.categorized-duas-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 1.4rem;
+}
+
+.cat-dua-card {
+  background: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 1rem;
+  box-shadow: var(--shadow-sm);
+  transition: all var(--transition-normal);
+  position: relative;
+}
+
+.cat-dua-card:hover {
+  transform: translateY(-3px);
+  border-color: var(--gold-400);
+  box-shadow: var(--shadow-md);
+}
+
+.cat-dua-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.cat-dua-title {
+  font-weight: 700;
+  font-size: 1rem;
+  color: var(--gold-300);
+}
+
+.cat-dua-repeat-badge {
+  background: rgba(212, 175, 55, 0.15);
+  border: 1px solid rgba(212, 175, 55, 0.3);
+  color: var(--gold-300);
+  padding: 0.15rem 0.6rem;
+  border-radius: var(--radius-full);
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.cat-dua-body {
+  font-family: var(--font-quran, serif);
+  font-size: 1.18rem;
+  line-height: 1.85;
+  color: #fff;
+  text-align: justify;
+}
+
+.cat-dua-source {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  border-top: 1px dashed rgba(255, 255, 255, 0.08);
+  padding-top: 0.6rem;
+}
+
+.cat-dua-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  padding-top: 0.5rem;
+}
+
+/* ==========================================================================
+   6. نافذة البحث في القرآن الكريم (Quran Search Modal)
+   ========================================================================== */
+.modal-card-quran-search {
+  max-width: 680px;
+}
+
+.quran-search-input-box {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  position: relative;
+  margin-bottom: 1rem;
+}
+
+.quran-search-input {
+  padding-right: 2.5rem;
+  font-size: 1rem;
+}
+
+.search-field-icon {
+  position: absolute;
+  right: 1rem;
+  color: var(--gold-400);
+  pointer-events: none;
+}
+
+.quran-search-status {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  margin-bottom: 1rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.quran-search-results {
+  max-height: 380px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding-left: 0.3rem;
+}
+
+.quran-search-item {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: var(--radius-md);
+  padding: 1rem 1.2rem;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.quran-search-item:hover {
+  background: rgba(212, 175, 55, 0.08);
+  border-color: var(--gold-400);
+  transform: translateX(-3px);
+}
+
+.quran-match-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.quran-match-surah {
+  font-weight: 700;
+  color: var(--gold-300);
+  font-size: 0.95rem;
+}
+
+.quran-match-page-badge {
+  background: rgba(212, 175, 55, 0.15);
+  color: var(--gold-400);
+  padding: 0.15rem 0.55rem;
+  border-radius: var(--radius-full);
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.quran-match-text {
+  font-family: var(--font-quran, serif);
+  font-size: 1.1rem;
+  line-height: 1.8;
+  color: #fff;
+}
+
+.quran-match-text mark {
+  background: rgba(212, 175, 55, 0.35);
+  color: #fff;
+  padding: 0 0.2rem;
+  border-radius: 3px;
+}
+
+/* ==========================================================================
+   7. نافذة حاسبة الزكاة الذكية الشرعية (Zakat Calculator Modal)
+   ========================================================================== */
+.modal-card-zakat {
+  max-width: 680px;
+}
+
+.zakat-intro {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin-bottom: 1.2rem;
+}
+
+.zakat-form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.zakat-field-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.zakat-label {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--text-color);
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.zakat-summary-card {
+  background: rgba(14, 25, 43, 0.75);
+  border: 1px solid rgba(212, 175, 55, 0.3);
+  border-radius: var(--radius-md);
+  padding: 1.2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-bottom: 1.2rem;
+}
+
+.zakat-summary-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+}
+
+.zakat-summary-row strong {
+  color: #fff;
+  font-size: 1rem;
+}
+
+.zakat-status-banner {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.65rem 0.9rem;
+  border-radius: var(--radius-sm);
+  background: rgba(255, 255, 255, 0.04);
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+.zakat-status-banner.is-due {
+  background: rgba(16, 185, 129, 0.15);
+  border: 1px solid #10b981;
+  color: #34d399;
+  font-weight: 700;
+}
+
+.zakat-status-banner.not-due {
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  color: #f87171;
+}
+
+.zakat-final-amount-box {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 0.6rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.zakat-final-label {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--gold-300);
+}
+
+.zakat-final-value {
+  font-size: 1.35rem;
+  font-weight: 800;
+  color: #34d399;
+}
+
+.zakat-dua-box {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px dashed rgba(212, 175, 55, 0.3);
+  border-radius: var(--radius-md);
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.zakat-dua-title {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--gold-400);
+}
+
+.zakat-dua-text {
+  font-family: var(--font-quran, serif);
+  font-size: 1.05rem;
+  color: #fff;
+  line-height: 1.6;
+}
+
+@media (max-width: 576px) {
+  .zakat-form-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+
 

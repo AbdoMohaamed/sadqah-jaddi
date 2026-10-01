@@ -147,6 +147,9 @@ function initRealMushaf() {
     populateSurahsDropdown();
     setupMushafNavigation();
     initTafsirModal();
+    initMushafComfortTools();
+    initQuranSearchEngine();
+    restoreMushafPreferences();
     
     // تحميل الصفحة الافتراضية الأولى
     goToMushafPage(currentPageNumber);
@@ -518,5 +521,363 @@ function renderTafsirData(ayahs) {
         `;
         contentBox.appendChild(div);
     });
+}
+
+/* ==========================================================================
+   أدوات راحة القراءة وتخصيص المصحف (Reading Comfort, Zoom, Sepia & Bookmark)
+   ========================================================================== */
+let mushafZoomLevel = 1.0;
+
+function initMushafComfortTools() {
+    const btnZoomIn = document.getElementById("btn-mushaf-zoom-in");
+    const btnZoomOut = document.getElementById("btn-mushaf-zoom-out");
+    const btnTheme = document.getElementById("btn-mushaf-theme");
+    const btnBookmark = document.getElementById("btn-mushaf-bookmark");
+    const btnGotoBookmark = document.getElementById("btn-mushaf-goto-bookmark");
+    const mushafCard = document.querySelector(".real-mushaf-card");
+    const pageImg = document.getElementById("mushaf-real-page-img");
+
+    // 1. تكبير صفحة المصحف
+    if (btnZoomIn) {
+        btnZoomIn.addEventListener("click", () => {
+            if (mushafZoomLevel < 1.6) {
+                mushafZoomLevel = Math.min(1.6, +(mushafZoomLevel + 0.15).toFixed(2));
+                applyMushafZoom();
+                if (typeof showToast === "function") {
+                    showToast(`تم تكبير صفحة المصحف (${Math.round(mushafZoomLevel * 100)}%) 🔍`);
+                }
+            }
+        });
+    }
+
+    // 2. تصغير صفحة المصحف
+    if (btnZoomOut) {
+        btnZoomOut.addEventListener("click", () => {
+            if (mushafZoomLevel > 0.8) {
+                mushafZoomLevel = Math.max(0.8, +(mushafZoomLevel - 0.15).toFixed(2));
+                applyMushafZoom();
+                if (typeof showToast === "function") {
+                    showToast(`تم تصغير صفحة المصحف (${Math.round(mushafZoomLevel * 100)}%) 🔍`);
+                }
+            }
+        });
+    }
+
+    // 3. نمط القراءة الورقي الدافئ (Sepia Theme)
+    if (btnTheme && mushafCard) {
+        btnTheme.addEventListener("click", () => {
+            const isSepia = mushafCard.classList.toggle("theme-sepia");
+            localStorage.setItem("mushaf_theme_sepia", isSepia ? "1" : "0");
+            btnTheme.classList.toggle("active", isSepia);
+            
+            const label = btnTheme.querySelector("span");
+            if (label) {
+                label.textContent = isSepia ? "الوضع الليلي" : "الوضع المريح";
+            }
+            
+            if (typeof showToast === "function") {
+                showToast(isSepia ? "تم تفعيل وضع القراءة الورقي المريح للعين 📜" : "تم الرجوع للوضع الليلي الملكي 🌙");
+            }
+        });
+    }
+
+    // 4. حفظ علامة القراءة (Bookmark)
+    if (btnBookmark) {
+        btnBookmark.addEventListener("click", () => {
+            localStorage.setItem("mushaf_saved_bookmark", String(currentPageNumber));
+            updateBookmarkButtonUI(currentPageNumber);
+            if (typeof playCompletionChime === "function") playCompletionChime();
+            if (typeof showToast === "function") {
+                showToast(`تم حفظ صفحة ${currentPageNumber} في علامتك المرجعية بنجاح 🔖`);
+            }
+        });
+    }
+
+    // 5. الانتقال إلى العلامة المحفوظة
+    if (btnGotoBookmark) {
+        btnGotoBookmark.addEventListener("click", () => {
+            const saved = localStorage.getItem("mushaf_saved_bookmark");
+            if (saved) {
+                const page = parseInt(saved, 10);
+                if (!isNaN(page) && page >= 1 && page <= TOTAL_MUSHAF_PAGES) {
+                    goToMushafPage(page);
+                    if (typeof showToast === "function") {
+                        showToast(`تم الانتقال إلى علامتك المحفوظة (صفحة ${page}) 📖`);
+                    }
+                }
+            }
+        });
+    }
+}
+
+function applyMushafZoom() {
+    const pageImg = document.getElementById("mushaf-real-page-img");
+    if (pageImg) {
+        pageImg.style.transform = `scale(${mushafZoomLevel})`;
+        pageImg.style.transformOrigin = "top center";
+        pageImg.style.transition = "transform 0.25s cubic-bezier(0.4, 0, 0.2, 1)";
+    }
+}
+
+function restoreMushafPreferences() {
+    // استعادة وضع Sepia المحفوظ
+    const savedSepia = localStorage.getItem("mushaf_theme_sepia");
+    const mushafCard = document.querySelector(".real-mushaf-card");
+    const btnTheme = document.getElementById("btn-mushaf-theme");
+    if (savedSepia === "1" && mushafCard) {
+        mushafCard.classList.add("theme-sepia");
+        if (btnTheme) {
+            btnTheme.classList.add("active");
+            const label = btnTheme.querySelector("span");
+            if (label) label.textContent = "الوضع الليلي";
+        }
+    }
+
+    // استعادة العلامة المحفوظة
+    const savedBookmark = localStorage.getItem("mushaf_saved_bookmark");
+    if (savedBookmark) {
+        const page = parseInt(savedBookmark, 10);
+        if (!isNaN(page)) {
+            updateBookmarkButtonUI(page);
+        }
+    }
+}
+
+function updateBookmarkButtonUI(pageNumber) {
+    const btnGotoBookmark = document.getElementById("btn-mushaf-goto-bookmark");
+    const labelText = document.getElementById("bookmark-label-text");
+    if (btnGotoBookmark) {
+        btnGotoBookmark.style.display = "inline-flex";
+        if (labelText) {
+            labelText.textContent = `العلامة (ص ${pageNumber})`;
+        }
+    }
+}
+
+/* ==========================================================================
+   محرك البحث الفوري في القرآن الكريم (Quran Search Engine)
+   ========================================================================== */
+function initQuranSearchEngine() {
+    const modal = document.getElementById("quran-search-modal");
+    const btnOpen = document.getElementById("btn-open-quran-search");
+    const btnClose = document.getElementById("btn-close-quran-search-modal");
+    const input = document.getElementById("quran-search-input");
+    const btnSubmit = document.getElementById("btn-submit-quran-search");
+
+    if (btnOpen && modal) {
+        btnOpen.addEventListener("click", () => {
+            modal.classList.add("open");
+            setTimeout(() => {
+                if (input) input.focus();
+            }, 100);
+        });
+    }
+
+    if (btnClose && modal) {
+        btnClose.addEventListener("click", () => {
+            modal.classList.remove("open");
+        });
+    }
+
+    if (modal) {
+        modal.addEventListener("click", (e) => {
+            if (e.target === modal) modal.classList.remove("open");
+        });
+    }
+
+    if (btnSubmit) {
+        btnSubmit.addEventListener("click", () => {
+            if (input) handleQuranSearch(input.value.trim());
+        });
+    }
+
+    if (input) {
+        input.addEventListener("keydown", (e) => {
+            if (e.key === "Enter") {
+                e.preventDefault();
+                handleQuranSearch(input.value.trim());
+            }
+        });
+    }
+}
+
+// تنظيف وتوحيد الحروف العربية للبحث الدقيق
+function normalizeArabicText(str) {
+    if (!str) return "";
+    return str
+        .replace(/[\u064B-\u065F\u0670]/g, "") // إزالة حركات التشكيل والتنوين
+        .replace(/[إأآا]/g, "ا")
+        .replace(/ى/g, "ي")
+        .replace(/ؤ/g, "و")
+        .replace(/ئ/g, "ي")
+        .replace(/ة/g, "ه")
+        .replace(/[ـ]/g, "") // إزالة التطويل (الكشيدة)
+        .trim();
+}
+
+function handleQuranSearch(query) {
+    const resultsContainer = document.getElementById("quran-search-results");
+    const statusEl = document.getElementById("quran-search-status");
+
+    if (!query || query.length < 2) {
+        if (statusEl) statusEl.innerHTML = '<span style="color: var(--gold-400);">يرجى كتابة كلمة من حرفين أو أكثر للبحث في القرآن الكريم 🔍</span>';
+        return;
+    }
+
+    if (statusEl) {
+        statusEl.innerHTML = `<span>جاري البحث عن "<strong>${escapeHtml(query)}</strong>" في المصحف الشريف... <i class="fa-solid fa-spinner fa-spin"></i></span>`;
+    }
+
+    if (resultsContainer) {
+        resultsContainer.innerHTML = `
+            <div style="text-align: center; padding: 2.5rem; color: var(--gold-300);">
+                <i class="fa-solid fa-spinner fa-spin fa-2x"></i>
+                <p style="margin-top: 0.8rem; font-size: 0.95rem;">جاري البحث في آيات الذكر الحكيم...</p>
+            </div>
+        `;
+    }
+
+    const cleanQuery = normalizeArabicText(query);
+    const cacheKey = `q_search_${cleanQuery}`;
+    const cached = sessionStorage.getItem(cacheKey);
+
+    if (cached) {
+        try {
+            const data = JSON.parse(cached);
+            renderQuranSearchResults(data, query);
+            return;
+        } catch(e) {}
+    }
+
+    // استعلام محرك البحث عبر واجهة AlQuran Cloud
+    fetch(`https://api.alquran.cloud/v1/search/${encodeURIComponent(cleanQuery)}/all/ar.muyassar`)
+        .then(res => res.json())
+        .then(res => {
+            if (res && res.code === 200 && res.data && res.data.matches && res.data.matches.length > 0) {
+                sessionStorage.setItem(cacheKey, JSON.stringify(res.data));
+                renderQuranSearchResults(res.data, query);
+            } else {
+                // محاولة بحث احتياطية بنص بسيط
+                fetch(`https://api.alquran.cloud/v1/search/${encodeURIComponent(query)}/all/quran-simple-clean`)
+                    .then(r => r.json())
+                    .then(fallbackRes => {
+                        if (fallbackRes && fallbackRes.code === 200 && fallbackRes.data && fallbackRes.data.matches && fallbackRes.data.matches.length > 0) {
+                            sessionStorage.setItem(cacheKey, JSON.stringify(fallbackRes.data));
+                            renderQuranSearchResults(fallbackRes.data, query);
+                        } else {
+                            renderEmptySearchResults(query);
+                        }
+                    })
+                    .catch(() => renderEmptySearchResults(query));
+            }
+        })
+        .catch(() => {
+            renderEmptySearchResults(query);
+        });
+}
+
+function renderQuranSearchResults(data, rawQuery) {
+    const resultsContainer = document.getElementById("quran-search-results");
+    const statusEl = document.getElementById("quran-search-status");
+    if (!resultsContainer) return;
+
+    const matches = data.matches || [];
+    const count = data.count || matches.length;
+
+    if (statusEl) {
+        statusEl.innerHTML = `<span>تم العثور على <strong>${count}</strong> ${count === 1 ? 'آية كريمة' : 'آيات كريمة'} مطابقة لكلمة "<strong>${escapeHtml(rawQuery)}</strong>":</span>`;
+    }
+
+    resultsContainer.innerHTML = "";
+    const cleanTokens = normalizeArabicText(rawQuery).split(/\s+/).filter(Boolean);
+
+    matches.slice(0, 50).forEach(match => {
+        const surah = match.surah || {};
+        const surahName = surah.name ? surah.name.replace(/^سُورَةُ\s+/, "") : "";
+        const ayahNum = match.numberInSurah || 1;
+        const pageNum = match.page || calculateEstimatedPage(surah.number, ayahNum);
+
+        const card = document.createElement("div");
+        card.className = "quran-search-item";
+        card.setAttribute("title", "اضغط للانتقال الفوري إلى صفحة الآية في المصحف");
+
+        // تمييز الكلمة المبحوث عنها
+        let displayText = match.text || "";
+        cleanTokens.forEach(token => {
+            if (token.length >= 2) {
+                const regex = new RegExp(`(${escapeRegex(token)})`, "gi");
+                displayText = displayText.replace(regex, "<mark>$1</mark>");
+            }
+        });
+
+        card.innerHTML = `
+            <div class="quran-match-header">
+                <span class="quran-match-surah"><i class="fa-solid fa-quran text-gold"></i> سورة ${surahName} (آية ${ayahNum})</span>
+                <span class="quran-match-page-badge"><i class="fa-solid fa-file-lines"></i> صفحة ${pageNum}</span>
+            </div>
+            <div class="quran-match-text">" ${displayText} "</div>
+        `;
+
+        card.addEventListener("click", () => {
+            const modal = document.getElementById("quran-search-modal");
+            if (modal) modal.classList.remove("open");
+
+            goToMushafPage(pageNum, surah.number);
+
+            // تمرير سلس لقسم المصحف
+            const quranSec = document.getElementById("quran-khatma");
+            if (quranSec) {
+                quranSec.scrollIntoView({ behavior: "smooth", block: "start" });
+            }
+
+            if (typeof showToast === "function") {
+                showToast(`تم الانتقال لصفحة ${pageNum} (سورة ${surahName} - آية ${ayahNum}) 📖`);
+            }
+        });
+
+        resultsContainer.appendChild(card);
+    });
+}
+
+function renderEmptySearchResults(query) {
+    const resultsContainer = document.getElementById("quran-search-results");
+    const statusEl = document.getElementById("quran-search-status");
+
+    if (statusEl) {
+        statusEl.innerHTML = `<span style="color: var(--gold-400);">لم يتم العثور على نتائج لكلمة "<strong>${escapeHtml(query)}</strong>"</span>`;
+    }
+
+    if (resultsContainer) {
+        resultsContainer.innerHTML = `
+            <div style="text-align: center; padding: 2rem 1rem; color: var(--text-muted);">
+                <i class="fa-solid fa-magnifying-glass fa-2x text-gold" style="margin-bottom: 0.8rem; opacity: 0.7;"></i>
+                <p style="margin-bottom: 0.5rem; color: #fff; font-weight: 600;">لا توجد آيات مطابقة للبحث</p>
+                <p style="font-size: 0.85rem;">تأكد من كتابة الكلمة بصورة صحيحة (مثال: الصابرين، الرحمن، الجنة، النور)</p>
+            </div>
+        `;
+    }
+}
+
+function calculateEstimatedPage(surahNumber, ayahNumber) {
+    if (!surahNumber) return 1;
+    const surahData = SURAHS_INDEX.find(s => s.id === surahNumber);
+    if (!surahData) return 1;
+
+    // تقدير الصفحة بناءً على رقم الآية
+    const nextSurah = SURAHS_INDEX.find(s => s.id === surahNumber + 1);
+    const endPage = nextSurah ? nextSurah.page : 604;
+    const totalPagesInSurah = Math.max(1, endPage - surahData.page);
+    const progress = Math.min(1, Math.max(0, (ayahNumber - 1) / (surahData.ayahs || 1)));
+    const estimated = Math.round(surahData.page + progress * (totalPagesInSurah - 1));
+    return Math.min(604, Math.max(1, estimated));
+}
+
+function escapeHtml(str) {
+    if (!str) return "";
+    return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+}
+
+function escapeRegex(str) {
+    return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
 
