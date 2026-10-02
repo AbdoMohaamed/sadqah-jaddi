@@ -146,6 +146,7 @@ function initRealMushaf() {
     renderQuickJumpButtons();
     populateSurahsDropdown();
     setupMushafNavigation();
+    initReadingTrackerButton();
     initTafsirModal();
     initMushafComfortTools();
     initQuranSearchEngine();
@@ -291,6 +292,24 @@ function goToMushafPage(pageNumber, surahId = null) {
         // حساب رقم الجزء تقريبياً
         const juzNumber = Math.ceil(pageNumber / 20.13);
         countEl.textContent = `الجزء ${juzNumber} • صفحة ${pageNumber} من ${TOTAL_MUSHAF_PAGES}`;
+    }
+
+    // تحديث شريط متابع القراءة والختمة
+    updateReadingTrackerUI(pageNumber, currentSurah);
+    localStorage.setItem("mushaf_last_page", String(pageNumber));
+
+    // تسجيل تقدم القراءة في حديقة الحسنات
+    const todayKey = `quran_pages_read_${new Date().toISOString().slice(0, 10)}`;
+    const visitedKey = `quran_p_${pageNumber}_${new Date().toISOString().slice(0, 10)}`;
+    if (!sessionStorage.getItem(visitedKey)) {
+        sessionStorage.setItem(visitedKey, "1");
+        const currentCount = parseInt(localStorage.getItem(todayKey) || "0", 10) + 1;
+        localStorage.setItem(todayKey, String(currentCount));
+        const todayPagesEl = document.getElementById("tracker-today-pages-count");
+        if (todayPagesEl) todayPagesEl.textContent = currentCount;
+        if (typeof window.addSpiritualGardenDeed === "function") {
+            window.addSpiritualGardenDeed("quran", 5);
+        }
     }
 
     // إظهار اللودر ريثما تنتهي الصورة من التحميل
@@ -651,6 +670,55 @@ function updateBookmarkButtonUI(pageNumber) {
         if (labelText) {
             labelText.textContent = `العلامة (ص ${pageNumber})`;
         }
+    }
+}
+
+function updateReadingTrackerUI(pageNumber, currentSurah) {
+    const trackerText = document.getElementById("tracker-bookmark-text");
+    const khatmaPercent = document.getElementById("tracker-khatma-percent");
+    const currentPageEl = document.getElementById("tracker-current-page-num");
+    const progressFill = document.getElementById("tracker-progress-fill");
+    const todayPagesEl = document.getElementById("tracker-today-pages-count");
+
+    const pct = Math.min(100, Math.max(1, Math.round((pageNumber / TOTAL_MUSHAF_PAGES) * 100)));
+    
+    if (khatmaPercent) khatmaPercent.textContent = `${pct}%`;
+    if (currentPageEl) currentPageEl.textContent = pageNumber;
+    if (progressFill) progressFill.style.width = `${pct}%`;
+
+    // استعادة العلامة المرجعية أو آخر صفحة
+    const savedBookmark = localStorage.getItem("mushaf_saved_bookmark");
+    if (trackerText) {
+        if (savedBookmark) {
+            const bPage = parseInt(savedBookmark, 10);
+            const bSurah = findSurahForPage(bPage);
+            trackerText.textContent = `سورة ${bSurah ? bSurah.name : ''} • صفحة ${bPage}`;
+        } else if (currentSurah) {
+            trackerText.textContent = `سورة ${currentSurah.name} • صفحة ${pageNumber}`;
+        }
+    }
+
+    // تتبع عدد صفحات اليوم
+    const todayKey = `quran_pages_read_${new Date().toISOString().slice(0, 10)}`;
+    const todayCount = parseInt(localStorage.getItem(todayKey) || "0", 10);
+    if (todayPagesEl) todayPagesEl.textContent = todayCount;
+}
+
+function initReadingTrackerButton() {
+    const btnResume = document.getElementById("btn-tracker-resume-reading");
+    if (btnResume) {
+        btnResume.addEventListener("click", () => {
+            const savedBookmark = localStorage.getItem("mushaf_saved_bookmark") || localStorage.getItem("mushaf_last_page");
+            const page = savedBookmark ? parseInt(savedBookmark, 10) : 562;
+            goToMushafPage(page);
+            const mushafCard = document.querySelector(".real-mushaf-card");
+            if (mushafCard) {
+                mushafCard.scrollIntoView({ behavior: "smooth", block: "center" });
+            }
+            if (typeof showToast === "function") {
+                showToast(`تم الانتقال لعلامتك المرجعية (صفحة ${page}) 📖✨`);
+            }
+        });
     }
 }
 

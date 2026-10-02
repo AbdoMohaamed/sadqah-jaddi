@@ -23,6 +23,8 @@ document.addEventListener("DOMContentLoaded", () => {
     initIslamicQuiz();
     initLiveRadioWidgetWithSleepTimer();
     initGlobalCommunityCounter();
+    initSpiritualGarden();
+    initSmartTimelyReminders();
 });
 
 /* ==========================================================================
@@ -2036,6 +2038,303 @@ function initGlobalCommunityCounter() {
         });
     });
 }
+
+/* ==========================================================================
+   12. حديقة الحسنات وشجرة الذكر التفاعلية (Spiritual Garden & Tree)
+   ========================================================================== */
+const GARDEN_STAGES = [
+    {
+        id: 1,
+        title: "المرحلة الأولى: بذرة الإيمان 🌱",
+        desc: "غرس طيب مبارك، ابدأ بالتسبيح والقرآن لتنمو شجرتك",
+        minPoints: 0,
+        nextTarget: 25,
+        emoji: "🌱",
+        nextTitle: "غرس مبارك 🌿"
+    },
+    {
+        id: 2,
+        title: "المرحلة الثانية: غرس مبارك 🌿",
+        desc: "أورقت شجرتك الإيمانية بفضل أذكارك وتلاوتك",
+        minPoints: 25,
+        nextTarget: 75,
+        emoji: "🌿",
+        nextTitle: "شجرة الاستغفار 🌳"
+    },
+    {
+        id: 3,
+        title: "المرحلة الثالثة: شجرة الاستغفار 🌳",
+        desc: "شجرة باسقة مباركة تظلل صاحبها بالأجر والثواب",
+        minPoints: 75,
+        nextTarget: 150,
+        emoji: "🌳",
+        nextTitle: "أصلها ثابت وفرعها في السماء 🌳✨"
+    },
+    {
+        id: 4,
+        title: "المرحلة الرابعة: أصلها ثابت وفرعها في السماء 🌳✨",
+        desc: "تؤتي أُكُلها كل حين بإذن ربها، تقبل الله طاعاتك",
+        minPoints: 150,
+        nextTarget: 300,
+        emoji: "🌳✨",
+        nextTitle: "روضة الرضوان والجنة 🌺🌸"
+    },
+    {
+        id: 5,
+        title: "المرحلة الخامسة: روضة الرضوان والجنة 🌺🌸",
+        desc: "ما شاء الله! حديقة إيمانية متكاملة عامرة بالبركة والحسنات",
+        minPoints: 300,
+        nextTarget: 300,
+        emoji: "🌺🌸",
+        nextTitle: "أعلى المراتب 🌟"
+    }
+];
+
+function getGardenStorageKey() {
+    return `spiritual_garden_${new Date().toISOString().slice(0, 10)}`;
+}
+
+function getGardenData() {
+    const key = getGardenStorageKey();
+    const raw = localStorage.getItem(key);
+    if (raw) {
+        try {
+            return JSON.parse(raw);
+        } catch(e) {}
+    }
+    return {
+        points: 0,
+        tasbeeh: 0,
+        quran: 0,
+        azkar: 0,
+        quiz: 0,
+        streak: parseInt(localStorage.getItem("spiritual_garden_streak") || "1", 10)
+    };
+}
+
+function saveGardenData(data) {
+    const key = getGardenStorageKey();
+    localStorage.setItem(key, JSON.stringify(data));
+    localStorage.setItem("spiritual_garden_streak", String(data.streak || 1));
+}
+
+window.addSpiritualGardenDeed = function(type, points = 1) {
+    const data = getGardenData();
+    const prevPoints = data.points;
+    data.points += points;
+
+    if (type === "tasbeeh") data.tasbeeh = (data.tasbeeh || 0) + 1;
+    else if (type === "quran") data.quran = (data.quran || 0) + 1;
+    else if (type === "azkar") data.azkar = (data.azkar || 0) + 1;
+    else if (type === "quiz") data.quiz = (data.quiz || 0) + 1;
+
+    saveGardenData(data);
+    updateGardenUI(data);
+
+    // التحقق من الترقية لمرحلة جديدة
+    const prevStage = GARDEN_STAGES.slice().reverse().find(s => prevPoints >= s.minPoints) || GARDEN_STAGES[0];
+    const newStage = GARDEN_STAGES.slice().reverse().find(s => data.points >= s.minPoints) || GARDEN_STAGES[0];
+
+    if (newStage.id > prevStage.id) {
+        if (typeof playCompletionChime === "function") playCompletionChime();
+        if (typeof showToast === "function") {
+            showToast(`مبارك! ارتقت شجرة حسناتك إلى «${newStage.title}» 🌳🎉`);
+        }
+        const emojiEl = document.getElementById("tree-stage-emoji");
+        if (emojiEl) {
+            emojiEl.style.transform = "scale(1.4) rotate(10deg)";
+            setTimeout(() => { emojiEl.style.transform = ""; }, 600);
+        }
+    }
+};
+
+function updateGardenUI(data = null) {
+    if (!data) data = getGardenData();
+
+    const pointsEl = document.getElementById("garden-points-count");
+    const streakEl = document.getElementById("garden-streak-count");
+    const emojiEl = document.getElementById("tree-stage-emoji");
+    const titleEl = document.getElementById("tree-stage-title");
+    const descEl = document.getElementById("tree-stage-desc");
+    const nextLabelEl = document.getElementById("garden-next-level-label");
+    const ratioEl = document.getElementById("garden-progress-ratio");
+    const barEl = document.getElementById("garden-progress-bar");
+
+    const tasbeehEl = document.getElementById("garden-tasbeeh-deeds");
+    const quranEl = document.getElementById("garden-quran-deeds");
+    const azkarEl = document.getElementById("garden-azkar-deeds");
+    const quizEl = document.getElementById("garden-quiz-deeds");
+
+    if (pointsEl) pointsEl.textContent = data.points;
+    if (streakEl) streakEl.textContent = data.streak || 1;
+    if (tasbeehEl) tasbeehEl.textContent = data.tasbeeh || 0;
+    if (quranEl) quranEl.textContent = data.quran || 0;
+    if (azkarEl) azkarEl.textContent = data.azkar || 0;
+    if (quizEl) quizEl.textContent = data.quiz || 0;
+
+    const currentStage = GARDEN_STAGES.slice().reverse().find(s => data.points >= s.minPoints) || GARDEN_STAGES[0];
+
+    if (emojiEl) emojiEl.textContent = currentStage.emoji;
+    if (titleEl) titleEl.textContent = currentStage.title;
+    if (descEl) descEl.textContent = currentStage.desc;
+
+    if (currentStage.id === 5) {
+        if (nextLabelEl) nextLabelEl.textContent = "حديقتك في أعلى درجات البركة والازدهار ✨";
+        if (ratioEl) ratioEl.textContent = `${data.points} حسنة`;
+        if (barEl) barEl.style.width = "100%";
+    } else {
+        const nextStage = GARDEN_STAGES.find(s => s.id === currentStage.id + 1);
+        if (nextStage) {
+            const range = nextStage.minPoints - currentStage.minPoints;
+            const progress = data.points - currentStage.minPoints;
+            const pct = Math.min(100, Math.max(0, Math.round((progress / range) * 100)));
+            if (nextLabelEl) nextLabelEl.textContent = `الهدف للترقية إلى «${nextStage.title}»:`;
+            if (ratioEl) ratioEl.textContent = `${data.points} / ${nextStage.minPoints}`;
+            if (barEl) barEl.style.width = `${pct}%`;
+        }
+    }
+}
+
+function initSpiritualGarden() {
+    updateGardenUI();
+
+    const shareBtn = document.getElementById("btn-share-garden-status");
+    if (shareBtn) {
+        shareBtn.addEventListener("click", () => {
+            const data = getGardenData();
+            const currentStage = GARDEN_STAGES.slice().reverse().find(s => data.points >= s.minPoints) || GARDEN_STAGES[0];
+            const deceasedName = (typeof DECEASED_INFO !== "undefined" && DECEASED_INFO.name) ? DECEASED_INFO.name : "موتانا وموتى المسلمين";
+            
+            const msg = `🌳 *شجرة الذكر وحديقة الحسنات اليومية*\n\n🌱 وصلت اليوم إلى: *${currentStage.title}*\n✨ رصيد بركتي: *${data.points} حسنة/نقطة*\n📿 تسبيحات: ${data.tasbeeh || 0} • 📖 صفحات قرآن: ${data.quran || 0}\n\n🤍 صدقة جارية لروح (${deceasedName})\n📲 ازرع شجرتك في الجنة الآن: https://abdomohaamed.github.io/sadqah-jaddi/`;
+            
+            const url = `https://api.whatsapp.com/send?text=${encodeURIComponent(msg)}`;
+            window.open(url, "_blank");
+        });
+    }
+}
+
+/* ==========================================================================
+   13. تنبيهات الطاعات الذكية الصامتة واللطيفة (Smart Timely Reminders)
+   ========================================================================== */
+function initSmartTimelyReminders() {
+    const now = new Date();
+    const dayOfWeek = now.getDay(); // 5 = Friday
+    const hour = now.getHours();
+
+    const heroSection = document.getElementById("hero");
+    if (!heroSection) return;
+
+    let reminderConfig = null;
+
+    // 1. تذكير يوم الجمعة المباركة
+    if (dayOfWeek === 5) {
+        reminderConfig = {
+            id: "friday_kahf",
+            icon: "fa-solid fa-star-and-crescent",
+            title: "اليوم الجمعة المباركة 🌸",
+            desc: "لا تنسَ قراءة سورة الكهف، والإكثار من الصلاة على النبي ﷺ، والدعاء في ساعة الاستجابة.",
+            actionText: "قراءة سورة الكهف 📖",
+            actionCallback: () => {
+                if (typeof goToMushafPage === "function") goToMushafPage(293, 18);
+                const quranSec = document.getElementById("quran-khatma");
+                if (quranSec) quranSec.scrollIntoView({ behavior: "smooth" });
+            }
+        };
+    } 
+    // 2. تذكير الليل وسورة الملك والوتر (9 مساءً إلى 1 صباحاً)
+    else if (hour >= 21 || hour < 2) {
+        reminderConfig = {
+            id: "night_mulk",
+            icon: "fa-solid fa-moon",
+            title: "سكينة الليل ونور القبر 🌙",
+            desc: "سورة الملك تنجي من عذاب القبر وتشفع لصاحبها، واختم ليلتك بركعة الوتر.",
+            actionText: "قراءة سورة الملك 📖",
+            actionCallback: () => {
+                if (typeof goToMushafPage === "function") goToMushafPage(562, 67);
+                const quranSec = document.getElementById("quran-khatma");
+                if (quranSec) quranSec.scrollIntoView({ behavior: "smooth" });
+            }
+        };
+    }
+    // 3. تذكير أذكار الصباح (الفجر وحتى 11 صباحاً)
+    else if (hour >= 5 && hour < 11) {
+        reminderConfig = {
+            id: "morning_azkar",
+            icon: "fa-solid fa-sun",
+            title: "ألا بذكر الله تطمئن القلوب 🌅",
+            desc: "ابدأ يومك بحفظ الله ورعايته عبر أذكار الصباح وحصن المسلم.",
+            actionText: "أذكار الصباح 🛡️",
+            actionCallback: () => {
+                const azkarTab = document.getElementById("tab-morning");
+                if (azkarTab) azkarTab.click();
+                const azkarSec = document.getElementById("azkar");
+                if (azkarSec) azkarSec.scrollIntoView({ behavior: "smooth" });
+            }
+        };
+    }
+    // 4. تذكير أذكار المساء (العصر وحتى 7 مساءً)
+    else if (hour >= 16 && hour < 19) {
+        reminderConfig = {
+            id: "evening_azkar",
+            icon: "fa-solid fa-cloud-sun",
+            title: "حصّن نفسك وأهلك 🌇",
+            desc: "حان وقت أذكار المساء لطمأنينة القلب والوقاية من كل مكروه.",
+            actionText: "أذكار المساء 🛡️",
+            actionCallback: () => {
+                const azkarTab = document.getElementById("tab-evening");
+                if (azkarTab) azkarTab.click();
+                const azkarSec = document.getElementById("azkar");
+                if (azkarSec) azkarSec.scrollIntoView({ behavior: "smooth" });
+            }
+        };
+    }
+
+    if (reminderConfig) {
+        const dismissKey = `reminder_dismissed_${reminderConfig.id}_${now.toISOString().slice(0, 10)}`;
+        if (sessionStorage.getItem(dismissKey)) return;
+
+        const banner = document.createElement("div");
+        banner.className = "smart-reminder-banner container";
+        banner.innerHTML = `
+            <div class="smart-reminder-main">
+                <div class="smart-reminder-icon"><i class="${reminderConfig.icon} text-gold"></i></div>
+                <div class="smart-reminder-text-group">
+                    <span class="smart-reminder-title">${reminderConfig.title}</span>
+                    <span class="smart-reminder-desc">${reminderConfig.desc}</span>
+                </div>
+            </div>
+            <div class="smart-reminder-actions">
+                <button type="button" class="btn btn-gold btn-sm btn-reminder-act">
+                    <span>${reminderConfig.actionText}</span>
+                </button>
+                <button type="button" class="btn-close-radio btn-dismiss-reminder" style="font-size: 1.3rem;" title="إغلاق">&times;</button>
+            </div>
+        `;
+
+        const actBtn = banner.querySelector(".btn-reminder-act");
+        if (actBtn) {
+            actBtn.addEventListener("click", () => {
+                reminderConfig.actionCallback();
+            });
+        }
+
+        const dismissBtn = banner.querySelector(".btn-dismiss-reminder");
+        if (dismissBtn) {
+            dismissBtn.addEventListener("click", () => {
+                banner.remove();
+                sessionStorage.setItem(dismissKey, "1");
+            });
+        }
+
+        const charityBanner = heroSection.querySelector(".charity-memorial-banner");
+        if (charityBanner) {
+            charityBanner.insertAdjacentElement("afterend", banner);
+        } else {
+            heroSection.querySelector(".container").appendChild(banner);
+        }
+    }
+}
+
 
 
 

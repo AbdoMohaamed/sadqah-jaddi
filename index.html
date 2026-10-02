@@ -67,7 +67,7 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css">
 
     <!-- تنسيقات الموقع -->
-    <link rel="stylesheet" href="assets/css/style.css?v=70">
+    <link rel="stylesheet" href="assets/css/style.css?v=71">
 </head>
 <body>
 
@@ -85,6 +85,7 @@
             <ul class="nav-links">
                 <li><a href="#hero" class="active">الرئيسية</a></li>
                 <li><a href="#quran-khatma">المصحف والختمة</a></li>
+                <li><a href="#spiritual-garden">حديقة الحسنات 🌳</a></li>
                 <li><a href="#prayer-times">مواقيت الصلاة</a></li>
                 <!--<li><a href="#nawawi">الأربعون النووية</a></li>-->
                 <!--<li><a href="#asmaa-allah">أسماء الله الحسنى</a></li>-->
@@ -130,6 +131,7 @@
             <ul class="mobile-nav-list">
                 <li><a href="#hero" class="mobile-nav-link active"><i class="fa-solid fa-house"></i> <span>الرئيسية</span></a></li>
                 <li><a href="#quran-khatma" class="mobile-nav-link"><i class="fa-solid fa-book-quran"></i> <span>المصحف والختمة</span></a></li>
+                <li><a href="#spiritual-garden" class="mobile-nav-link"><i class="fa-solid fa-seedling text-emerald-400"></i> <span>حديقة الحسنات وشجرة الذكر</span></a></li>
                 <li><a href="#prayer-times" class="mobile-nav-link"><i class="fa-solid fa-mosque"></i> <span>مواقيت الصلاة والقبلة</span></a></li>
                 <li><a href="#nawawi" class="mobile-nav-link"><i class="fa-solid fa-book-open-reader"></i> <span>الأربعون النووية</span></a></li>
                 <li><a href="#asmaa-allah" class="mobile-nav-link"><i class="fa-solid fa-star-and-crescent"></i> <span>أسماء الله الحسنى</span></a></li>
@@ -346,6 +348,34 @@
                         <span>مصحف الصدقة الجارية • تلاوة وتدبر</span>
                     </div>
                     <span class="subpart-badge">طبعة مجمع الملك فهد بالمدينة المنورة</span>
+                </div>
+
+                <!-- شريط فاصلة المصحف الذكية ومتابع القراءة والختمة -->
+                <div class="mushaf-reading-tracker-bar" id="mushaf-reading-tracker-bar">
+                    <div class="tracker-bookmark-col">
+                        <div class="tracker-badge-icon"><i class="fa-solid fa-bookmark text-gold"></i></div>
+                        <div class="tracker-bookmark-info">
+                            <span class="tracker-label">علامتك المرجعية وآخر وقوف:</span>
+                            <strong class="tracker-value" id="tracker-bookmark-text">سورة الملك • صفحة 562</strong>
+                        </div>
+                    </div>
+
+                    <div class="tracker-khatma-col">
+                        <div class="tracker-khatma-header">
+                            <span>ختمتك: <strong id="tracker-khatma-percent" class="text-gold">93%</strong> من المصحف</span>
+                            <span class="tracker-today-pages" id="tracker-today-pages-badge"><i class="fa-solid fa-leaf text-emerald-400"></i> <strong id="tracker-today-pages-count">0</strong> صفحة اليوم</span>
+                        </div>
+                        <div class="tracker-progress-track">
+                            <div class="tracker-progress-fill" id="tracker-progress-fill" style="width: 93%;"></div>
+                        </div>
+                    </div>
+
+                    <div class="tracker-actions-col">
+                        <button type="button" class="btn btn-gold btn-sm" id="btn-tracker-resume-reading">
+                            <i class="fa-solid fa-book-open-reader"></i>
+                            <span>مواصلة القراءة 📖</span>
+                        </button>
+                    </div>
                 </div>
 
                 <!-- عناصر اختيار السورة -->
@@ -712,6 +742,97 @@
                             <span>إجمالي الزوار عالمياً:</span>
                             <span class="stat-val text-gold" id="total-global-tasbeeh-count">0</span>
                         </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==========================================
+         قسم حديقة الحسنات وشجرة الذكر التفاعلية (Spiritual Garden & Tree)
+         ========================================== -->
+    <section id="spiritual-garden" class="spiritual-garden-section">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-tag"><i class="fa-solid fa-seedling text-emerald-400"></i> غرس الجنة والبركة</span>
+                <h2 class="section-title">حديقة الحسنات وشجرة الذكر التفاعلية</h2>
+                <p class="section-desc">
+                    كل تسبيحة تسبحها، وكل آية تقرؤها، تغرس لك شجرة في الجنة وتنمي حديقة بركاتك اليومية وثوابها لفقيدنا الغالي رحمه الله.
+                </p>
+            </div>
+
+            <div class="garden-interactive-card">
+                <div class="garden-visual-col">
+                    <div class="tree-display-wrapper" id="tree-display-wrapper">
+                        <!-- هالة النور وشجرة الطاعات التفاعلية -->
+                        <div class="spiritual-tree-aura" id="tree-aura"></div>
+                        <div class="spiritual-tree-stage-graphic" id="tree-stage-graphic">
+                            <span class="tree-stage-emoji" id="tree-stage-emoji">🌱</span>
+                        </div>
+                    </div>
+                    <div class="tree-stage-badge" id="tree-stage-title">المرحلة الأولى: بذرة الإيمان 🌱</div>
+                    <div class="tree-stage-desc" id="tree-stage-desc">ابدأ بالتسبيح وتلاوة القرآن لتنمو شجرتك وتورق ثمارها</div>
+                </div>
+
+                <div class="garden-stats-col">
+                    <div class="garden-score-header">
+                        <div class="score-pill">
+                            <span class="score-label">رصيد بركة اليوم:</span>
+                            <span class="score-number" id="garden-points-count">0</span>
+                            <span class="score-unit">حسنة / نقطة</span>
+                        </div>
+                        <div class="streak-pill" id="garden-streak-pill">
+                            <i class="fa-solid fa-fire-flame-curved text-gold"></i>
+                            <span>تتابع: <strong id="garden-streak-count">1</strong> يوم</span>
+                        </div>
+                    </div>
+
+                    <div class="garden-progress-box">
+                        <div class="progress-info-row">
+                            <span id="garden-next-level-label">الهدف للترقية إلى «غرس مبارك 🌿»:</span>
+                            <span id="garden-progress-ratio">0 / 25</span>
+                        </div>
+                        <div class="garden-progress-track">
+                            <div class="garden-progress-bar" id="garden-progress-bar" style="width: 0%;"></div>
+                        </div>
+                    </div>
+
+                    <div class="garden-deeds-grid">
+                        <div class="garden-deed-item" title="كل نقرة في السبحة تزيد حسنة">
+                            <div class="deed-icon"><i class="fa-solid fa-ring text-gold"></i></div>
+                            <div class="deed-info">
+                                <span class="deed-title">التسبيحات</span>
+                                <span class="deed-count" id="garden-tasbeeh-deeds">0</span>
+                            </div>
+                        </div>
+                        <div class="garden-deed-item" title="كل صفحة في المصحف تزيد 5 حسنات">
+                            <div class="deed-icon"><i class="fa-solid fa-book-quran text-emerald-400"></i></div>
+                            <div class="deed-info">
+                                <span class="deed-title">صفحات القرآن</span>
+                                <span class="deed-count" id="garden-quran-deeds">0</span>
+                            </div>
+                        </div>
+                        <div class="garden-deed-item" title="إتمام الأذكار يزيد 15 حسنة">
+                            <div class="deed-icon"><i class="fa-solid fa-shield-halved text-gold"></i></div>
+                            <div class="deed-info">
+                                <span class="deed-title">أوراد الأذكار</span>
+                                <span class="deed-count" id="garden-azkar-deeds">0</span>
+                            </div>
+                        </div>
+                        <div class="garden-deed-item" title="حل المسابقات والأحاديث يزيد 5 حسنات">
+                            <div class="deed-icon"><i class="fa-solid fa-star text-gold"></i></div>
+                            <div class="deed-info">
+                                <span class="deed-title">المسابقات والسنن</span>
+                                <span class="deed-count" id="garden-quiz-deeds">0</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="garden-actions-row">
+                        <button type="button" class="btn btn-gold btn-sm" id="btn-share-garden-status">
+                            <i class="fa-brands fa-whatsapp"></i>
+                            <span>مشاركة إنجاز شجرتي اليوم 🌿</span>
+                        </button>
                     </div>
                 </div>
             </div>
@@ -2081,13 +2202,13 @@
     <script src="assets/js/nawawi-data.js?v=1"></script>
     <script src="assets/js/islamic-guide-data.js?v=1"></script>
     <script src="assets/js/daily-message-data.js?v=2"></script>
-    <script src="assets/js/radio-stations-data.js?v=2"></script>
+    <script src="assets/js/radio-stations-data.js?v=3"></script>
     <script src="assets/js/quiz-data.js?v=2"></script>
     <script src="assets/js/islamic-stories-data.js?v=2"></script>
     <script src="assets/js/firebase-config.js"></script>
-    <script src="assets/js/app.js?v=11"></script>
-    <script src="assets/js/quran.js?v=11"></script>
-    <script src="assets/js/extended-modules.js?v=11"></script>
+    <script src="assets/js/app.js?v=12"></script>
+    <script src="assets/js/quran.js?v=12"></script>
+    <script src="assets/js/extended-modules.js?v=13"></script>
 
 
 </body>

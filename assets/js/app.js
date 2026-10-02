@@ -599,6 +599,10 @@ function incrementTasbeeh() {
     // نغمة صوتية هادئة تمثل خرزة السبحة
     playBeadSound(480 + (currentZkrCount % 10) * 15);
 
+    if (typeof window.addSpiritualGardenDeed === "function") {
+        window.addSpiritualGardenDeed("tasbeeh", 1);
+    }
+
     updateCounterDisplay();
     updateTotalDisplays();
 
@@ -1339,6 +1343,10 @@ window.handleAzkarTap = function(itemId, totalCount) {
     if ("vibrate" in navigator) navigator.vibrate(25);
     playBeadSound(520 + (remaining * 20));
 
+    if (typeof window.addSpiritualGardenDeed === "function") {
+        window.addSpiritualGardenDeed("azkar", 1);
+    }
+
     const card = document.getElementById(`azkar-card-${itemId}`);
     if (card) {
         const btn = card.querySelector(".azkar-tap-btn span");
@@ -1350,6 +1358,10 @@ window.handleAzkarTap = function(itemId, totalCount) {
             if (btn) btn.textContent = "تم الذكر بنجاح";
             if (icon) icon.className = "fa-solid fa-check-double";
             playCompletionChime();
+
+            if (typeof window.addSpiritualGardenDeed === "function") {
+                window.addSpiritualGardenDeed("azkar", 5);
+            }
 
             // انتقال سلس وتلقائي للذكر التالي
             setTimeout(() => {
