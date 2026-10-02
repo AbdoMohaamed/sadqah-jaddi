@@ -3,22 +3,24 @@
  * يوفر سرعة تحميل فورية ودعم التثبيت كـ PWA
  */
 
-const CACHE_NAME = "sadqah-jaddi-v3";
+const CACHE_NAME = "sadqah-jaddi-v4";
 const ASSETS_TO_CACHE = [
   "./",
   "./index.html",
-  "./assets/css/style.css?v=58",
   "./assets/css/style.css",
   "./assets/js/data.js",
   "./assets/js/azkar-data.js",
+  "./assets/js/asmaa-allah-data.js",
+  "./assets/js/nawawi-data.js",
+  "./assets/js/islamic-guide-data.js",
+  "./assets/js/extended-modules.js",
   "./assets/js/firebase-config.js",
-  "./assets/js/app.js?v=4",
   "./assets/js/app.js",
   "./assets/js/quran.js",
   "./assets/icon.svg",
   "./assets/share-preview.jpg",
   "./manifest.json",
-  "https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&family=Tajawal:wght@300;400;500;700;800;900&family=UthmanicHafs:wght@400;700&display=swap",
+  "https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&family=Tajawal:wght@300;400;500;700;800;900&display=swap",
   "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css",
   "https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css",
   "https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"

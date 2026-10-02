@@ -60,14 +60,24 @@
                 <li><a href="#hero" class="active">الرئيسية</a></li>
                 <li><a href="#quran-khatma">المصحف والختمة</a></li>
                 <li><a href="#prayer-times">مواقيت الصلاة</a></li>
-                <li><a href="#daily-wird">الورد اليومي</a></li>
-                <li><a href="#categorized-duas">الأدعية النبوية</a></li>
+                <!--<li><a href="#nawawi">الأربعون النووية</a></li>-->
+                <li><a href="#asmaa-allah">أسماء الله الحسنى</a></li>
+                <li><a href="#seasons">مواسم الطاعات</a></li>
+                <!--<li><a href="#islamic-guide">أحكام الجنائز</a></li>-->
                 <li><a href="#tasbeeh">السبحة</a></li>
-                <li><a href="#azkar">أذكار اليوم</a></li>
+                <li><a href="#azkar">الأذكار</a></li>
                 <li><a href="#prayers">أدعية الزوار</a></li>
             </ul>
 
             <div class="nav-actions">
+                <button id="btn-open-notifications-nav" class="btn btn-outline" title="تنبيهات وإشعارات الطاعات">
+                    <i class="fa-solid fa-bell text-gold"></i>
+                    <span>التنبيهات</span>
+                </button>
+                <button id="btn-open-custom-share-nav" class="btn btn-gold btn-sm" title="إنشاء رابط صدقة جارية لفقيدك">
+                    <i class="fa-solid fa-gift"></i>
+                    <span>إهداء صدقة</span>
+                </button>
                 <button id="btn-install-app" class="btn btn-install-pwa" style="display: none;" title="تثبيت التطبيق على جهازك">
                     <i class="fa-solid fa-mobile-screen-button"></i>
                     <span>تثبيت التطبيق</span>
@@ -956,6 +966,117 @@
                 </div>
             </div>
         </div>
+    <!-- ==========================================
+         قسم الأربعين النووية الشاملة (42 Hadiths)
+         ========================================== -->
+    <section id="nawawi" class="nawawi-section">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-tag"><i class="fa-solid fa-book-quran"></i> جوامع الكلم والسنّة النبوية</span>
+                <h2 class="section-title">الأربعون النووية للإمام النووي رحمه الله</h2>
+                <p class="section-desc">
+                    42 حديثاً نبوياً شريفاً تجمع أصول وقواعد الشريعة الإسلامية مع الشرح والفوائد التربوية والتلاوة الصوتية العذبة.
+                </p>
+            </div>
+
+            <!-- شريط البحث في الأحاديث -->
+            <div class="nawawi-search-box">
+                <i class="fa-solid fa-magnifying-glass nawawi-search-icon"></i>
+                <input type="text" id="nawawi-search-input" class="nawawi-search-input" placeholder="ابحث في الأحاديث النبوية (مثال: النيات، الحلال، الاستقامة، الجار)...">
+            </div>
+
+            <!-- تصنيفات الأحاديث -->
+            <div class="nawawi-filter-bar" id="nawawi-filter-bar">
+                <button type="button" class="nawawi-filter-pill active" data-cat="all">جميع الأحاديث (42)</button>
+                <button type="button" class="nawawi-filter-pill" data-cat="عقيدة وإخلاص">عقيدة وإخلاص</button>
+                <button type="button" class="nawawi-filter-pill" data-cat="عبادات">عبادات</button>
+                <button type="button" class="nawawi-filter-pill" data-cat="تزكية وأخلاق">تزكية وأخلاق</button>
+                <button type="button" class="nawawi-filter-pill" data-cat="معاملات ودعوة">معاملات ودعوة</button>
+                <button type="button" class="nawawi-filter-pill" data-cat="منهج واتباع">منهج واتباع</button>
+            </div>
+
+            <!-- شبكة الأحاديث النبوية -->
+            <div class="nawawi-grid" id="nawawi-grid">
+                <!-- يُملأ برمجياً من nawawi-data.js و app.js -->
+            </div>
+        </div>
+    </section>
+
+    <!-- ==========================================
+         قسم أسماء الله الحسنى الـ 99 (99 Names of Allah)
+         ========================================== -->
+    <section id="asmaa-allah" class="asmaa-section">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-tag"><i class="fa-solid fa-star-and-crescent"></i> وَلِلَّهِ الْأَسْمَاءُ الْحُسْنَىٰ فَادْعُوهُ بِهَا</span>
+                <h2 class="section-title">مكتبة أسماء الله الحسنى ومعانيها</h2>
+                <p class="section-desc">
+                    تعرّف على معاني أسماء الله الحسنى الـ 99 ودلالاتها الإيمانية وثمار الدعاء بها لنيل البشارة النبوية بدخول الجنة.
+                </p>
+            </div>
+
+            <div class="asmaa-counter-banner">
+                <div class="asmaa-counter-text">
+                    <i class="fa-solid fa-quote-right text-gold"></i>
+                    قال رسول الله ﷺ: <strong>«إِنَّ لِلَّهِ تِسْعَةً وَتِسْعِينَ اسْمًا، مِائَةً إِلَّا وَاحِدًا، مَنْ أَحْصَاهَا دَخَلَ الْجَنَّةَ»</strong> [متفق عليه]
+                </div>
+            </div>
+
+            <!-- تصنيفات أسماء الله الحسنى -->
+            <div class="nawawi-filter-bar" id="asmaa-filter-bar">
+                <button type="button" class="nawawi-filter-pill active" data-cat="all">جميع الأسماء (99)</button>
+                <button type="button" class="nawawi-filter-pill" data-cat="جلال">أسماء الجلال والعظمة</button>
+                <button type="button" class="nawawi-filter-pill" data-cat="رحمة">أسماء الرحمة واللطف</button>
+                <button type="button" class="nawawi-filter-pill" data-cat="قدرة">أسماء القدرة والخلق</button>
+                <button type="button" class="nawawi-filter-pill" data-cat="رزق">أسماء الرزق والإنعام</button>
+                <button type="button" class="nawawi-filter-pill" data-cat="مغفرة">أسماء المغفرة والعفو</button>
+                <button type="button" class="nawawi-filter-pill" data-cat="علم">أسماء العلم والإحاطة</button>
+                <button type="button" class="nawawi-filter-pill" data-cat="حكمة">أسماء الحكمة والعدل</button>
+            </div>
+
+            <!-- شبكة الأسماء الحسنى -->
+            <div class="asmaa-grid" id="asmaa-grid">
+                <!-- يُملأ برمجياً من asmaa-allah-data.js و app.js -->
+            </div>
+        </div>
+    </section>
+
+    <!-- ==========================================
+         قسم مواسم الطاعات والتقويم الهجري (Seasons of Worship)
+         ========================================== -->
+    <section id="seasons" class="seasons-section">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-tag"><i class="fa-solid fa-calendar-days"></i> مواسم الخير ومضاعفة الأجور</span>
+                <h2 class="section-title">مواسم الطاعات والتقويم الهجري</h2>
+                <p class="section-desc">
+                    تعرّف على مواعيد أعظم المناسبات الإسلامية وأيام الصيام المستحبة مع عد تنازلي حيّ لكل موسم مبارك.
+                </p>
+            </div>
+
+            <div class="seasons-grid" id="seasons-grid">
+                <!-- يُملأ برمجياً من app.js -->
+            </div>
+        </div>
+    </section>
+
+    <!-- ==========================================
+         قسم دليل أحكام الجنائز والصدقة الجارية (Islamic Deceased Guide)
+         ========================================== -->
+    <section id="islamic-guide" class="faq-section">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-tag"><i class="fa-solid fa-scale-balanced"></i> فتاوى وأحكام شرعية موثقة</span>
+                <h2 class="section-title">دليل أحكام الجنائز والصدقة الجارية وما ينفع الميت</h2>
+                <p class="section-desc">
+                    إجابات شرعية موثقة من الكتاب والسنّة وإجماع العلماء حول ما يصل للميت من دعاء وصدقات وأحكام الحج والصيام عنه.
+                </p>
+            </div>
+
+            <div class="faq-accordion-list" id="islamic-faq-list">
+                <!-- يُملأ برمجياً من islamic-guide-data.js و app.js -->
+            </div>
+        </div>
     </section>
 
     <!-- ==========================================
@@ -1141,6 +1262,24 @@
                     </div>
 
                     <div class="form-group">
+                        <label class="form-label">اختر أبعاد وحجم البطاقة:</label>
+                        <div class="dua-theme-pills" id="dua-format-pills">
+                            <button type="button" class="theme-pill active" data-format="story">
+                                <i class="fa-solid fa-mobile-screen"></i>
+                                <span>حالة / ستوري (9:16)</span>
+                            </button>
+                            <button type="button" class="theme-pill" data-format="card">
+                                <i class="fa-solid fa-image"></i>
+                                <span>بطاقة عمودية (4:5)</span>
+                            </button>
+                            <button type="button" class="theme-pill" data-format="post">
+                                <i class="fa-solid fa-square"></i>
+                                <span>منشور مربع (1:1)</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
                         <label class="form-label">اختر السمة واللون المفضل للبطاقة:</label>
                         <div class="dua-theme-pills">
                             <button type="button" class="theme-pill active" data-theme="royal-navy">
@@ -1150,6 +1289,10 @@
                             <button type="button" class="theme-pill" data-theme="emerald">
                                 <span class="theme-color-dot" style="background: #064e3b; border: 1px solid #34d399;"></span>
                                 <span>الزمردي 🌿</span>
+                            </button>
+                            <button type="button" class="theme-pill" data-theme="burgundy">
+                                <span class="theme-color-dot" style="background: #4a0e17; border: 1px solid #d4af37;"></span>
+                                <span>العنابي الإسلامي 🍷</span>
                             </button>
                             <button type="button" class="theme-pill" data-theme="parchment">
                                 <span class="theme-color-dot" style="background: #fbf8ee; border: 1px solid #aa820a;"></span>
@@ -1386,7 +1529,172 @@
                 </div>
             </div>
         </div>
+    <!-- ==========================================
+    نافذة إنشاء رابط صدقة جارية مخصص للإهداء (Custom Memorial Link)
+    ========================================== -->
+    <div class="modal-overlay" id="custom-share-modal">
+        <div class="modal-card">
+            <button class="modal-close-btn" id="btn-close-custom-share-modal" aria-label="إغلاق">&times;</button>
+            <h3 class="modal-title"><i class="fa-solid fa-gift text-gold"></i> إنشاء رابط صدقة جارية لفقيدك</h3>
+            <p class="modal-desc">
+                اكتب اسم فقيدك العزيز وسنقوم بإنشاء رابط مخصص يظهر فيه اسمه ودعاؤه في جميع أرجاء التطبيق لتشاركه مع أهلك وأحبابك لنيل الأجر.
+            </p>
+
+            <form id="custom-share-form">
+                <div class="form-group">
+                    <label class="form-label" for="custom-deceased-name-input">اسم المتوفى (رحمه الله):</label>
+                    <input type="text" id="custom-deceased-name-input" class="form-input" placeholder="مثال: جدي الحاج محمد / والدي الحبيب أحمد..." required>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="custom-deceased-relation-select">صلة القرابة / اللقب:</label>
+                    <select id="custom-deceased-relation-select" class="form-input">
+                        <option value="فقيدنا الغالي">فقيدنا الغالي</option>
+                        <option value="والدي الحبيب">والدي الحبيب</option>
+                        <option value="والدتي الغالية">والدتي الغالية</option>
+                        <option value="جدي الغالي">جدي الغالي</option>
+                        <option value="جدتي الغالية">جدتي الغالية</option>
+                        <option value="أخي الحبيب">أخي الحبيب</option>
+                        <option value="أختي الغالية">أختي الغالية</option>
+                        <option value="موتانا وموتى المسلمين">موتانا وموتى المسلمين</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">الرابط المخصص لفقيدك:</label>
+                    <div class="copy-input-row" style="display: flex; gap: 0.5rem;">
+                        <input type="text" id="generated-share-url" class="form-input" readonly value="https://abdomohaamed.github.io/sadqah-jaddi/">
+                        <button type="button" class="btn btn-gold btn-sm" id="btn-copy-custom-url">
+                            <i class="fa-solid fa-copy"></i>
+                            <span>نسخ</span>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="modal-actions-dual" style="margin-top: 1.5rem;">
+                    <button type="button" class="btn btn-gold btn-block" id="btn-share-custom-whatsapp">
+                        <i class="fa-brands fa-whatsapp"></i>
+                        <span>مشاركة مباشرة عبر واتساب</span>
+                    </button>
+                </div>
+            </form>
+        </div>
     </div>
+
+    <!-- ==========================================
+    نافذة التنبيهات والإشعارات الذكية (Smart Push Notifications Modal)
+    ========================================== -->
+    <div class="modal-overlay" id="notifications-modal">
+        <div class="modal-card">
+            <button class="modal-close-btn" id="btn-close-notifications-modal" aria-label="إغلاق">&times;</button>
+            <h3 class="modal-title"><i class="fa-solid fa-bell text-gold"></i> تذكيرات وإشعارات الطاعات الذكية</h3>
+            <p class="modal-desc">
+                فعّل التنبيهات لتصلك إشعارات المتصفح بأوقات الأذكار والصيام وسورة الكهف والأذان في مواعيدها المباركة.
+            </p>
+
+            <div class="notifications-settings-list">
+                <div class="toggle-switch-row">
+                    <div class="toggle-switch-info">
+                        <span class="toggle-switch-title">🌅 أذكار الصباح</span>
+                        <span class="toggle-switch-desc">تنبيه يومي مع شروق الشمس (6:30 ص)</span>
+                    </div>
+                    <label class="custom-switch">
+                        <input type="checkbox" id="notify-morning-azkar" checked>
+                        <span class="slider-round"></span>
+                    </label>
+                </div>
+
+                <div class="toggle-switch-row">
+                    <div class="toggle-switch-info">
+                        <span class="toggle-switch-title">🌇 أذكار المساء</span>
+                        <span class="toggle-switch-desc">تنبيه يومي قبل غروب الشمس (5:00 م)</span>
+                    </div>
+                    <label class="custom-switch">
+                        <input type="checkbox" id="notify-evening-azkar" checked>
+                        <span class="slider-round"></span>
+                    </label>
+                </div>
+
+                <div class="toggle-switch-row">
+                    <div class="toggle-switch-info">
+                        <span class="toggle-switch-title">🕌 سورة الكهف والصلاة على النبي</span>
+                        <span class="toggle-switch-desc">تنبيه صباح كل يوم جمعة مباركة</span>
+                    </div>
+                    <label class="custom-switch">
+                        <input type="checkbox" id="notify-friday-kahf" checked>
+                        <span class="slider-round"></span>
+                    </label>
+                </div>
+
+                <div class="toggle-switch-row">
+                    <div class="toggle-switch-info">
+                        <span class="toggle-switch-title">🌙 صيام الإثنين والخميس والأيام البيض</span>
+                        <span class="toggle-switch-desc">تذكير بصيام السنن قبل يوم من موعدها</span>
+                    </div>
+                    <label class="custom-switch">
+                        <input type="checkbox" id="notify-fasting-days" checked>
+                        <span class="slider-round"></span>
+                    </label>
+                </div>
+
+                <div class="toggle-switch-row">
+                    <div class="toggle-switch-info">
+                        <span class="toggle-switch-title">🕋 تنبيه مواقيت الصلاة والأذان</span>
+                        <span class="toggle-switch-desc">صوت الأذان والتنبيه مع دخول وقت كل صلاة</span>
+                    </div>
+                    <label class="custom-switch">
+                        <input type="checkbox" id="notify-adhan-calls" checked>
+                        <span class="slider-round"></span>
+                    </label>
+                </div>
+            </div>
+
+            <div style="margin-top: 1.5rem;">
+                <button type="button" class="btn btn-gold btn-block" id="btn-request-notification-perm">
+                    <i class="fa-solid fa-circle-check"></i>
+                    <span>تفعيل وتحديث إعدادات التنبيهات</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==========================================
+    نافذة تفاصيل اسم الله الحسنى (Asmaa Detail Modal)
+    ========================================== -->
+    <div class="modal-overlay" id="asmaa-detail-modal">
+        <div class="modal-card">
+            <button class="modal-close-btn" id="btn-close-asmaa-modal" aria-label="إغلاق">&times;</button>
+            <div class="asmaa-modal-header" style="text-align: center; margin-bottom: 1.5rem;">
+                <span class="hadith-number-badge" id="modal-asmaa-num">1</span>
+                <h2 id="modal-asmaa-name" style="font-family: var(--font-quran, serif); font-size: 3rem; color: var(--gold-300); margin: 0.5rem 0;">الله</h2>
+                <span class="hadith-category-tag" id="modal-asmaa-cat">جلال</span>
+            </div>
+
+            <div class="asmaa-modal-body">
+                <div class="form-group">
+                    <label class="form-label text-gold"><i class="fa-solid fa-book-open"></i> المعنى والشرح:</label>
+                    <p id="modal-asmaa-meaning" style="font-size: 1.05rem; line-height: 1.8; color: #f3f4f6;"></p>
+                </div>
+
+                <div class="form-group" style="background: rgba(212, 175, 55, 0.1); padding: 1rem; border-radius: var(--radius-md); border-right: 3px solid var(--gold-400);">
+                    <label class="form-label text-gold"><i class="fa-solid fa-hands-praying"></i> الثمرة الإيمانية والدعاء به:</label>
+                    <p id="modal-asmaa-virtue" style="font-size: 0.95rem; line-height: 1.7; color: #e5e7eb; margin: 0;"></p>
+                </div>
+
+                <div class="modal-actions-dual" style="margin-top: 1.25rem;">
+                    <button type="button" class="btn btn-outline" id="btn-copy-asmaa">
+                        <i class="fa-solid fa-copy"></i>
+                        <span>نسخ الاسم ومعناه</span>
+                    </button>
+                    <button type="button" class="btn btn-gold" id="btn-share-asmaa">
+                        <i class="fa-brands fa-whatsapp"></i>
+                        <span>مشاركة</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- ==========================================
     ويدجت إذاعة القرآن الكريم المباشرة (24/7 Live Radio)
     ========================================== -->
@@ -1468,12 +1776,16 @@
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
 
-    <!-- ملف البيانات وإعدادات السحابة والمنطق البرمجي وقارئ القرآن -->
+    <!-- ملف البيانات وإعدادات السحابة والمنطق البرمجي وقارئ القرآن والمكتبة الإسلامية -->
     <script src="assets/js/data.js"></script>
     <script src="assets/js/azkar-data.js?v=10"></script>
+    <script src="assets/js/asmaa-allah-data.js?v=1"></script>
+    <script src="assets/js/nawawi-data.js?v=1"></script>
+    <script src="assets/js/islamic-guide-data.js?v=1"></script>
     <script src="assets/js/firebase-config.js"></script>
     <script src="assets/js/app.js?v=10"></script>
     <script src="assets/js/quran.js?v=10"></script>
+    <script src="assets/js/extended-modules.js?v=1"></script>
 
 
 </body>

@@ -1,0 +1,891 @@
+/**
+ * الوحدات الإضافية الشاملة لتطبيق زاد المسلم
+ * 1. روابط الصدقة الجارية المخصصة (Custom Memorial Links)
+ * 2. الأربعون النووية كاملة (42 Hadiths)
+ * 3. أسماء الله الحسنى الـ 99 (99 Names of Allah)
+ * 4. مواسم الطاعات والتقويم الهجري والعد التنازلي (Seasons of Worship)
+ * 5. دليل وفتاوى أحكام الجنائز والصدقة الجارية (Islamic FAQ)
+ * 6. نظام التنبيهات والإشعارات الذكية (Smart Notifications)
+ */
+
+document.addEventListener("DOMContentLoaded", () => {
+    initCustomShareLink();
+    initNawawiHadiths();
+    initAsmaaAllah();
+    initSeasonsOfWorship();
+    initIslamicGuideFaq();
+    initSmartNotifications();
+    initEnhancedCardGenerator();
+});
+
+/* ==========================================================================
+   1. ميزة إنشاء رابط صدقة جارية مخصص لفقيد الزائر (Custom Memorial Links)
+   ========================================================================== */
+function initCustomShareLink() {
+    try {
+        const urlParams = new URLSearchParams(window.location.search);
+        const customName = urlParams.get("name");
+        const customRel = urlParams.get("rel") || "فقيدنا الغالي";
+
+        if (customName && customName.trim()) {
+            const formattedName = `${customRel} (${decodeURIComponent(customName.trim())})`;
+            if (typeof DECEASED_INFO !== "undefined") {
+                DECEASED_INFO.name = formattedName;
+            }
+            
+            document.querySelectorAll(".deceased-name").forEach(el => {
+                el.textContent = formattedName;
+            });
+
+            const charityBanner = document.querySelector(".charity-memorial-text");
+            if (charityBanner) {
+                charityBanner.innerHTML = `تطبيق إسلامي متاح مجاناً لوجه الله تعالى • <strong>صدقة جارية على روح ${formattedName} وموتى المسلمين جميعاً</strong> — نسألكم الفاتحة وصالح الدعاء.`;
+            }
+        }
+    } catch(e) {
+        console.error("Error parsing URL params:", e);
+    }
+
+    const modal = document.getElementById("custom-share-modal");
+    const openBtns = [
+        document.getElementById("btn-open-custom-share-nav"),
+        document.getElementById("btn-open-custom-share-hero")
+    ];
+    const closeBtn = document.getElementById("btn-close-custom-share-modal");
+    const nameInput = document.getElementById("custom-deceased-name-input");
+    const relSelect = document.getElementById("custom-deceased-relation-select");
+    const urlOutput = document.getElementById("generated-share-url");
+    const copyBtn = document.getElementById("btn-copy-custom-url");
+    const whatsappBtn = document.getElementById("btn-share-custom-whatsapp");
+
+    openBtns.forEach(btn => {
+        if (btn) {
+            btn.addEventListener("click", () => {
+                if (modal) modal.classList.add("open");
+                updateGeneratedUrl();
+            });
+        }
+    });
+
+    if (closeBtn && modal) {
+        closeBtn.addEventListener("click", () => modal.classList.remove("open"));
+    }
+
+    if (modal) {
+        modal.addEventListener("click", (e) => {
+            if (e.target === modal) modal.classList.remove("open");
+        });
+    }
+
+    function updateGeneratedUrl() {
+        if (!urlOutput) return;
+        const nameVal = nameInput ? nameInput.value.trim() : "";
+        const relVal = relSelect ? relSelect.value : "فقيدنا الغالي";
+        const baseUrl = window.location.origin + window.location.pathname;
+
+        if (nameVal) {
+            const fullUrl = `${baseUrl}?name=${encodeURIComponent(nameVal)}&rel=${encodeURIComponent(relVal)}`;
+            urlOutput.value = fullUrl;
+        } else {
+            urlOutput.value = baseUrl;
+        }
+    }
+
+    if (nameInput) nameInput.addEventListener("input", updateGeneratedUrl);
+    if (relSelect) relSelect.addEventListener("change", updateGeneratedUrl);
+
+    if (copyBtn && urlOutput) {
+        copyBtn.addEventListener("click", () => {
+            copyTextToClipboard(urlOutput.value);
+            showToast("تم نسخ رابط الصدقة المخصص بنجاح 📋");
+        });
+    }
+
+    if (whatsappBtn && urlOutput) {
+        whatsappBtn.addEventListener("click", () => {
+            const nameVal = nameInput ? nameInput.value.trim() : "فقيدنا الغالي";
+            const relVal = relSelect ? relSelect.value : "فقيدنا الغالي";
+            const msg = `🌿 *صدقة جارية ودعاء لروح ${relVal} (${nameVal})*\n\nأهديكم هذا التطبيق الإسلامي الشامل (زاد المسلم): للقرآن الكريم ومواقيت الصلاة والأذكار والسبحة الإلكترونية ليكون صدقة جارية ونوراً على روحه.\n\n📲 ادخل واكسب الأجر وادعُ له:\n${urlOutput.value}`;
+            const waUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(msg)}`;
+            window.open(waUrl, "_blank");
+        });
+    }
+}
+
+/* ==========================================================================
+   2. قسم الأربعين النووية الشاملة (42 Hadiths)
+   ========================================================================== */
+let currentNawawiAudio = null;
+let currentPlayingHadithId = null;
+
+function initNawawiHadiths() {
+    const grid = document.getElementById("nawawi-grid");
+    const searchInput = document.getElementById("nawawi-search-input");
+    const filterPills = document.querySelectorAll("#nawawi-filter-bar .nawawi-filter-pill");
+
+    if (!grid || typeof NAWAWI_HADITHS === "undefined") return;
+
+    let activeCat = "all";
+    let searchQuery = "";
+
+    function renderHadiths() {
+        grid.innerHTML = "";
+        const filtered = NAWAWI_HADITHS.filter(h => {
+            const matchCat = activeCat === "all" || h.category === activeCat;
+            const matchQuery = !searchQuery || 
+                h.title.includes(searchQuery) || 
+                h.text.includes(searchQuery) || 
+                h.narrator.includes(searchQuery) || 
+                h.explanation.includes(searchQuery);
+            return matchCat && matchQuery;
+        });
+
+        if (filtered.length === 0) {
+            grid.innerHTML = `
+                <div style="grid-column: 1/-1; text-align: center; padding: 3rem 1rem; color: var(--text-muted);">
+                    <i class="fa-solid fa-book-open" style="font-size: 2.5rem; color: var(--gold-400); margin-bottom: 1rem;"></i>
+                    <p style="font-size: 1.1rem;">لا توجد أحاديث تطابق بحثك، جرّب كلمة أخرى.</p>
+                </div>
+            `;
+            return;
+        }
+
+        filtered.forEach(h => {
+            const card = document.createElement("div");
+            card.className = "hadith-card";
+            const isPlaying = currentPlayingHadithId === h.id;
+
+            card.innerHTML = `
+                <div class="hadith-card-header">
+                    <span class="hadith-number-badge">الحديث ${h.id}</span>
+                    <span class="hadith-category-tag">${h.category}</span>
+                </div>
+                <h3 class="hadith-title">${h.title}</h3>
+                <div class="hadith-narrator"><i class="fa-solid fa-user-pen text-gold"></i> عن ${h.narrator}</div>
+                <div class="hadith-text">${h.text}</div>
+                
+                <button type="button" class="hadith-details-toggle">
+                    <i class="fa-solid fa-chevron-down text-gold"></i>
+                    <span>الشرح والفوائد التربوية</span>
+                </button>
+                
+                <div class="hadith-details-body">
+                    <div style="margin-bottom: 0.75rem;">
+                        <strong style="color: var(--gold-300);"><i class="fa-solid fa-lightbulb"></i> الشرح الميسر:</strong>
+                        <p style="margin: 0.3rem 0 0.6rem 0;">${h.explanation}</p>
+                    </div>
+                    <div>
+                        <strong style="color: var(--gold-300);"><i class="fa-solid fa-check-double"></i> من فوائد الحديث:</strong>
+                        <ul style="padding-right: 1.2rem; margin: 0.3rem 0 0 0;">
+                            ${h.benefits.map(b => `<li>${b}</li>`).join("")}
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="hadith-actions">
+                    <button type="button" class="btn-hadith-audio ${isPlaying ? 'playing' : ''}" data-id="${h.id}" data-audio="${h.audioUrl}">
+                        <i class="fa-solid ${isPlaying ? 'fa-pause' : 'fa-play'}"></i>
+                        <span>${isPlaying ? 'إيقاف' : 'استماع صوتي'}</span>
+                    </button>
+
+                    <div class="hadith-card-btns">
+                        <button type="button" class="btn btn-outline btn-sm btn-copy-hadith" title="نسخ الحديث">
+                            <i class="fa-solid fa-copy"></i>
+                        </button>
+                        <button type="button" class="btn btn-outline btn-sm btn-share-hadith" title="مشاركة لواتساب">
+                            <i class="fa-brands fa-whatsapp" style="color: #25D366;"></i>
+                        </button>
+                    </div>
+                </div>
+            `;
+
+            const toggleBtn = card.querySelector(".hadith-details-toggle");
+            const detailsBody = card.querySelector(".hadith-details-body");
+            if (toggleBtn && detailsBody) {
+                toggleBtn.addEventListener("click", () => {
+                    const isOpen = detailsBody.classList.toggle("open");
+                    toggleBtn.querySelector("i").style.transform = isOpen ? "rotate(180deg)" : "rotate(0deg)";
+                });
+            }
+
+            const audioBtn = card.querySelector(".btn-hadith-audio");
+            if (audioBtn) {
+                audioBtn.addEventListener("click", () => {
+                    playHadithAudio(h.id, h.audioUrl);
+                });
+            }
+
+            const copyBtn = card.querySelector(".btn-copy-hadith");
+            if (copyBtn) {
+                copyBtn.addEventListener("click", () => {
+                    const textToCopy = `📖 *الحديث ${h.id} من الأربعين النووية:* [${h.title}]\n\nعن ${h.narrator}:\n${h.text}\n\n💡 *الشرح:* ${h.explanation}\n\n🕊️ زاد المسلم: https://abdomohaamed.github.io/sadqah-jaddi/`;
+                    copyTextToClipboard(textToCopy);
+                    showToast("تم نسخ الحديث بنجاح 📋");
+                });
+            }
+
+            const shareBtn = card.querySelector(".btn-share-hadith");
+            if (shareBtn) {
+                shareBtn.addEventListener("click", () => {
+                    const deceasedName = (typeof DECEASED_INFO !== "undefined" && DECEASED_INFO.name) ? DECEASED_INFO.name : "فقيدنا الغالي";
+                    const msg = `📖 *الحديث ${h.id} من الأربعين النووية:* [${h.title}]\n\nعن ${h.narrator}:\n${h.text}\n\n🤍 صدقة جارية لروح (${deceasedName})\n📲 للمزيد من الأحاديث والتلاوات: https://abdomohaamed.github.io/sadqah-jaddi/`;
+                    const waUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(msg)}`;
+                    window.open(waUrl, "_blank");
+                });
+            }
+
+            grid.appendChild(card);
+        });
+    }
+
+    function playHadithAudio(id, url) {
+        if (currentPlayingHadithId === id && currentNawawiAudio && !currentNawawiAudio.paused) {
+            currentNawawiAudio.pause();
+            currentPlayingHadithId = null;
+            renderHadiths();
+            return;
+        }
+
+        if (currentNawawiAudio) {
+            currentNawawiAudio.pause();
+            currentNawawiAudio = null;
+        }
+
+        currentNawawiAudio = new Audio(url);
+        currentPlayingHadithId = id;
+        renderHadiths();
+
+        currentNawawiAudio.play().catch(e => {
+            showToast("تعذر تشغيل الصوت تلقائياً، يرجى المحاولة ثانية");
+            currentPlayingHadithId = null;
+            renderHadiths();
+        });
+
+        currentNawawiAudio.onended = () => {
+            currentPlayingHadithId = null;
+            renderHadiths();
+        };
+    }
+
+    if (searchInput) {
+        searchInput.addEventListener("input", (e) => {
+            searchQuery = e.target.value.trim();
+            renderHadiths();
+        });
+    }
+
+    filterPills.forEach(pill => {
+        pill.addEventListener("click", () => {
+            filterPills.forEach(p => p.classList.remove("active"));
+            pill.classList.add("active");
+            activeCat = pill.getAttribute("data-cat");
+            renderHadiths();
+        });
+    });
+
+    renderHadiths();
+}
+
+/* ==========================================================================
+   3. قسم ومكتبة أسماء الله الحسنى الـ 99 (Asmaa Allah)
+   ========================================================================== */
+function initAsmaaAllah() {
+    const grid = document.getElementById("asmaa-grid");
+    const filterPills = document.querySelectorAll("#asmaa-filter-bar .nawawi-filter-pill");
+    const modal = document.getElementById("asmaa-detail-modal");
+    const closeBtn = document.getElementById("btn-close-asmaa-modal");
+
+    const modalNum = document.getElementById("modal-asmaa-num");
+    const modalName = document.getElementById("modal-asmaa-name");
+    const modalCat = document.getElementById("modal-asmaa-cat");
+    const modalMeaning = document.getElementById("modal-asmaa-meaning");
+    const modalVirtue = document.getElementById("modal-asmaa-virtue");
+    const copyBtn = document.getElementById("btn-copy-asmaa");
+    const shareBtn = document.getElementById("btn-share-asmaa");
+
+    let currentSelectedName = null;
+
+    if (!grid || typeof ASMAA_ALLAH === "undefined") return;
+
+    let activeCat = "all";
+
+    function renderAsmaa() {
+        grid.innerHTML = "";
+        const filtered = ASMAA_ALLAH.filter(item => {
+            return activeCat === "all" || item.category === activeCat;
+        });
+
+        filtered.forEach(item => {
+            const card = document.createElement("div");
+            card.className = "asmaa-card";
+            card.innerHTML = `
+                <div class="asmaa-card-num">${item.id}</div>
+                <div class="asmaa-card-name">${item.name}</div>
+                <div class="asmaa-card-cat">${item.category}</div>
+                <div class="asmaa-card-meaning">${item.meaning}</div>
+            `;
+
+            card.addEventListener("click", () => {
+                openAsmaaDetail(item);
+            });
+
+            grid.appendChild(card);
+        });
+    }
+
+    function openAsmaaDetail(item) {
+        currentSelectedName = item;
+        if (modalNum) modalNum.textContent = item.id;
+        if (modalName) modalName.textContent = item.name;
+        if (modalCat) modalCat.textContent = `أسماء ${item.category}`;
+        if (modalMeaning) modalMeaning.textContent = item.meaning;
+        if (modalVirtue) modalVirtue.textContent = item.virtue;
+
+        if (modal) modal.classList.add("open");
+    }
+
+    if (closeBtn && modal) {
+        closeBtn.addEventListener("click", () => modal.classList.remove("open"));
+    }
+
+    if (modal) {
+        modal.addEventListener("click", (e) => {
+            if (e.target === modal) modal.classList.remove("open");
+        });
+    }
+
+    if (copyBtn) {
+        copyBtn.addEventListener("click", () => {
+            if (!currentSelectedName) return;
+            const textToCopy = `✨ *اسم الله الأعظم:* [${currentSelectedName.name}]\n\n📖 *المعنى:* ${currentSelectedName.meaning}\n\n🤲 *الثمرة الإيمانية:* ${currentSelectedName.virtue}\n\n🕊️ زاد المسلم: https://abdomohaamed.github.io/sadqah-jaddi/`;
+            copyTextToClipboard(textToCopy);
+            showToast(`تم نسخ اسم (${currentSelectedName.name}) ومعناه بنجاح 📋`);
+        });
+    }
+
+    if (shareBtn) {
+        shareBtn.addEventListener("click", () => {
+            if (!currentSelectedName) return;
+            const deceasedName = (typeof DECEASED_INFO !== "undefined" && DECEASED_INFO.name) ? DECEASED_INFO.name : "فقيدنا الغالي";
+            const msg = `✨ *اسم الله الأعظم:* [${currentSelectedName.name}]\n\n📖 *المعنى:* ${currentSelectedName.meaning}\n\n🤲 *الثمرة والدعاء به:* ${currentSelectedName.virtue}\n\n🤍 صدقة جارية لروح (${deceasedName})\n📲 مكتبة أسماء الله الحسنى: https://abdomohaamed.github.io/sadqah-jaddi/`;
+            const waUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(msg)}`;
+            window.open(waUrl, "_blank");
+        });
+    }
+
+    filterPills.forEach(pill => {
+        pill.addEventListener("click", () => {
+            filterPills.forEach(p => p.classList.remove("active"));
+            pill.classList.add("active");
+            activeCat = pill.getAttribute("data-cat");
+            renderAsmaa();
+        });
+    });
+
+    renderAsmaa();
+}
+
+/* ==========================================================================
+   4. مواسم الطاعات والتقويم والعد التنازلي للمناسبات الإسلامية
+   ========================================================================== */
+function initSeasonsOfWorship() {
+    const grid = document.getElementById("seasons-grid");
+    if (!grid) return;
+
+    const SEASONS_DATA = [
+        {
+            title: "شهر رمضان المبارك 🌙",
+            icon: "fa-moon",
+            dateStr: "1 رمضان المبارك",
+            targetDate: new Date("2026-02-18T00:00:00"),
+            virtue: "شهر الصيام والقرآن، فيه ليلة القدر خير من ألف شهر، وتفتح فيه أبواب الجنان."
+        },
+        {
+            title: "وقفة عرفات المباركة 🕋",
+            icon: "fa-kaaba",
+            dateStr: "9 ذو الحجة",
+            targetDate: new Date("2026-05-26T00:00:00"),
+            virtue: "أعظم أيام الدهر، وصيامه لغير الحاج يكفر ذنوب سنة ماضية وسنة باقية."
+        },
+        {
+            title: "عيد الأضحى المبارك 🐑",
+            icon: "fa-heart",
+            dateStr: "10 ذو الحجة",
+            targetDate: new Date("2026-05-27T00:00:00"),
+            virtue: "يوم النحر، أعظم الأيام عند الله، يوم فرح وشكر وإطعام الطعام وصلة الأرحام."
+        },
+        {
+            title: "يوم عاشوراء المبارك 🌊",
+            icon: "fa-water",
+            dateStr: "10 محرم",
+            targetDate: new Date("2026-06-25T00:00:00"),
+            virtue: "اليوم الذي نجى الله فيه موسى عليه السلام، وصيامه يكفر ذنوب السنة الماضية."
+        },
+        {
+            title: "الأيام البيض القادمة 🌕",
+            icon: "fa-circle",
+            dateStr: "13، 14، 15 من كل شهر هجري",
+            targetDate: getNextWhiteDaysDate(),
+            virtue: "صيام ثلاثة أيام من كل شهر تعدل صيام الدهر كله كما جاء في الحديث الصحيح."
+        },
+        {
+            title: "صيام الإثنين والخميس القادم 🌿",
+            icon: "fa-hands-praying",
+            dateStr: "سنة نبوية مؤكدة",
+            targetDate: getNextMondayOrThursday(),
+            virtue: "تعرض الأعمال على الله تعالى يومي الإثنين والخميس، وأحب أن يعرض عملي وأنا صائم."
+        }
+    ];
+
+    function getNextWhiteDaysDate() {
+        const d = new Date();
+        d.setDate(d.getDate() + ((15 - d.getDate() + 30) % 30 || 7));
+        return d;
+    }
+
+    function getNextMondayOrThursday() {
+        const d = new Date();
+        const day = d.getDay();
+        let daysUntil = 1;
+        if (day === 0) daysUntil = 1;
+        else if (day === 1) daysUntil = 3;
+        else if (day === 2) daysUntil = 2;
+        else if (day === 3) daysUntil = 1;
+        else if (day === 4) daysUntil = 4;
+        else if (day === 5) daysUntil = 3;
+        else if (day === 6) daysUntil = 2;
+        d.setDate(d.getDate() + daysUntil);
+        d.setHours(0, 0, 0, 0);
+        return d;
+    }
+
+    function renderSeasons() {
+        grid.innerHTML = "";
+        const now = new Date().getTime();
+
+        SEASONS_DATA.forEach(season => {
+            let diff = season.targetDate.getTime() - now;
+            if (diff < 0) diff = Math.abs(diff) + (354 * 24 * 3600 * 1000);
+
+            const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+
+            const card = document.createElement("div");
+            card.className = "season-card";
+            card.innerHTML = `
+                <div class="season-card-icon"><i class="fa-solid ${season.icon}"></i></div>
+                <h3 class="season-card-title">${season.title}</h3>
+                <div class="season-card-date"><i class="fa-solid fa-calendar-day text-gold"></i> ${season.dateStr}</div>
+                
+                <div class="season-countdown-box">
+                    <div class="countdown-unit">
+                        <span class="countdown-val">${days}</span>
+                        <span class="countdown-label">يوم</span>
+                    </div>
+                    <div class="countdown-unit">
+                        <span class="countdown-val">${hours}</span>
+                        <span class="countdown-label">ساعة</span>
+                    </div>
+                    <div class="countdown-unit">
+                        <span class="countdown-val">${minutes}</span>
+                        <span class="countdown-label">دقيقة</span>
+                    </div>
+                </div>
+
+                <div class="season-card-virtue">
+                    ${season.virtue}
+                </div>
+            `;
+            grid.appendChild(card);
+        });
+    }
+
+    renderSeasons();
+    setInterval(renderSeasons, 60000);
+}
+
+/* ==========================================================================
+   5. دليل وفتاوى أحكام الجنائز والصدقة الجارية (Islamic FAQ)
+   ========================================================================== */
+function initIslamicGuideFaq() {
+    const list = document.getElementById("islamic-faq-list");
+    if (!list || typeof ISLAMIC_DECEASED_GUIDE === "undefined") return;
+
+    list.innerHTML = "";
+    ISLAMIC_DECEASED_GUIDE.forEach((item, index) => {
+        const faqItem = document.createElement("div");
+        faqItem.className = `faq-item ${index === 0 ? 'active' : ''}`;
+        faqItem.innerHTML = `
+            <div class="faq-header">
+                <h4 class="faq-question">
+                    <i class="fa-solid fa-circle-question text-gold"></i>
+                    <span>${item.title}</span>
+                </h4>
+                <i class="fa-solid fa-chevron-down faq-icon-arrow"></i>
+            </div>
+            <div class="faq-body">
+                ${item.content}
+            </div>
+        `;
+
+        const header = faqItem.querySelector(".faq-header");
+        if (header) {
+            header.addEventListener("click", () => {
+                faqItem.classList.toggle("active");
+            });
+        }
+
+        list.appendChild(faqItem);
+    });
+}
+
+/* ==========================================================================
+   6. نظام التنبيهات والإشعارات الذكية للطاعات (Smart Notifications)
+   ========================================================================== */
+function initSmartNotifications() {
+    const modal = document.getElementById("notifications-modal");
+    const openBtns = [
+        document.getElementById("btn-open-notifications-nav"),
+        document.getElementById("btn-open-notifications-hero")
+    ];
+    const closeBtn = document.getElementById("btn-close-notifications-modal");
+    const requestBtn = document.getElementById("btn-request-notification-perm");
+
+    const chkMorning = document.getElementById("notify-morning-azkar");
+    const chkEvening = document.getElementById("notify-evening-azkar");
+    const chkFriday = document.getElementById("notify-friday-kahf");
+    const chkFasting = document.getElementById("notify-fasting-days");
+    const chkAdhan = document.getElementById("notify-adhan-calls");
+
+    try {
+        const savedSettings = JSON.parse(localStorage.getItem("smart_notify_settings") || "{}");
+        if (chkMorning && savedSettings.morning !== undefined) chkMorning.checked = savedSettings.morning;
+        if (chkEvening && savedSettings.evening !== undefined) chkEvening.checked = savedSettings.evening;
+        if (chkFriday && savedSettings.friday !== undefined) chkFriday.checked = savedSettings.friday;
+        if (chkFasting && savedSettings.fasting !== undefined) chkFasting.checked = savedSettings.fasting;
+        if (chkAdhan && savedSettings.adhan !== undefined) chkAdhan.checked = savedSettings.adhan;
+    } catch(e) {}
+
+    openBtns.forEach(btn => {
+        if (btn) {
+            btn.addEventListener("click", () => {
+                if (modal) modal.classList.add("open");
+            });
+        }
+    });
+
+    if (closeBtn && modal) {
+        closeBtn.addEventListener("click", () => modal.classList.remove("open"));
+    }
+
+    if (modal) {
+        modal.addEventListener("click", (e) => {
+            if (e.target === modal) modal.classList.remove("open");
+        });
+    }
+
+    if (requestBtn) {
+        requestBtn.addEventListener("click", async () => {
+            const settings = {
+                morning: chkMorning ? chkMorning.checked : true,
+                evening: chkEvening ? chkEvening.checked : true,
+                friday: chkFriday ? chkFriday.checked : true,
+                fasting: chkFasting ? chkFasting.checked : true,
+                adhan: chkAdhan ? chkAdhan.checked : true
+            };
+            localStorage.setItem("smart_notify_settings", JSON.stringify(settings));
+
+            if ("Notification" in window) {
+                if (Notification.permission === "granted") {
+                    showToast("تم تفعيل وتحديث إعدادات التنبيهات بنجاح 🔔✨");
+                    if (modal) modal.classList.remove("open");
+                } else if (Notification.permission !== "denied") {
+                    const permission = await Notification.requestPermission();
+                    if (permission === "granted") {
+                        showToast("تم تفعيل إشعارات المتصفح بنجاح! جزاكم الله خيراً 🌿");
+                        new Notification("زاد المسلم • صدقة جارية", {
+                            body: "أهلاً بك! تم تفعيل تنبيهات الأذكار والصلوات بنجاح لتنال الأجر دائماً 🤲",
+                            icon: "assets/icon.svg"
+                        });
+                        if (modal) modal.classList.remove("open");
+                    } else {
+                        showToast("يرجى السماح بالإشعارات من إعدادات المتصفح لتصلك التنبيهات.");
+                    }
+                } else {
+                    showToast("الإشعارات محظورة في متصفحك. يرجى تفعيلها من إعدادات الموقع.");
+                }
+            } else {
+                showToast("متصفحك لا يدعم الإشعارات، لكن تم حفظ التفضيلات محلياً.");
+                if (modal) modal.classList.remove("open");
+            }
+        });
+    }
+}
+
+/* ==========================================================================
+   7. ترقية صانع بطاقات الأدعية والمشاركات الاجتماعية (Enhanced Card Generator)
+   ========================================================================== */
+let currentCardFormat = "story"; // 'story' | 'card' | 'post'
+let currentCardTheme = "royal-navy"; // 'royal-navy' | 'emerald' | 'burgundy' | 'parchment'
+
+function initEnhancedCardGenerator() {
+    const formatPills = document.querySelectorAll("#dua-format-pills .theme-pill");
+    const themePills = document.querySelectorAll(".dua-theme-pills .theme-pill[data-theme]");
+
+    formatPills.forEach(pill => {
+        pill.addEventListener("click", () => {
+            formatPills.forEach(p => p.classList.remove("active"));
+            pill.classList.add("active");
+            currentCardFormat = pill.getAttribute("data-format") || "story";
+            if (typeof drawEnhancedDuaCard === "function") {
+                drawEnhancedDuaCard();
+            }
+        });
+    });
+
+    themePills.forEach(pill => {
+        pill.addEventListener("click", () => {
+            themePills.forEach(p => p.classList.remove("active"));
+            pill.classList.add("active");
+            currentCardTheme = pill.getAttribute("data-theme") || "royal-navy";
+            if (typeof drawEnhancedDuaCard === "function") {
+                drawEnhancedDuaCard();
+            }
+        });
+    });
+
+    // إعادة توجيه أزرار التحميل والمشاركة
+    const downloadBtn = document.getElementById("btn-download-dua-image");
+    const shareBtn = document.getElementById("btn-share-dua-image");
+
+    if (downloadBtn) {
+        downloadBtn.onclick = downloadEnhancedDuaCard;
+    }
+
+    if (shareBtn) {
+        shareBtn.onclick = shareEnhancedDuaCard;
+    }
+
+    // ربط الحقول بإعادة الرسم
+    const recipientInput = document.getElementById("dua-card-recipient-input");
+    const templateSelect = document.getElementById("dua-template-select");
+    const customInput = document.getElementById("custom-dua-input");
+
+    if (recipientInput) recipientInput.addEventListener("input", drawEnhancedDuaCard);
+    if (templateSelect) templateSelect.addEventListener("change", drawEnhancedDuaCard);
+    if (customInput) customInput.addEventListener("input", drawEnhancedDuaCard);
+
+    // الرسم المبدئي
+    setTimeout(drawEnhancedDuaCard, 300);
+}
+
+function drawEnhancedDuaCard() {
+    const canvas = document.getElementById("dua-card-canvas");
+    if (!canvas) return;
+    const ctx = canvas.getContext("2d");
+
+    let width = 1080;
+    let height = 1920; // Default: Story 9:16
+
+    if (currentCardFormat === "post") {
+        height = 1080; // 1:1
+    } else if (currentCardFormat === "card") {
+        height = 1350; // 4:5
+    }
+
+    canvas.width = width;
+    canvas.height = height;
+
+    // 1. إعداد الخلفية بحسب السمة
+    let bgGradient;
+    let borderColor = "#d4af37";
+    let textColor = "#ffffff";
+    let subTextColor = "#e5e7eb";
+    let accentGold = "#d4af37";
+
+    if (currentCardTheme === "emerald") {
+        bgGradient = ctx.createLinearGradient(0, 0, 0, height);
+        bgGradient.addColorStop(0, "#064e3b");
+        bgGradient.addColorStop(0.5, "#022c22");
+        bgGradient.addColorStop(1, "#064e3b");
+        borderColor = "#34d399";
+        accentGold = "#6ee7b7";
+    } else if (currentCardTheme === "burgundy") {
+        bgGradient = ctx.createLinearGradient(0, 0, 0, height);
+        bgGradient.addColorStop(0, "#4a0e17");
+        bgGradient.addColorStop(0.5, "#25050a");
+        bgGradient.addColorStop(1, "#4a0e17");
+        borderColor = "#d4af37";
+        accentGold = "#fbbf24";
+    } else if (currentCardTheme === "parchment") {
+        bgGradient = ctx.createLinearGradient(0, 0, 0, height);
+        bgGradient.addColorStop(0, "#fbf8ee");
+        bgGradient.addColorStop(0.5, "#f3eedd");
+        bgGradient.addColorStop(1, "#fbf8ee");
+        borderColor = "#aa820a";
+        textColor = "#1f2937";
+        subTextColor = "#4b5563";
+        accentGold = "#b45309";
+    } else {
+        // royal-navy
+        bgGradient = ctx.createLinearGradient(0, 0, 0, height);
+        bgGradient.addColorStop(0, "#0b172a");
+        bgGradient.addColorStop(0.5, "#030712");
+        bgGradient.addColorStop(1, "#0b172a");
+        borderColor = "#d4af37";
+        accentGold = "#f59e0b";
+    }
+
+    ctx.fillStyle = bgGradient;
+    ctx.fillRect(0, 0, width, height);
+
+    // 2. إطار إسلامي مزخرف
+    ctx.lineWidth = 4;
+    ctx.strokeStyle = borderColor;
+    ctx.strokeRect(40, 40, width - 80, height - 80);
+
+    ctx.lineWidth = 1.5;
+    ctx.strokeRect(55, 55, width - 110, height - 110);
+
+    // زخارف الأركان
+    const cornerSize = 40;
+    const drawCorner = (x, y) => {
+        ctx.save();
+        ctx.strokeStyle = accentGold;
+        ctx.lineWidth = 3;
+        ctx.beginPath();
+        ctx.arc(x, y, cornerSize, 0, Math.PI * 2);
+        ctx.stroke();
+        ctx.restore();
+    };
+    drawCorner(55, 55);
+    drawCorner(width - 55, 55);
+    drawCorner(55, height - 55);
+    drawCorner(width - 55, height - 55);
+
+    // 3. نصوص البطاقة
+    ctx.textAlign = "center";
+    ctx.direction = "rtl";
+
+    // البسملة
+    ctx.fillStyle = accentGold;
+    ctx.font = "bold 38px 'Amiri', 'Traditional Arabic', serif";
+    ctx.fillText("بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ", width / 2, height * 0.12);
+
+    // شريط الإهداء
+    const recipientInput = document.getElementById("dua-card-recipient-input");
+    const recipientName = (recipientInput && recipientInput.value.trim()) || ((typeof DECEASED_INFO !== "undefined" && DECEASED_INFO.name) ? DECEASED_INFO.name : "فقيدنا الغالي");
+
+    ctx.fillStyle = subTextColor;
+    ctx.font = "32px 'Tajawal', sans-serif";
+    ctx.fillText(`صدقة جارية ودعاء لروح`, width / 2, height * 0.18);
+
+    ctx.fillStyle = accentGold;
+    ctx.font = "bold 44px 'Tajawal', sans-serif";
+    ctx.fillText(recipientName, width / 2, height * 0.23);
+
+    // خط فاصل مزخرف
+    ctx.strokeStyle = borderColor;
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(width / 2 - 220, height * 0.26);
+    ctx.lineTo(width / 2 + 220, height * 0.26);
+    ctx.stroke();
+
+    // نص الدعاء
+    let duaText = "اللهم اغفر له وارحمه، وعافه واعف عنه، وأكرم نزله، ووسع مدخله، واغسله بالماء والثلج والبرد، ونقه من الذنوب والخطايا كما ينقى الثوب الأبيض من الدنس.";
+    const templateSelect = document.getElementById("dua-template-select");
+    const customInput = document.getElementById("custom-dua-input");
+
+    if (templateSelect && templateSelect.value === "custom" && customInput && customInput.value.trim()) {
+        duaText = customInput.value.trim();
+    } else if (templateSelect && templateSelect.value && templateSelect.value !== "custom") {
+        duaText = templateSelect.value;
+    }
+
+    ctx.fillStyle = textColor;
+    ctx.font = "bold 42px 'Amiri', 'Traditional Arabic', serif";
+
+    // رسم النص مع التفاف الأسطر
+    const maxWidth = width - 200;
+    const lineHeight = 68;
+    const words = duaText.split(" ");
+    let line = "";
+    const lines = [];
+
+    for (let n = 0; n < words.length; n++) {
+        const testLine = line + words[n] + " ";
+        const metrics = ctx.measureText(testLine);
+        if (metrics.width > maxWidth && n > 0) {
+            lines.push(line);
+            line = words[n] + " ";
+        } else {
+            line = testLine;
+        }
+    }
+    lines.push(line);
+
+    let startY = height * 0.38;
+    if (currentCardFormat === "story") startY = height * 0.42;
+    if (currentCardFormat === "post") startY = height * 0.35;
+
+    lines.forEach((l, i) => {
+        ctx.fillText(l.trim(), width / 2, startY + (i * lineHeight));
+    });
+
+    // دعاء التثبيت والختام
+    const footerY = height - 120;
+    ctx.fillStyle = accentGold;
+    ctx.font = "bold 32px 'Tajawal', sans-serif";
+    ctx.fillText("اللهم استجب واجعل ثواب هذا العمل نوراً في قبره 🤲", width / 2, footerY - 40);
+
+    ctx.fillStyle = subTextColor;
+    ctx.font = "24px 'Tajawal', sans-serif";
+    ctx.fillText("زاد المسلم • تطبيق إسلامي شامل", width / 2, footerY);
+}
+
+function downloadEnhancedDuaCard() {
+    const canvas = document.getElementById("dua-card-canvas");
+    if (!canvas) return;
+    const link = document.createElement("a");
+    link.download = `dua-card-${Date.now()}.png`;
+    link.href = canvas.toDataURL("image/png");
+    link.click();
+    showToast("تم تنزيل البطاقة بنجاح، تقبل الله منكم 🌿🖼️");
+}
+
+async function shareEnhancedDuaCard() {
+    const canvas = document.getElementById("dua-card-canvas");
+    if (!canvas) return;
+
+    // استخدام Web Share API لمشاركة الصورة مباشرة للموبايل إن أمكن
+    if (navigator.share && navigator.canShare) {
+        canvas.toBlob(async (blob) => {
+            if (!blob) return;
+            const file = new File([blob], "dua-card.png", { type: "image/png" });
+            if (navigator.canShare({ files: [file] })) {
+                try {
+                    await navigator.share({
+                        files: [file],
+                        title: "زاد المسلم • بطاقة دعاء",
+                        text: "نسألكم الدعاء لفقيدنا الغالي وجميع موتى المسلمين 🤲"
+                    });
+                    return;
+                } catch(e) {}
+            }
+            fallbackShareWhatsApp();
+        });
+    } else {
+        fallbackShareWhatsApp();
+    }
+}
+
+function fallbackShareWhatsApp() {
+    const recipientInput = document.getElementById("dua-card-recipient-input");
+    const nameVal = (recipientInput && recipientInput.value.trim()) || "فقيدنا الغالي";
+    const msg = `🌿 *بطاقة دعاء لروح (${nameVal})*\n\nاللهم اغفر له وارحمه وعافه واعف عنه واجعل قبره روضة من رياض الجنة.\n\n📲 صمم بطاقة لفقيدك واكسب الأجر: https://abdomohaamed.github.io/sadqah-jaddi/`;
+    const waUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(msg)}`;
+    window.open(waUrl, "_blank");
+    showToast("جاري فتح واتساب للمشاركة 📲");
+}
