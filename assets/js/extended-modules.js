@@ -18,6 +18,11 @@ document.addEventListener("DOMContentLoaded", () => {
     initSmartNotifications();
     initEnhancedCardGenerator();
     initEnhancedCategorizedDuas();
+    initDailySpiritualMessage();
+    initIslamicStories();
+    initIslamicQuiz();
+    initLiveRadioWidgetWithSleepTimer();
+    initGlobalCommunityCounter();
 });
 
 /* ==========================================================================
@@ -445,84 +450,139 @@ function initSeasonsOfWorship() {
     const grid = document.getElementById("seasons-grid");
     if (!grid) return;
 
-    const SEASONS_DATA = [
-        {
-            title: "شهر رمضان المبارك 🌙",
-            icon: "fa-moon",
-            dateStr: "1 رمضان المبارك",
-            targetDate: new Date("2026-02-18T00:00:00"),
-            virtue: "شهر الصيام والقرآن، فيه ليلة القدر خير من ألف شهر، وتفتح فيه أبواب الجنان."
-        },
-        {
-            title: "وقفة عرفات المباركة 🕋",
-            icon: "fa-kaaba",
-            dateStr: "9 ذو الحجة",
-            targetDate: new Date("2026-05-26T00:00:00"),
-            virtue: "أعظم أيام الدهر، وصيامه لغير الحاج يكفر ذنوب سنة ماضية وسنة باقية."
-        },
-        {
-            title: "عيد الأضحى المبارك 🐑",
-            icon: "fa-heart",
-            dateStr: "10 ذو الحجة",
-            targetDate: new Date("2026-05-27T00:00:00"),
-            virtue: "يوم النحر، أعظم الأيام عند الله، يوم فرح وشكر وإطعام الطعام وصلة الأرحام."
-        },
-        {
-            title: "يوم عاشوراء المبارك 🌊",
-            icon: "fa-water",
-            dateStr: "10 محرم",
-            targetDate: new Date("2026-06-25T00:00:00"),
-            virtue: "اليوم الذي نجى الله فيه موسى عليه السلام، وصيامه يكفر ذنوب السنة الماضية."
-        },
-        {
-            title: "الأيام البيض القادمة 🌕",
-            icon: "fa-circle",
-            dateStr: "13، 14، 15 من كل شهر هجري",
-            targetDate: getNextWhiteDaysDate(),
-            virtue: "صيام ثلاثة أيام من كل شهر تعدل صيام الدهر كله كما جاء في الحديث الصحيح."
-        },
-        {
-            title: "صيام الإثنين والخميس القادم 🌿",
-            icon: "fa-hands-praying",
-            dateStr: "سنة نبوية مؤكدة",
-            targetDate: getNextMondayOrThursday(),
-            virtue: "تعرض الأعمال على الله تعالى يومي الإثنين والخميس، وأحب أن يعرض عملي وأنا صائم."
+    function getHijriDateDetails(date) {
+        try {
+            const formatter = new Intl.DateTimeFormat('en-u-ca-islamic-umalqura', {
+                day: 'numeric',
+                month: 'numeric',
+                year: 'numeric'
+            });
+            const parts = formatter.formatToParts(date);
+            let day = 1, month = 1, year = 1448;
+            for (const p of parts) {
+                if (p.type === 'day') day = parseInt(p.value, 10);
+                if (p.type === 'month') month = parseInt(p.value, 10);
+                if (p.type === 'year') year = parseInt(p.value, 10);
+            }
+            return { day, month, year };
+        } catch (e) {
+            const jd = Math.floor(date.getTime() / 86400000) + 2440587.5;
+            const l = Math.floor(jd - 1948440 + 10632);
+            const n = Math.floor((l - 1) / 10631);
+            const l2 = l - 10631 * n + 354;
+            const j = (Math.floor((10985 - l2) / 5316)) * (Math.floor((50 * l2) / 17719)) + (Math.floor(l2 / 5670)) * (Math.floor((43 * l2) / 15238));
+            const l3 = l2 - (Math.floor((30 - j) / 15)) * (Math.floor((17719 * j) / 50)) - (Math.floor(j / 16)) * (Math.floor((15238 * j) / 43)) + 29;
+            const m = Math.floor((24 * l3) / 709);
+            const d = l3 - Math.floor((709 * m) / 24);
+            const y = 30 * n + j - 30;
+            return { day: d, month: m, year: y };
         }
-    ];
+    }
+
+    function findNextHijriEventDate(targetMonth, targetDay) {
+        const now = new Date();
+        const testDate = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0);
+        for (let i = 0; i <= 400; i++) {
+            const h = getHijriDateDetails(testDate);
+            if (h.month === targetMonth && h.day === targetDay) {
+                return testDate;
+            }
+            testDate.setDate(testDate.getDate() + 1);
+        }
+        return new Date(now.getTime() + 180 * 86400000);
+    }
 
     function getNextWhiteDaysDate() {
-        const d = new Date();
-        d.setDate(d.getDate() + ((15 - d.getDate() + 30) % 30 || 7));
-        return d;
+        const now = new Date();
+        const testDate = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0);
+        for (let i = 0; i <= 35; i++) {
+            const h = getHijriDateDetails(testDate);
+            if (h.day === 13) {
+                return testDate;
+            }
+            testDate.setDate(testDate.getDate() + 1);
+        }
+        return new Date(now.getTime() + 14 * 86400000);
     }
 
     function getNextMondayOrThursday() {
-        const d = new Date();
-        const day = d.getDay();
-        let daysUntil = 1;
-        if (day === 0) daysUntil = 1;
-        else if (day === 1) daysUntil = 3;
-        else if (day === 2) daysUntil = 2;
-        else if (day === 3) daysUntil = 1;
-        else if (day === 4) daysUntil = 4;
-        else if (day === 5) daysUntil = 3;
-        else if (day === 6) daysUntil = 2;
-        d.setDate(d.getDate() + daysUntil);
-        d.setHours(0, 0, 0, 0);
-        return d;
+        const now = new Date();
+        const testDate = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0);
+        testDate.setDate(testDate.getDate() + 1);
+        for (let i = 0; i < 7; i++) {
+            const day = testDate.getDay();
+            if (day === 1 || day === 4) { // 1: الاثنين، 4: الخميس
+                return testDate;
+            }
+            testDate.setDate(testDate.getDate() + 1);
+        }
+        return testDate;
+    }
+
+    function getSeasonsList() {
+        const list = [
+            {
+                title: "صيام الإثنين والخميس القادم 🌿",
+                icon: "fa-hands-praying",
+                dateStr: "سنة نبوية مؤكدة",
+                targetDate: getNextMondayOrThursday(),
+                virtue: "تعرض الأعمال على الله تعالى يومي الإثنين والخميس، وأحب أن يعرض عملي وأنا صائم."
+            },
+            {
+                title: "الأيام البيض القادمة 🌕",
+                icon: "fa-circle",
+                dateStr: "13، 14، 15 من كل شهر هجري",
+                targetDate: getNextWhiteDaysDate(),
+                virtue: "صيام ثلاثة أيام من كل شهر تعدل صيام الدهر كله كما جاء في الحديث الصحيح."
+            },
+            {
+                title: "شهر رمضان المبارك 🌙",
+                icon: "fa-moon",
+                dateStr: "1 رمضان المبارك",
+                targetDate: findNextHijriEventDate(9, 1),
+                virtue: "شهر الصيام والقرآن، فيه ليلة القدر خير من ألف شهر، وتفتح فيه أبواب الجنان."
+            },
+            {
+                title: "وقفة عرفات المباركة 🕋",
+                icon: "fa-kaaba",
+                dateStr: "9 ذو الحجة",
+                targetDate: findNextHijriEventDate(12, 9),
+                virtue: "أعظم أيام الدهر، وصيامه لغير الحاج يكفر ذنوب سنة ماضية وسنة باقية."
+            },
+            {
+                title: "عيد الأضحى المبارك 🐑",
+                icon: "fa-heart",
+                dateStr: "10 ذو الحجة",
+                targetDate: findNextHijriEventDate(12, 10),
+                virtue: "يوم النحر، أعظم الأيام عند الله، يوم فرح وشكر وإطعام الطعام وصلة الأرحام."
+            },
+            {
+                title: "يوم عاشوراء المبارك 🌊",
+                icon: "fa-water",
+                dateStr: "10 محرم",
+                targetDate: findNextHijriEventDate(1, 10),
+                virtue: "اليوم الذي نجى الله فيه موسى عليه السلام، وصيامه يكفر ذنوب السنة الماضية."
+            }
+        ];
+
+        // ترتيب المواسم تصاعدياً بحسب الأقرب تاريخاً
+        list.sort((a, b) => a.targetDate.getTime() - b.targetDate.getTime());
+        return list;
     }
 
     function renderSeasons() {
         grid.innerHTML = "";
         const now = new Date().getTime();
+        const seasons = getSeasonsList();
 
-        SEASONS_DATA.forEach(season => {
-            let diff = season.targetDate.getTime() - now;
-            if (diff < 0) diff = Math.abs(diff) + (354 * 24 * 3600 * 1000);
+        seasons.forEach(season => {
+            const diff = season.targetDate.getTime() - now;
+            const isToday = diff <= 0 && diff > -86400000;
+            const validDiff = Math.max(0, diff);
 
-            const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-            const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-            const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+            const days = Math.floor(validDiff / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((validDiff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((validDiff % (1000 * 60 * 60)) / (1000 * 60));
 
             const card = document.createElement("div");
             card.className = "season-card";
@@ -532,18 +592,24 @@ function initSeasonsOfWorship() {
                 <div class="season-card-date"><i class="fa-solid fa-calendar-day text-gold"></i> ${season.dateStr}</div>
                 
                 <div class="season-countdown-box">
-                    <div class="countdown-unit">
-                        <span class="countdown-val">${days}</span>
-                        <span class="countdown-label">يوم</span>
-                    </div>
-                    <div class="countdown-unit">
-                        <span class="countdown-val">${hours}</span>
-                        <span class="countdown-label">ساعة</span>
-                    </div>
-                    <div class="countdown-unit">
-                        <span class="countdown-val">${minutes}</span>
-                        <span class="countdown-label">دقيقة</span>
-                    </div>
+                    ${isToday ? `
+                        <div style="width: 100%; color: var(--emerald-400); font-weight: 700; font-size: 1.05rem; text-align: center; padding: 0.3rem;">
+                            <i class="fa-solid fa-star"></i> اليوم هو الموعد المبارك! تقبل الله طاعتكم
+                        </div>
+                    ` : `
+                        <div class="countdown-unit">
+                            <span class="countdown-val">${days}</span>
+                            <span class="countdown-label">يوم</span>
+                        </div>
+                        <div class="countdown-unit">
+                            <span class="countdown-val">${hours}</span>
+                            <span class="countdown-label">ساعة</span>
+                        </div>
+                        <div class="countdown-unit">
+                            <span class="countdown-val">${minutes}</span>
+                            <span class="countdown-label">دقيقة</span>
+                        </div>
+                    `}
                 </div>
 
                 <div class="season-card-virtue">
@@ -1171,6 +1237,624 @@ function initEnhancedCategorizedDuas() {
         }
     }
 }
+
+/* ==========================================================================
+   7. رسالة وتدبر آية اليوم لقلبك (Daily Spiritual Message & Story Share)
+   ========================================================================== */
+function initDailySpiritualMessage() {
+    const dailyWisdomCard = document.getElementById("daily-wisdom-card");
+    const dailyMsgModal = document.getElementById("daily-message-modal");
+    const closeBtn = document.getElementById("btn-close-daily-msg-modal");
+    const shareStoryBtn = document.getElementById("btn-share-wisdom-story");
+    const copyBtn = document.getElementById("btn-copy-daily-msg");
+    const shareWaBtn = document.getElementById("btn-share-daily-msg-wa");
+
+    if (typeof getDailyMessageOfTheDay !== "function") return;
+    const todayMsg = getDailyMessageOfTheDay();
+    if (!todayMsg) return;
+
+    // تحديث المحتوى في البطاقة الرئيسية بالصفحة
+    const ayahSurahEl = document.getElementById("wisdom-ayah-surah");
+    const ayahTextEl = document.getElementById("wisdom-ayah-text");
+    const ayahTadabburEl = document.getElementById("wisdom-ayah-tadabbur");
+
+    if (ayahSurahEl) ayahSurahEl.textContent = todayMsg.surah;
+    if (ayahTextEl) ayahTextEl.textContent = todayMsg.verse;
+    if (ayahTadabburEl) ayahTadabburEl.textContent = todayMsg.reflection;
+
+    const openModal = () => {
+        if (!dailyMsgModal) return;
+        const tagEl = document.getElementById("modal-msg-tag");
+        const titleEl = document.getElementById("modal-msg-title");
+        const verseEl = document.getElementById("modal-msg-verse");
+        const surahEl = document.getElementById("modal-msg-surah");
+        const reflectionEl = document.getElementById("modal-msg-reflection");
+        const duaEl = document.getElementById("modal-msg-dua");
+
+        if (tagEl) tagEl.textContent = todayMsg.tag || "قبس إيماني متجدد";
+        if (titleEl) titleEl.textContent = todayMsg.title || "رسالة لقلبك اليوم";
+        if (verseEl) verseEl.textContent = todayMsg.verse;
+        if (surahEl) surahEl.textContent = todayMsg.surah;
+        if (reflectionEl) reflectionEl.textContent = todayMsg.reflection;
+        if (duaEl) duaEl.textContent = todayMsg.dua;
+
+        dailyMsgModal.classList.add("open");
+        dailyMsgModal.classList.add("active");
+        document.body.style.overflow = "hidden";
+    };
+
+    const closeModal = () => {
+        if (!dailyMsgModal) return;
+        dailyMsgModal.classList.remove("open");
+        dailyMsgModal.classList.remove("active");
+        document.body.style.overflow = "";
+    };
+
+    if (dailyWisdomCard) {
+        dailyWisdomCard.addEventListener("click", (e) => {
+            if (e.target.closest("#btn-share-wisdom-story")) return;
+            openModal();
+        });
+    }
+
+    if (closeBtn) {
+        closeBtn.addEventListener("click", closeModal);
+    }
+
+    if (dailyMsgModal) {
+        dailyMsgModal.addEventListener("click", (e) => {
+            if (e.target === dailyMsgModal) closeModal();
+        });
+    }
+
+    const formatShareText = () => {
+        const deceasedName = (typeof DECEASED_INFO !== "undefined" && DECEASED_INFO.name) ? DECEASED_INFO.name : "جدي الغالي (عبدالمعبود أمين سعيد)";
+        return `✨ *${todayMsg.title}* ✨\n\n` +
+               `📖 ${todayMsg.verse}\n` +
+               `📌 (${todayMsg.surah})\n\n` +
+               `💡 *الخاطرة والتدبر:*\n${todayMsg.reflection}\n\n` +
+               `🤲 *دعاء اليوم:*\n${todayMsg.dua}\n\n` +
+               `🌿 _صدقة جارية عن روح ${deceasedName}_\n` +
+               `📲 تصفح المزيد وتدبر القرآن كاملاً:\n${window.location.origin + window.location.pathname}`;
+    };
+
+    if (copyBtn) {
+        copyBtn.addEventListener("click", () => {
+            navigator.clipboard.writeText(formatShareText()).then(() => {
+                showToast("تم نسخ رسالة اليوم بنجاح 📋");
+            }).catch(() => {
+                showToast("تعذر النسخ تلقائياً");
+            });
+        });
+    }
+
+    const handleWhatsAppShare = (e) => {
+        if (e) e.stopPropagation();
+        const text = encodeURIComponent(formatShareText());
+        window.open(`https://api.whatsapp.com/send?text=${text}`, "_blank");
+    };
+
+    if (shareStoryBtn) shareStoryBtn.addEventListener("click", handleWhatsAppShare);
+    if (shareWaBtn) shareWaBtn.addEventListener("click", handleWhatsAppShare);
+}
+
+/* ==========================================================================
+   8. مكتبة قصص الأنبياء وسير الصحابة الكرام (Islamic Stories)
+   ========================================================================== */
+function initIslamicStories() {
+    const storiesGrid = document.getElementById("stories-grid");
+    const filterPills = document.querySelectorAll("#stories-filter-bar .nawawi-filter-pill");
+    const storyModal = document.getElementById("story-details-modal");
+    const closeBtn = document.getElementById("btn-close-story-modal");
+    const copyBtn = document.getElementById("btn-copy-story");
+    const shareWaBtn = document.getElementById("btn-share-story-wa");
+
+    if (!storiesGrid || typeof ISLAMIC_STORIES_DATA === "undefined") return;
+
+    let activeStory = null;
+
+    // استخراج كافة القصص في مصفوفة مسطحة مع تصنيفاتها
+    const getAllStories = () => {
+        if (Array.isArray(ISLAMIC_STORIES_DATA)) {
+            return ISLAMIC_STORIES_DATA;
+        }
+        let list = [];
+        if (ISLAMIC_STORIES_DATA.prophets && Array.isArray(ISLAMIC_STORIES_DATA.prophets)) {
+            list = list.concat(ISLAMIC_STORIES_DATA.prophets.map(s => ({ ...s, category: "prophets" })));
+        }
+        if (ISLAMIC_STORIES_DATA.sahaba && Array.isArray(ISLAMIC_STORIES_DATA.sahaba)) {
+            list = list.concat(ISLAMIC_STORIES_DATA.sahaba.map(s => ({ ...s, category: "sahaba" })));
+        }
+        return list;
+    };
+
+    const allStories = getAllStories();
+
+    const renderStories = (cat = "all") => {
+        storiesGrid.innerHTML = "";
+        const filtered = cat === "all" ? allStories : allStories.filter(s => s.category === cat);
+
+        filtered.forEach(story => {
+            const card = document.createElement("div");
+            card.className = "story-card";
+            const storyTitle = story.name || story.title || "قصة مباركة";
+            const storyTag = story.tag || (story.category === 'prophets' ? 'قصص الأنبياء' : 'سير الصحابة');
+            const storyVerse = story.keyVerse || story.verse || '';
+            const storySummary = story.summary || '';
+            const firstLesson = (story.lessons && story.lessons[0]) ? story.lessons[0] : 'عبرة إيمانية ملهمة';
+
+            card.innerHTML = `
+                <div class="story-card-header">
+                    <div class="story-header-info">
+                        <div class="story-icon-badge"><i class="${story.icon || 'fa-solid fa-book-open'}"></i></div>
+                        <div class="story-title-group">
+                            <h3>${storyTitle}</h3>
+                            <span class="story-card-tag">${storyTag}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="story-card-body">
+                    ${storyVerse ? `<div class="story-verse-preview">${storyVerse}</div>` : ''}
+                    <p class="story-card-summary">${storySummary}</p>
+                    <div class="story-lesson-preview">
+                        <i class="fa-solid fa-lightbulb"></i>
+                        <span>${firstLesson}</span>
+                    </div>
+                </div>
+
+                <div class="story-card-footer">
+                    <button type="button" class="btn btn-gold btn-read-story" data-story-id="${story.id}">
+                        <i class="fa-solid fa-book-open-reader"></i>
+                        <span>اقرأ القصة كاملة والعِبر</span>
+                    </button>
+                </div>
+            `;
+
+            const readBtn = card.querySelector(".btn-read-story");
+            if (readBtn) {
+                readBtn.addEventListener("click", () => {
+                    openStoryModal(story);
+                });
+            }
+
+            storiesGrid.appendChild(card);
+        });
+    };
+
+    const openStoryModal = (story) => {
+        activeStory = story;
+        if (!storyModal) return;
+
+        const iconEl = document.getElementById("modal-story-icon");
+        const titleEl = document.getElementById("modal-story-title");
+        const tagEl = document.getElementById("modal-story-tag");
+        const verseEl = document.getElementById("modal-story-verse");
+        const textEl = document.getElementById("modal-story-text");
+        const lessonsEl = document.getElementById("modal-story-lessons");
+
+        const storyTitle = story.name || story.title || "قصة مباركة";
+        const storyTag = story.tag || (story.category === "prophets" ? "قصص الأنبياء عليهم السلام" : "العشرة المبشرون وسير الصحابة");
+        const storyVerse = story.keyVerse || story.verse || "";
+        const storyFullText = story.fullStory || story.summary || "";
+
+        if (iconEl) iconEl.innerHTML = `<i class="${story.icon || 'fa-solid fa-book-open'}"></i>`;
+        if (titleEl) titleEl.textContent = storyTitle;
+        if (tagEl) tagEl.textContent = storyTag;
+        if (verseEl) verseEl.textContent = storyVerse;
+        if (textEl) textEl.textContent = storyFullText;
+
+        if (lessonsEl) {
+            lessonsEl.innerHTML = "";
+            if (story.lessons && Array.isArray(story.lessons)) {
+                story.lessons.forEach(lesson => {
+                    const li = document.createElement("li");
+                    li.style.marginBottom = "0.4rem";
+                    li.textContent = lesson;
+                    lessonsEl.appendChild(li);
+                });
+            }
+        }
+
+        storyModal.classList.add("open");
+        storyModal.classList.add("active");
+        document.body.style.overflow = "hidden";
+    };
+
+    const closeStoryModal = () => {
+        if (!storyModal) return;
+        storyModal.classList.remove("open");
+        storyModal.classList.remove("active");
+        document.body.style.overflow = "";
+    };
+
+    if (closeBtn) closeBtn.addEventListener("click", closeStoryModal);
+    if (storyModal) {
+        storyModal.addEventListener("click", (e) => {
+            if (e.target === storyModal) closeStoryModal();
+        });
+    }
+
+    if (copyBtn) {
+        copyBtn.addEventListener("click", () => {
+            if (!activeStory) return;
+            const title = activeStory.name || activeStory.title;
+            const verse = activeStory.keyVerse || activeStory.verse || '';
+            const text = `📜 *${title}*\n\n${verse}\n\n💡 *أهم العبر والدروس:*\n` +
+                         (activeStory.lessons ? activeStory.lessons.map(l => `• ${l}`).join('\n') : '') +
+                         `\n\n🌿 موقع زاد المسلم: ${window.location.origin + window.location.pathname}`;
+            navigator.clipboard.writeText(text).then(() => {
+                showToast("تم نسخ قصة وعبر اليوم بنجاح 📋");
+            });
+        });
+    }
+
+    if (shareWaBtn) {
+        shareWaBtn.addEventListener("click", () => {
+            if (!activeStory) return;
+            const title = activeStory.name || activeStory.title;
+            const verse = activeStory.keyVerse || activeStory.verse || '';
+            const text = encodeURIComponent(
+                `📜 *${title}*\n\n` +
+                `${verse}\n\n` +
+                `💡 *الدروس المستفادة:*\n` +
+                (activeStory.lessons ? activeStory.lessons.map(l => `• ${l}`).join('\n') : '') +
+                `\n\n🌿 اقرأ المزيد من القصص والسير المباركة:\n${window.location.origin + window.location.pathname}`
+            );
+            window.open(`https://api.whatsapp.com/send?text=${text}`, "_blank");
+        });
+    }
+
+    // تبديل التصنيفات
+    filterPills.forEach(pill => {
+        pill.addEventListener("click", () => {
+            filterPills.forEach(p => p.classList.remove("active"));
+            pill.classList.add("active");
+            const cat = pill.getAttribute("data-cat") || "all";
+            renderStories(cat);
+        });
+    });
+
+    window.scrollStoriesContainer = function(direction) {
+        const container = document.getElementById("stories-grid");
+        if (!container) return;
+        const card = container.querySelector(".story-card");
+        const scrollAmount = card ? (card.offsetWidth + 20) : 340;
+        const delta = direction === "left" ? -scrollAmount : scrollAmount;
+        container.scrollBy({ left: delta, behavior: "smooth" });
+    };
+
+    renderStories("all");
+}
+
+/* ==========================================================================
+   9. مسابقة واختبر معلوماتك الإسلامية (Islamic Quiz & Trivia)
+   ========================================================================== */
+function initIslamicQuiz() {
+    const quizContainer = document.getElementById("quiz-container-card");
+    if (!quizContainer || typeof ISLAMIC_QUIZ_QUESTIONS === "undefined") return;
+
+    let roundQuestions = [];
+    let currentIndex = 0;
+    let score = 0;
+    let isAnswered = false;
+
+    const startQuizRound = () => {
+        // خلط واختيار 5 أسئلة عشوائية في كل جولة
+        const shuffled = [...ISLAMIC_QUIZ_QUESTIONS].sort(() => 0.5 - Math.random());
+        roundQuestions = shuffled.slice(0, 5);
+        currentIndex = 0;
+        score = 0;
+        isAnswered = false;
+        renderQuestion();
+    };
+
+    const renderQuestion = () => {
+        const q = roundQuestions[currentIndex];
+        if (!q) {
+            renderQuizResult();
+            return;
+        }
+
+        isAnswered = false;
+        const progressPct = ((currentIndex + 1) / roundQuestions.length) * 100;
+        const correctIdx = (typeof q.correctIndex !== "undefined") ? q.correctIndex : ((typeof q.correct !== "undefined") ? q.correct : 0);
+
+        quizContainer.innerHTML = `
+            <div class="quiz-header-bar">
+                <span class="quiz-progress-text">السؤال ${currentIndex + 1} من ${roundQuestions.length}</span>
+                <span class="quiz-score-pill"><i class="fa-solid fa-star text-gold"></i> النقاط: ${score}</span>
+            </div>
+
+            <div class="quiz-progress-track">
+                <div class="quiz-progress-fill" style="width: ${progressPct}%;"></div>
+            </div>
+
+            <div class="quiz-question-box">
+                <div class="quiz-question-category"><i class="fa-solid fa-tag"></i> ${q.category || 'معلومات إسلامية'}</div>
+                <h3 class="quiz-question-title">${q.question}</h3>
+            </div>
+
+            <div class="quiz-options-list" id="quiz-options-list">
+                ${q.options.map((opt, idx) => `
+                    <button type="button" class="quiz-option-btn" data-opt-index="${idx}">
+                        <span>${opt}</span>
+                        <i class="fa-regular fa-circle-check opt-icon"></i>
+                    </button>
+                `).join('')}
+            </div>
+
+            <div id="quiz-feedback-container"></div>
+        `;
+
+        const optionButtons = quizContainer.querySelectorAll(".quiz-option-btn");
+        optionButtons.forEach(btn => {
+            btn.addEventListener("click", () => {
+                if (isAnswered) return;
+                isAnswered = true;
+                const selectedIdx = parseInt(btn.getAttribute("data-opt-index"), 10);
+                const isCorrect = selectedIdx === correctIdx;
+
+                optionButtons.forEach((b, idx) => {
+                    b.disabled = true;
+                    if (idx === correctIdx) {
+                        b.classList.add("correct");
+                        const icon = b.querySelector(".opt-icon");
+                        if (icon) icon.className = "fa-solid fa-circle-check opt-icon";
+                    } else if (idx === selectedIdx && !isCorrect) {
+                        b.classList.add("wrong");
+                        const icon = b.querySelector(".opt-icon");
+                        if (icon) icon.className = "fa-solid fa-circle-xmark opt-icon";
+                    }
+                });
+
+                if (isCorrect) {
+                    score++;
+                    const scorePill = quizContainer.querySelector(".quiz-score-pill");
+                    if (scorePill) scorePill.innerHTML = `<i class="fa-solid fa-star text-gold"></i> النقاط: ${score}`;
+                    if ("vibrate" in navigator) navigator.vibrate(30);
+                    if (typeof playCompletionChime === "function") playCompletionChime();
+                } else {
+                    if ("vibrate" in navigator) navigator.vibrate([60, 40, 60]);
+                }
+
+                // إظهار الشرح وزر الانتقال
+                const feedbackBox = document.getElementById("quiz-feedback-container");
+                if (feedbackBox) {
+                    const isLast = currentIndex === roundQuestions.length - 1;
+                    feedbackBox.innerHTML = `
+                        <div class="quiz-explanation-box">
+                            <div style="font-size: 0.95rem; color: ${isCorrect ? 'var(--emerald-400)' : '#f87171'}; font-weight: 700; margin-bottom: 0.4rem;">
+                                ${isCorrect ? '🎉 إجابة صحيحة وممتازة!' : '❌ إجابة غير صحيحة، والإجابة الصواب موضحة بالأخضر.'}
+                            </div>
+                            <p style="font-size: 0.92rem; color: #e5e7eb; line-height: 1.6; margin: 0 0 1rem 0;">${q.explanation || ''}</p>
+                            <button type="button" class="btn btn-gold" id="btn-next-question" style="width: 100%;">
+                                <span>${isLast ? 'عرض النتيجة النهائية 🏆' : 'السؤال التالي ➡️'}</span>
+                            </button>
+                        </div>
+                    `;
+
+                    const nextBtn = document.getElementById("btn-next-question");
+                    if (nextBtn) {
+                        nextBtn.addEventListener("click", () => {
+                            currentIndex++;
+                            renderQuestion();
+                        });
+                    }
+                }
+            });
+        });
+    };
+
+    const renderQuizResult = () => {
+        let message = "ما شاء الله! بداية مباركة للعلم النافع 🌿";
+        if (score === 5) message = "ما شاء الله تبارك الله! علامة كاملة ومستوى متميز في العلوم الإسلامية 🌟👑";
+        else if (score >= 3) message = "أحسنت! إجابات رائعة ومستوى طيب جداً، داوم على الاستزادة 🌸";
+
+        quizContainer.innerHTML = `
+            <div class="quiz-result-view">
+                <div class="quiz-result-score-circle">
+                    <div>${score}/5</div>
+                    <span class="quiz-result-score-label">النتيجة النهائية</span>
+                </div>
+                <h3 class="quiz-result-title">اكتملت الجولة الإيمانية بنجاح!</h3>
+                <p class="quiz-result-desc">${message}</p>
+
+                <div class="quiz-result-actions">
+                    <button type="button" class="btn btn-outline" id="btn-retry-quiz">
+                        <i class="fa-solid fa-rotate-right"></i>
+                        <span>جولة جديدة بأسئلة مختلفة</span>
+                    </button>
+                    <button type="button" class="btn btn-gold" id="btn-share-quiz-score">
+                        <i class="fa-brands fa-whatsapp"></i>
+                        <span>تحدَّ أصدقاءك بنتيجتك</span>
+                    </button>
+                </div>
+            </div>
+        `;
+
+        const retryBtn = document.getElementById("btn-retry-quiz");
+        const shareScoreBtn = document.getElementById("btn-share-quiz-score");
+
+        if (retryBtn) retryBtn.addEventListener("click", startQuizRound);
+        if (shareScoreBtn) {
+            shareScoreBtn.addEventListener("click", () => {
+                const text = encodeURIComponent(
+                    `🎯 حصلت على (${score} من 5) في مسابقة المعلومات الإسلامية على موقع زاد المسلم!\n` +
+                    `اختبر معلوماتك الدينية وتحدَّ أصدقاءك في القرآن والسيرة العطرة:\n` +
+                    `${window.location.origin + window.location.pathname}#islamic-quiz`
+                );
+                window.open(`https://api.whatsapp.com/send?text=${text}`, "_blank");
+            });
+        }
+    };
+
+    startQuizRound();
+}
+
+/* ==========================================================================
+   10. ويدجت إذاعة القرآن الكريم ومؤقت النوم الذكي (Live Radio & Sleep Timer)
+   ========================================================================== */
+function initLiveRadioWidgetWithSleepTimer() {
+    const radioAudio = document.getElementById("live-radio-audio");
+    const fabBtn = document.getElementById("radio-fab-btn");
+    const panel = document.getElementById("radio-panel");
+    const closeBtn = document.getElementById("btn-close-radio");
+    const playBtn = document.getElementById("btn-radio-play");
+    const playIcon = document.getElementById("radio-play-icon");
+    const select = document.getElementById("radio-station-select");
+    const volumeSlider = document.getElementById("radio-volume-slider");
+    const nameEl = document.getElementById("current-station-name");
+    const descEl = document.getElementById("current-station-desc");
+    const sleepSelect = document.getElementById("radio-sleep-timer-select");
+    const countdownEl = document.getElementById("radio-timer-countdown");
+    const remTimeEl = document.getElementById("radio-timer-rem-time");
+    const wavesEl = document.getElementById("radio-waves");
+
+    if (!radioAudio) return;
+
+    const stations = (typeof RADIO_STATIONS_LIST !== "undefined" && RADIO_STATIONS_LIST.length > 0)
+        ? RADIO_STATIONS_LIST
+        : (typeof RADIO_STATIONS !== "undefined" ? RADIO_STATIONS : []);
+
+    if (stations.length === 0) return;
+
+    let isPlaying = false;
+    let sleepTimerInterval = null;
+
+    // ملء قائمة المحطات
+    if (select) {
+        select.innerHTML = "";
+        stations.forEach(st => {
+            const opt = document.createElement("option");
+            opt.value = st.id;
+            opt.textContent = st.name;
+            select.appendChild(opt);
+        });
+
+        select.addEventListener("change", () => {
+            const st = stations.find(s => s.id === select.value) || stations[0];
+            if (nameEl) nameEl.textContent = st.name;
+            if (descEl) descEl.textContent = st.desc;
+            radioAudio.src = st.url;
+            if (isPlaying) {
+                radioAudio.play().catch(e => console.warn(e));
+            }
+        });
+    }
+
+    const defaultStation = stations[0];
+    radioAudio.src = defaultStation.url;
+    if (nameEl) nameEl.textContent = defaultStation.name;
+    if (descEl) descEl.textContent = defaultStation.desc;
+
+    // تشغيل / إيقاف
+    const updatePlayState = (playing) => {
+        isPlaying = playing;
+        if (playIcon) {
+            playIcon.className = playing ? "fa-solid fa-pause" : "fa-solid fa-play";
+        }
+        if (fabBtn) {
+            if (playing) fabBtn.classList.add("is-playing");
+            else fabBtn.classList.remove("is-playing");
+        }
+        if (wavesEl) {
+            wavesEl.style.display = playing ? "flex" : "none";
+        }
+    };
+
+    if (playBtn) {
+        playBtn.addEventListener("click", () => {
+            if (isPlaying) {
+                radioAudio.pause();
+                updatePlayState(false);
+            } else {
+                radioAudio.play().then(() => {
+                    updatePlayState(true);
+                }).catch(e => {
+                    console.warn(e);
+                    showToast("جاري الاتصال بالبث المباشر للإذاعة...");
+                });
+            }
+        });
+    }
+
+    if (volumeSlider) {
+        radioAudio.volume = parseFloat(volumeSlider.value) || 0.8;
+        volumeSlider.addEventListener("input", () => {
+            radioAudio.volume = parseFloat(volumeSlider.value);
+        });
+    }
+
+    if (fabBtn && panel) {
+        fabBtn.addEventListener("click", () => {
+            panel.classList.toggle("open");
+        });
+    }
+
+    if (closeBtn && panel) {
+        closeBtn.addEventListener("click", () => {
+            panel.classList.remove("open");
+        });
+    }
+
+    // التحكم بمؤقت النوم الذكي (Sleep Timer)
+    if (sleepSelect) {
+        sleepSelect.addEventListener("change", () => {
+            if (sleepTimerInterval) {
+                clearInterval(sleepTimerInterval);
+                sleepTimerInterval = null;
+            }
+
+            const minutes = parseInt(sleepSelect.value, 10);
+            if (minutes > 0) {
+                const targetTime = Date.now() + minutes * 60 * 1000;
+                if (countdownEl) countdownEl.style.display = "block";
+
+                const updateTimer = () => {
+                    const remMs = targetTime - Date.now();
+                    if (remMs <= 0) {
+                        clearInterval(sleepTimerInterval);
+                        sleepTimerInterval = null;
+                        if (countdownEl) countdownEl.style.display = "none";
+                        sleepSelect.value = "0";
+                        radioAudio.pause();
+                        updatePlayState(false);
+                        showToast("تم إيقاف تلاوة القرآن الكريم بموجب مؤقت النوم 🌙 تقبل الله طاعتكم");
+                        return;
+                    }
+
+                    const totalSec = Math.floor(remMs / 1000);
+                    const m = Math.floor(totalSec / 60);
+                    const s = totalSec % 60;
+                    if (remTimeEl) {
+                        remTimeEl.textContent = `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+                    }
+                };
+
+                updateTimer();
+                sleepTimerInterval = setInterval(updateTimer, 1000);
+                showToast(`تم ضبط مؤقت إيقاف التلاوة بعد ${minutes} دقيقة ⏱️`);
+            } else {
+                if (countdownEl) countdownEl.style.display = "none";
+            }
+        });
+    }
+}
+
+/* ==========================================================================
+   11. العداد الإيماني التفاعلي الشامل (Global Community Counter)
+   ========================================================================== */
+function initGlobalCommunityCounter() {
+    const statCards = document.querySelectorAll(".stat-card");
+    statCards.forEach(card => {
+        card.addEventListener("click", () => {
+            if ("vibrate" in navigator) navigator.vibrate(20);
+            if (typeof playTasbeehClickTone === "function") playTasbeehClickTone();
+        });
+    });
+}
+
 
 
 
