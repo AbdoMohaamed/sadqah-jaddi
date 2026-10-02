@@ -16,7 +16,7 @@ const NAWAWI_HADITHS = [
             "تحويل العادات اليومية (النوم، الأكل، العمل) إلى عبادات وطاعات بالنية الصالحة."
         ],
         category: "عقيدة وإخلاص",
-        audioUrl: "https://server11.mp3quran.net/hadith/nawawi/01.mp3"
+        audioUrl: "https://archive.org/download/NAWWE/nawawi01.mp3"
     },
     {
         id: 2,
@@ -30,7 +30,7 @@ const NAWAWI_HADITHS = [
             "علم الغيب وموعد الساعة استأثر الله تعالى به وحده."
         ],
         category: "عقيدة وإخلاص",
-        audioUrl: "https://server11.mp3quran.net/hadith/nawawi/02.mp3"
+        audioUrl: "https://archive.org/download/NAWWE/nawawi02.mp3"
     },
     {
         id: 3,
@@ -44,7 +44,7 @@ const NAWAWI_HADITHS = [
             "أهمية الصلاة وأنها الركن العملي الأول بعد الشهادتين."
         ],
         category: "عبادات",
-        audioUrl: "https://server11.mp3quran.net/hadith/nawawi/03.mp3"
+        audioUrl: "https://archive.org/download/NAWWE/nawawi03.mp3"
     },
     {
         id: 4,
@@ -58,7 +58,7 @@ const NAWAWI_HADITHS = [
             "إعجاز القرآن والسنة في وصف تكوين الجنين قبل اكتشافات الطب الحديث."
         ],
         category: "عقيدة وإخلاص",
-        audioUrl: "https://server11.mp3quran.net/hadith/nawawi/04.mp3"
+        audioUrl: "https://archive.org/download/NAWWE/nawawi04.mp3"
     },
     {
         id: 5,
@@ -72,7 +72,7 @@ const NAWAWI_HADITHS = [
             "حفظ الشريعة ونقاء الدين من التحريف والتبديل."
         ],
         category: "منهج واتباع",
-        audioUrl: "https://server11.mp3quran.net/hadith/nawawi/05.mp3"
+        audioUrl: "https://archive.org/download/NAWWE/nawawi05.mp3"
     },
     {
         id: 6,
@@ -86,7 +86,7 @@ const NAWAWI_HADITHS = [
             "سد الذرائع الموصلة إلى الوقوع في المحرمات."
         ],
         category: "تزكية وأخلاق",
-        audioUrl: "https://server11.mp3quran.net/hadith/nawawi/06.mp3"
+        audioUrl: "https://archive.org/download/NAWWE/nawawi06.mp3"
     },
     {
         id: 7,
@@ -100,7 +100,7 @@ const NAWAWI_HADITHS = [
             "مراعاة حق ولاة الأمر وعامة المسلمين وإرادة الخير لهم."
         ],
         category: "معاملات ودعوة",
-        audioUrl: "https://server11.mp3quran.net/hadith/nawawi/07.mp3"
+        audioUrl: "https://archive.org/download/NAWWE/nawawi07.mp3"
     },
     {
         id: 8,
@@ -114,7 +114,7 @@ const NAWAWI_HADITHS = [
             "اقتران الصلاة بالزكاة في نصوص الكتاب والسنة."
         ],
         category: "معاملات ودعوة",
-        audioUrl: "https://server11.mp3quran.net/hadith/nawawi/08.mp3"
+        audioUrl: "https://archive.org/download/NAWWE/nawawi08.mp3"
     },
     {
         id: 9,
@@ -128,7 +128,7 @@ const NAWAWI_HADITHS = [
             "سماحة الإسلام ويسره ومراعاة طاقة المكلفين."
         ],
         category: "منهج واتباع",
-        audioUrl: "https://server11.mp3quran.net/hadith/nawawi/09.mp3"
+        audioUrl: "https://archive.org/download/NAWWE/nawawi09.mp3"
     },
     {
         id: 10,
@@ -142,7 +142,7 @@ const NAWAWI_HADITHS = [
             "آداب الدعاء: السفر، رفع اليدين، الإلحاح بيا رب، والتذلل لله."
         ],
         category: "تزكية وأخلاق",
-        audioUrl: "https://server11.mp3quran.net/hadith/nawawi/10.mp3"
+        audioUrl: "https://archive.org/download/NAWWE/nawawi10.mp3"
     },
     {
         id: 11,
@@ -156,7 +156,7 @@ const NAWAWI_HADITHS = [
             "تربية الضمير الحي عند المؤمن."
         ],
         category: "تزكية وأخلاق",
-        audioUrl: "https://server11.mp3quran.net/hadith/nawawi/11.mp3"
+        audioUrl: "https://archive.org/download/NAWWE/nawawi11.mp3"
     },
     {
         id: 12,
@@ -170,7 +170,7 @@ const NAWAWI_HADITHS = [
             "استثمار العمر في ماينفع في المعاد والمستقبل."
         ],
         category: "تزكية وأخلاق",
-        audioUrl: "https://server11.mp3quran.net/hadith/nawawi/12.mp3"
+        audioUrl: "https://archive.org/download/NAWWE/nawawi12.mp3"
     },
     {
         id: 13,
@@ -184,7 +184,7 @@ const NAWAWI_HADITHS = [
             "معاملة الناس كما تحب أن يعاملوك به."
         ],
         category: "تزكية وأخلاق",
-        audioUrl: "https://server11.mp3quran.net/hadith/nawawi/13.mp3"
+        audioUrl: "https://archive.org/download/NAWWE/nawawi13.mp3"
     },
     {
         id: 14,
@@ -198,7 +198,7 @@ const NAWAWI_HADITHS = [
             "حماية أمن المجتمع ووحدته."
         ],
         category: "معاملات ودعوة",
-        audioUrl: "https://server11.mp3quran.net/hadith/nawawi/14.mp3"
+        audioUrl: "https://archive.org/download/NAWWE/nawawi14.mp3"
     },
     {
         id: 15,
@@ -212,7 +212,7 @@ const NAWAWI_HADITHS = [
             "إكرام الضيف والترحيب به من شيم الكرام ومكارم الأخلاق."
         ],
         category: "تزكية وأخلاق",
-        audioUrl: "https://server11.mp3quran.net/hadith/nawawi/15.mp3"
+        audioUrl: "https://archive.org/download/NAWWE/nawawi15.mp3"
     },
     {
         id: 16,
@@ -226,7 +226,7 @@ const NAWAWI_HADITHS = [
             "القوي هو من يملك نفسه عند الغضب."
         ],
         category: "تزكية وأخلاق",
-        audioUrl: "https://server11.mp3quran.net/hadith/nawawi/16.mp3"
+        audioUrl: "https://archive.org/download/NAWWE/nawawi16.mp3"
     },
     {
         id: 17,
@@ -240,7 +240,7 @@ const NAWAWI_HADITHS = [
             "إتقان العمل وإحسانه لوجه الله تعالى."
         ],
         category: "معاملات ودعوة",
-        audioUrl: "https://server11.mp3quran.net/hadith/nawawi/17.mp3"
+        audioUrl: "https://archive.org/download/NAWWE/nawawi17.mp3"
     },
     {
         id: 18,
@@ -254,7 +254,7 @@ const NAWAWI_HADITHS = [
             "حسن الخلق هو أثقل ما يوضع في ميزان العبد يوم القيامة."
         ],
         category: "تزكية وأخلاق",
-        audioUrl: "https://server11.mp3quran.net/hadith/nawawi/18.mp3"
+        audioUrl: "https://archive.org/download/NAWWE/nawawi18.mp3"
     },
     {
         id: 19,
@@ -268,7 +268,7 @@ const NAWAWI_HADITHS = [
             "اليقين التام بأن النفع والضر بيد الله وحده لا بيد أحد من البشر."
         ],
         category: "عقيدة وإخلاص",
-        audioUrl: "https://server11.mp3quran.net/hadith/nawawi/19.mp3"
+        audioUrl: "https://archive.org/download/NAWWE/nawawi19.mp3"
     },
     {
         id: 20,
@@ -282,7 +282,7 @@ const NAWAWI_HADITHS = [
             "الحياء من الله يورث مراقبته في الخفاء والعلن."
         ],
         category: "تزكية وأخلاق",
-        audioUrl: "https://server11.mp3quran.net/hadith/nawawi/20.mp3"
+        audioUrl: "https://archive.org/download/NAWWE/nawawi20.mp3"
     },
     {
         id: 21,
@@ -296,7 +296,7 @@ const NAWAWI_HADITHS = [
             "بلاغة النبي ﷺ وجوامع كلمه."
         ],
         category: "عقيدة وإخلاص",
-        audioUrl: "https://server11.mp3quran.net/hadith/nawawi/21.mp3"
+        audioUrl: "https://archive.org/download/NAWWE/nawawi21.mp3"
     },
     {
         id: 22,
@@ -310,7 +310,7 @@ const NAWAWI_HADITHS = [
             "تيسير الشريعة الإسلامية وعدم التكليف بما يشق."
         ],
         category: "عبادات",
-        audioUrl: "https://server11.mp3quran.net/hadith/nawawi/22.mp3"
+        audioUrl: "https://archive.org/download/NAWWE/nawawi22.mp3"
     },
     {
         id: 23,
@@ -324,7 +324,7 @@ const NAWAWI_HADITHS = [
             "الصلاة نور في الوجه والقلب والقبر، والصدقة دليل على صدق الإيمان."
         ],
         category: "عبادات",
-        audioUrl: "https://server11.mp3quran.net/hadith/nawawi/23.mp3"
+        audioUrl: "https://archive.org/download/NAWWE/nawawi23.mp3"
     },
     {
         id: 24,
@@ -338,7 +338,7 @@ const NAWAWI_HADITHS = [
             "طاعات العباد لا تزيد في ملك الله ومعاصيهم لا تنقصه."
         ],
         category: "عقيدة وإخلاص",
-        audioUrl: "https://server11.mp3quran.net/hadith/nawawi/24.mp3"
+        audioUrl: "https://archive.org/download/NAWWE/nawawi24.mp3"
     },
     {
         id: 25,
@@ -352,7 +352,7 @@ const NAWAWI_HADITHS = [
             "حرص الصحابة رضي الله عنهم وتنافسهم في كسب الحسنات والدرجات العلى."
         ],
         category: "عبادات",
-        audioUrl: "https://server11.mp3quran.net/hadith/nawawi/25.mp3"
+        audioUrl: "https://archive.org/download/NAWWE/nawawi25.mp3"
     },
     {
         id: 26,
@@ -366,7 +366,7 @@ const NAWAWI_HADITHS = [
             "ركعتا الضحى تجزئان عن هذه الصدقات اليومية كلها."
         ],
         category: "معاملات ودعوة",
-        audioUrl: "https://server11.mp3quran.net/hadith/nawawi/26.mp3"
+        audioUrl: "https://archive.org/download/NAWWE/nawawi26.mp3"
     },
     {
         id: 27,
@@ -380,7 +380,7 @@ const NAWAWI_HADITHS = [
             "الحذر من تتبع الرخص المضللة والفتوى بغير علم."
         ],
         category: "تزكية وأخلاق",
-        audioUrl: "https://server11.mp3quran.net/hadith/nawawi/27.mp3"
+        audioUrl: "https://archive.org/download/NAWWE/nawawi27.mp3"
     },
     {
         id: 28,
@@ -394,7 +394,7 @@ const NAWAWI_HADITHS = [
             "السمع والطاعة بالمعروف حفاظاً على تماسك جماعة المسلمين."
         ],
         category: "منهج واتباع",
-        audioUrl: "https://server11.mp3quran.net/hadith/nawawi/28.mp3"
+        audioUrl: "https://archive.org/download/NAWWE/nawawi28.mp3"
     },
     {
         id: 29,
@@ -408,7 +408,7 @@ const NAWAWI_HADITHS = [
             "الصوم جنة ووقاية من الشهوات والمهالك."
         ],
         category: "تزكية وأخلاق",
-        audioUrl: "https://server11.mp3quran.net/hadith/nawawi/29.mp3"
+        audioUrl: "https://archive.org/download/NAWWE/nawawi29.mp3"
     },
     {
         id: 30,
@@ -422,7 +422,7 @@ const NAWAWI_HADITHS = [
             "المحافظة على الفرائض وعدم انتهاك الحرمات."
         ],
         category: "منهج واتباع",
-        audioUrl: "https://server11.mp3quran.net/hadith/nawawi/30.mp3"
+        audioUrl: "https://archive.org/download/NAWWE/nawawi30.mp3"
     },
     {
         id: 31,
@@ -436,7 +436,7 @@ const NAWAWI_HADITHS = [
             "الزهد ليس بتحريم الحلال وإنما بعدم جعل الدنيا أكبر الهم."
         ],
         category: "تزكية وأخلاق",
-        audioUrl: "https://server11.mp3quran.net/hadith/nawawi/31.mp3"
+        audioUrl: "https://archive.org/download/NAWWE/nawawi31.mp3"
     },
     {
         id: 32,
@@ -450,7 +450,7 @@ const NAWAWI_HADITHS = [
             "الاحتكام للعدل والشرع في رد المظالم دون إيقاع ضرر جديد."
         ],
         category: "معاملات ودعوة",
-        audioUrl: "https://server11.mp3quran.net/hadith/nawawi/32.mp3"
+        audioUrl: "https://archive.org/download/NAWWE/nawawi32.mp3"
     },
     {
         id: 33,
@@ -464,7 +464,7 @@ const NAWAWI_HADITHS = [
             "قواعد القضاء والشهادات في الإسلام قائمة على العدل المطلق."
         ],
         category: "معاملات ودعوة",
-        audioUrl: "https://server11.mp3quran.net/hadith/nawawi/33.mp3"
+        audioUrl: "https://archive.org/download/NAWWE/nawawi33.mp3"
     },
     {
         id: 34,
@@ -478,7 +478,7 @@ const NAWAWI_HADITHS = [
             "مراعاة عدم إحداث منكر أكبر عند محاولة التغيير."
         ],
         category: "معاملات ودعوة",
-        audioUrl: "https://server11.mp3quran.net/hadith/nawawi/34.mp3"
+        audioUrl: "https://archive.org/download/NAWWE/nawawi34.mp3"
     },
     {
         id: 35,
@@ -492,7 +492,7 @@ const NAWAWI_HADITHS = [
             "تحريم احتقار أي إنسان أو السخرية منه."
         ],
         category: "تزكية وأخلاق",
-        audioUrl: "https://server11.mp3quran.net/hadith/nawawi/35.mp3"
+        audioUrl: "https://archive.org/download/NAWWE/nawawi35.mp3"
     },
     {
         id: 36,
@@ -506,7 +506,7 @@ const NAWAWI_HADITHS = [
             "طلب العلم الشرعي هو أسرع الطرق الموصلة إلى الجنة ورضوان الله."
         ],
         category: "معاملات ودعوة",
-        audioUrl: "https://server11.mp3quran.net/hadith/nawawi/36.mp3"
+        audioUrl: "https://archive.org/download/NAWWE/nawawi36.mp3"
     },
     {
         id: 37,
@@ -520,7 +520,7 @@ const NAWAWI_HADITHS = [
             "ترك المعصية خوفاً من الله يُحتسب عبادة وطاعة يؤجر عليها."
         ],
         category: "عقيدة وإخلاص",
-        audioUrl: "https://server11.mp3quran.net/hadith/nawawi/37.mp3"
+        audioUrl: "https://archive.org/download/NAWWE/nawawi37.mp3"
     },
     {
         id: 38,
@@ -534,7 +534,7 @@ const NAWAWI_HADITHS = [
             "من نال محبة الله حظي بالتوفيق التام وإجابة الدعاء والحماية."
         ],
         category: "عقيدة وإخلاص",
-        audioUrl: "https://server11.mp3quran.net/hadith/nawawi/38.mp3"
+        audioUrl: "https://archive.org/download/NAWWE/nawawi38.mp3"
     },
     {
         id: 39,
@@ -548,7 +548,7 @@ const NAWAWI_HADITHS = [
             "وجوب تدارك الحقوق وإعادتها لأصحابها بعد زوال العذر."
         ],
         category: "منهج واتباع",
-        audioUrl: "https://server11.mp3quran.net/hadith/nawawi/39.mp3"
+        audioUrl: "https://archive.org/download/NAWWE/nawawi39.mp3"
     },
     {
         id: 40,
@@ -562,7 +562,7 @@ const NAWAWI_HADITHS = [
             "الدنيا دار ممر والآخرة هي دار المقر والخلود."
         ],
         category: "تزكية وأخلاق",
-        audioUrl: "https://server11.mp3quran.net/hadith/nawawi/40.mp3"
+        audioUrl: "https://archive.org/download/NAWWE/nawawi40.mp3"
     },
     {
         id: 41,
@@ -576,7 +576,7 @@ const NAWAWI_HADITHS = [
             "تحذير المسلم من اتخاذ إلهه هواه."
         ],
         category: "منهج واتباع",
-        audioUrl: "https://server11.mp3quran.net/hadith/nawawi/41.mp3"
+        audioUrl: "https://archive.org/download/NAWWE/nawawi41.mp3"
     },
     {
         id: 42,
@@ -590,6 +590,6 @@ const NAWAWI_HADITHS = [
             "اقتران الدعاء بالرجاء وحسن الظن بالله تعالى يورث المغفرة."
         ],
         category: "عقيدة وإخلاص",
-        audioUrl: "https://server11.mp3quran.net/hadith/nawawi/42.mp3"
+        audioUrl: "https://archive.org/download/NAWWE/nawawi42.mp3"
     }
 ];

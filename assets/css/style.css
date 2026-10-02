@@ -3,45 +3,43 @@
    ========================================================================== */
 
 :root {
-  /* نظام الألوان الإسلامي الروحاني */
-  --bg-main: #070d18;
-  --bg-surface: #0f1c30;
-  --bg-card: rgba(19, 35, 60, 0.75);
-  --bg-card-hover: rgba(25, 46, 78, 0.9);
-  --border-color: rgba(212, 175, 55, 0.25);
-  --border-glow: rgba(212, 175, 55, 0.6);
-
-  /* تدرجات الذهب والأخضر الزمردي */
-  --gold-100: #fff4d1;
-  --gold-300: #f5d77f;
-  --gold-500: #d4af37;
-  --gold-700: #997715;
-  --emerald-400: #34d399;
-  --emerald-500: #10b981;
-  --emerald-900: #064e3b;
-
-  /* النصوص */
-  --text-primary: #f8fafc;
-  --text-secondary: #cbd5e1;
-  --text-muted: #94a3b8;
-  --text-gold: #f8e3a1;
-
-  /* تأثيرات الظلال */
-  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.3);
-  --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.4);
-  --shadow-gold: 0 0 20px rgba(212, 175, 55, 0.25);
-  --shadow-emerald: 0 0 25px rgba(16, 185, 129, 0.3);
-
-  /* الخطوط */
-  --font-body: 'Tajawal', sans-serif;
-  --font-quran: 'Amiri', serif;
-
-  --transition-fast: 0.2s ease;
-  --transition-smooth: 0.35s cubic-bezier(0.4, 0, 0.2, 1);
-  --radius-sm: 8px;
-  --radius-md: 14px;
-  --radius-lg: 22px;
-  --radius-full: 9999px;
+    /* نظام الألوان الإسلامي الروحاني */
+    --bg-main: #070d18;
+    --bg-surface: #0f1c30;
+    --bg-card: rgba(19, 35, 60, 0.75);
+    --bg-card-hover: rgba(25, 46, 78, 0.9);
+    --border-color: rgba(212, 175, 55, 0.25);
+    --border-glow: rgba(212, 175, 55, 0.6);
+    /* تدرجات الذهب والأخضر الزمردي */
+    --gold-100: #fff4d1;
+    --gold-200: #fce8a8;
+    --gold-300: #f5d77f;
+    --gold-400: #e8c45a;
+    --gold-500: #d4af37;
+    --gold-600: #b89424;
+    --gold-700: #997715;
+    --emerald-400: #34d399;
+    --emerald-500: #10b981;
+    --emerald-900: #064e3b;
+    /* النصوص */
+    --text-primary: #f8fafc;
+    --text-secondary: #cbd5e1;
+    --text-muted: #94a3b8;
+    --text-gold: #f8e3a1;
+    /* تأثيرات الظلال */
+    --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.3);
+    --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.4);
+    --shadow-gold: 0 0 20px rgba(212, 175, 55, 0.25);
+    --shadow-emerald: 0 0 25px rgba(16, 185, 129, 0.3);
+    /* الخطوط */
+    --font-body: 'Tajawal', sans-serif;
+    --font-quran: 'Amiri', serif;
+    --transition-fast: 0.2s ease;
+    --transition-smooth: 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+    --radius-sm: 8px;
+    --radius-md: 14px;
+    --radius-lg: 22px;
+    --radius-full: 9999px;
 }
 
 /* التصفير والإعدادات الأساسية */
@@ -551,7 +549,7 @@ body {
    قسم السبحة الإلكترونية (Tasbeeh Counter)
    ========================================================================== */
 .tasbeeh-section {
-  padding: 25px 0;
+  padding: 0 0 25px 0;
   background: radial-gradient(circle at center, rgba(19, 35, 60, 0.6) 0%, rgba(7, 13, 24, 0.95) 70%);
   border-top: 1px solid rgba(212, 175, 55, 0.15);
   border-bottom: 1px solid rgba(212, 175, 55, 0.15);
@@ -831,7 +829,7 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 1000;
+  z-index: 2500;
   opacity: 0;
   visibility: hidden;
   transition: var(--transition-smooth);
@@ -2813,7 +2811,6 @@ body {
   border-radius: var(--radius-lg);
   padding: 1.2rem 1.6rem;
   margin: 0 auto 2.5rem;
-  max-width: 900px;
   display: flex;
   align-items: center;
   gap: 1.2rem;
@@ -4932,7 +4929,7 @@ body {
 }
 
 .hadith-number-badge {
-  background: linear-gradient(135deg, var(--gold-400), var(--gold-600));
+  background: linear-gradient(135deg, var(--gold-300), var(--gold-300));
   color: #070d18;
   font-weight: 800;
   padding: 0.25rem 0.75rem;

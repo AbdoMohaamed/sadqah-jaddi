@@ -47,10 +47,7 @@ function initCustomShareLink() {
     }
 
     const modal = document.getElementById("custom-share-modal");
-    const openBtns = [
-        document.getElementById("btn-open-custom-share-nav"),
-        document.getElementById("btn-open-custom-share-hero")
-    ];
+    const openBtns = document.querySelectorAll("#btn-open-custom-share-nav, #btn-open-custom-share-hero, .btn-open-custom-share");
     const closeBtn = document.getElementById("btn-close-custom-share-modal");
     const nameInput = document.getElementById("custom-deceased-name-input");
     const relSelect = document.getElementById("custom-deceased-relation-select");
@@ -211,7 +208,7 @@ function initNawawiHadiths() {
             const audioBtn = card.querySelector(".btn-hadith-audio");
             if (audioBtn) {
                 audioBtn.addEventListener("click", () => {
-                    playHadithAudio(h.id, h.audioUrl);
+                    playHadithAudio(h.id, h.audioUrl, h.text);
                 });
             }
 
@@ -238,12 +235,33 @@ function initNawawiHadiths() {
         });
     }
 
-    function playHadithAudio(id, url) {
+    function updateAudioButtonsState() {
+        document.querySelectorAll(".btn-hadith-audio").forEach(btn => {
+            const btnId = parseInt(btn.getAttribute("data-id"), 10);
+            if (btnId === currentPlayingHadithId) {
+                btn.classList.add("playing");
+                btn.style.background = "var(--gold-400)";
+                btn.style.color = "#070d18";
+                btn.innerHTML = '<i class="fa-solid fa-pause"></i> <span>إيقاف التلاوة</span>';
+            } else {
+                btn.classList.remove("playing");
+                btn.style.background = "rgba(212, 175, 55, 0.15)";
+                btn.style.color = "var(--gold-300)";
+                btn.innerHTML = '<i class="fa-solid fa-play"></i> <span>استماع صوتي</span>';
+            }
+        });
+    }
+
+    function playHadithAudio(id, url, hadithText) {
         if (currentPlayingHadithId === id && currentNawawiAudio && !currentNawawiAudio.paused) {
             currentNawawiAudio.pause();
             currentPlayingHadithId = null;
-            renderHadiths();
+            updateAudioButtonsState();
             return;
+        }
+
+        if (window.speechSynthesis) {
+            window.speechSynthesis.cancel();
         }
 
         if (currentNawawiAudio) {
@@ -251,19 +269,52 @@ function initNawawiHadiths() {
             currentNawawiAudio = null;
         }
 
-        currentNawawiAudio = new Audio(url);
         currentPlayingHadithId = id;
-        renderHadiths();
+        updateAudioButtonsState();
 
-        currentNawawiAudio.play().catch(e => {
-            showToast("تعذر تشغيل الصوت تلقائياً، يرجى المحاولة ثانية");
-            currentPlayingHadithId = null;
-            renderHadiths();
+        currentNawawiAudio = new Audio(url);
+        currentNawawiAudio.play().then(() => {
+            showToast("جاري الاستماع للحديث النبوي الشريف 🎧");
+        }).catch(e => {
+            console.warn("Audio play error, trying speech synthesis fallback:", e);
+            if ('speechSynthesis' in window) {
+                const utterance = new SpeechSynthesisUtterance(hadithText);
+                utterance.lang = 'ar-SA';
+                utterance.rate = 0.9;
+                utterance.onend = () => {
+                    currentPlayingHadithId = null;
+                    updateAudioButtonsState();
+                };
+                window.speechSynthesis.speak(utterance);
+                showToast("جاري تلاوة الحديث 🔊");
+            } else {
+                showToast("تعذر تشغيل التسجيل الصوتي.");
+                currentPlayingHadithId = null;
+                updateAudioButtonsState();
+            }
         });
 
         currentNawawiAudio.onended = () => {
             currentPlayingHadithId = null;
-            renderHadiths();
+            updateAudioButtonsState();
+        };
+
+        currentNawawiAudio.onerror = () => {
+            console.warn("Audio file error, falling back to speech synthesis.");
+            if ('speechSynthesis' in window) {
+                const utterance = new SpeechSynthesisUtterance(hadithText);
+                utterance.lang = 'ar-SA';
+                utterance.rate = 0.9;
+                utterance.onend = () => {
+                    currentPlayingHadithId = null;
+                    updateAudioButtonsState();
+                };
+                window.speechSynthesis.speak(utterance);
+            } else {
+                showToast("تعذر تشغيل الصوت.");
+                currentPlayingHadithId = null;
+                updateAudioButtonsState();
+            }
         };
     }
 
@@ -545,10 +596,7 @@ function initIslamicGuideFaq() {
    ========================================================================== */
 function initSmartNotifications() {
     const modal = document.getElementById("notifications-modal");
-    const openBtns = [
-        document.getElementById("btn-open-notifications-nav"),
-        document.getElementById("btn-open-notifications-hero")
-    ];
+    const openBtns = document.querySelectorAll("#btn-open-notifications-nav, #btn-open-notifications-hero, .btn-open-notifications");
     const closeBtn = document.getElementById("btn-close-notifications-modal");
     const requestBtn = document.getElementById("btn-request-notification-perm");
 
