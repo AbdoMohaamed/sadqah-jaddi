@@ -63,7 +63,7 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css">
 
     <!-- تنسيقات الموقع -->
-    <link rel="stylesheet" href="assets/css/style.css?v=69">
+    <link rel="stylesheet" href="assets/css/style.css?v=70">
 </head>
 <body>
 
@@ -1011,6 +1011,16 @@
                 </div>
             </div>
 
+            <!-- شريط البحث الفوري في أسماء الله الحسنى -->
+            <div class="asmaa-search-bar-wrap">
+                <div class="asmaa-search-box">
+                    <i class="fa-solid fa-magnifying-glass asmaa-search-icon"></i>
+                    <input type="text" id="asmaa-search-input" class="asmaa-search-input" placeholder="ابحث عن أي اسم من أسماء الله الحسنى أو في المعنى...">
+                    <button type="button" id="btn-clear-asmaa-search" class="btn-clear-search" style="display: none;" title="مسح البحث">&times;</button>
+                </div>
+                <div class="asmaa-search-status" id="asmaa-search-status">عرض جميع الأسماء (99 اسماً) • اضغط على أي اسم لعرض معناه وثمرته وصيغة الدعاء به</div>
+            </div>
+
             <!-- تصنيفات أسماء الله الحسنى -->
             <div class="nawawi-filter-bar" id="asmaa-filter-bar">
                 <button type="button" class="nawawi-filter-pill active" data-cat="all">جميع الأسماء (99)</button>
@@ -1023,26 +1033,11 @@
                 <button type="button" class="nawawi-filter-pill" data-cat="حكمة">أسماء الحكمة والعدل</button>
             </div>
 
-            <!-- حاوية بطاقات أسماء الله الحسنى -->
+            <!-- حاوية بطاقات أسماء الله الحسنى المدمجة والمريحة -->
             <div class="asmaa-cards-wrapper">
-                <div class="asmaa-mobile-nav-bar">
-                    <div class="asmaa-scroll-hint">
-                        <i class="fa-solid fa-arrows-left-right"></i>
-                        <span>اسحب أفقياً لتصفح أسماء الله الحسنى</span>
-                    </div>
-                    <div class="asmaa-scroll-arrows">
-                        <button type="button" class="btn-scroll-asmaa" onclick="scrollAsmaaContainer('right')" title="الاسم السابق">
-                            <i class="fa-solid fa-chevron-right"></i>
-                        </button>
-                        <button type="button" class="btn-scroll-asmaa" onclick="scrollAsmaaContainer('left')" title="الاسم التالي">
-                            <i class="fa-solid fa-chevron-left"></i>
-                        </button>
-                    </div>
-                </div>
-
-                <!-- شبكة الأسماء الحسنى -->
+                <!-- شبكة الأسماء الحسنى الفخمة -->
                 <div class="asmaa-grid" id="asmaa-grid">
-                    <!-- يُملأ برمجياً من asmaa-allah-data.js و app.js -->
+                    <!-- يُملأ برمجياً من asmaa-allah-data.js و extended-modules.js -->
                 </div>
             </div>
         </div>
@@ -1854,7 +1849,7 @@
             <button class="modal-close-btn" id="btn-close-asmaa-modal" aria-label="إغلاق">&times;</button>
             <div class="asmaa-modal-header" style="text-align: center; margin-bottom: 1.5rem;">
                 <span class="hadith-number-badge" id="modal-asmaa-num">1</span>
-                <h2 id="modal-asmaa-name" style="font-family: var(--font-quran, serif); font-size: 3rem; color: var(--gold-300); margin: 0.5rem 0;">الله</h2>
+                <h2 id="modal-asmaa-name" style="font-family: var(--font-quran, serif); font-size: 3.2rem; color: var(--gold-300); margin: 0.5rem 0; text-shadow: 0 0 15px rgba(212,175,55,0.4);">الله</h2>
                 <span class="hadith-category-tag" id="modal-asmaa-cat">جلال</span>
             </div>
 
@@ -1864,19 +1859,24 @@
                     <p id="modal-asmaa-meaning" style="font-size: 1.05rem; line-height: 1.8; color: #f3f4f6;"></p>
                 </div>
 
-                <div class="form-group" style="background: rgba(212, 175, 55, 0.1); padding: 1rem; border-radius: var(--radius-md); border-right: 3px solid var(--gold-400);">
-                    <label class="form-label text-gold"><i class="fa-solid fa-hands-praying"></i> الثمرة الإيمانية والدعاء به:</label>
+                <div class="form-group" style="background: rgba(212, 175, 55, 0.08); padding: 1rem; border-radius: var(--radius-md); border-right: 3px solid var(--gold-400);">
+                    <label class="form-label text-gold"><i class="fa-solid fa-lightbulb"></i> الثمرة الإيمانية:</label>
                     <p id="modal-asmaa-virtue" style="font-size: 0.95rem; line-height: 1.7; color: #e5e7eb; margin: 0;"></p>
                 </div>
 
-                <div class="modal-actions-dual" style="margin-top: 1.25rem;">
+                <div class="form-group" style="background: rgba(16, 185, 129, 0.08); padding: 1rem; border-radius: var(--radius-md); border-right: 3px solid var(--emerald-400); margin-top: 1rem;">
+                    <label class="form-label text-emerald-400" style="color: var(--emerald-400);"><i class="fa-solid fa-hands-praying"></i> صيغة الدعاء والتعبد بهذا الاسم:</label>
+                    <p id="modal-asmaa-dua" style="font-size: 1rem; line-height: 1.7; color: #f9fafb; font-weight: 500; margin: 0;"></p>
+                </div>
+
+                <div class="modal-actions-dual" style="margin-top: 1.5rem;">
                     <button type="button" class="btn btn-outline" id="btn-copy-asmaa">
                         <i class="fa-solid fa-copy"></i>
                         <span>نسخ الاسم ومعناه</span>
                     </button>
                     <button type="button" class="btn btn-gold" id="btn-share-asmaa">
                         <i class="fa-brands fa-whatsapp"></i>
-                        <span>مشاركة</span>
+                        <span>مشاركة كـ ستوري / حالة</span>
                     </button>
                 </div>
             </div>
@@ -2083,7 +2083,7 @@
     <script src="assets/js/firebase-config.js"></script>
     <script src="assets/js/app.js?v=10"></script>
     <script src="assets/js/quran.js?v=10"></script>
-    <script src="assets/js/extended-modules.js?v=9"></script>
+    <script src="assets/js/extended-modules.js?v=10"></script>
 
 
 </body>

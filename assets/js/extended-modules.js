@@ -352,30 +352,92 @@ function initAsmaaAllah() {
     const filterPills = document.querySelectorAll("#asmaa-filter-bar .nawawi-filter-pill");
     const modal = document.getElementById("asmaa-detail-modal");
     const closeBtn = document.getElementById("btn-close-asmaa-modal");
+    const searchInput = document.getElementById("asmaa-search-input");
+    const clearSearchBtn = document.getElementById("btn-clear-asmaa-search");
+    const searchStatus = document.getElementById("asmaa-search-status");
 
     const modalNum = document.getElementById("modal-asmaa-num");
     const modalName = document.getElementById("modal-asmaa-name");
     const modalCat = document.getElementById("modal-asmaa-cat");
     const modalMeaning = document.getElementById("modal-asmaa-meaning");
     const modalVirtue = document.getElementById("modal-asmaa-virtue");
+    const modalDua = document.getElementById("modal-asmaa-dua");
     const copyBtn = document.getElementById("btn-copy-asmaa");
     const shareBtn = document.getElementById("btn-share-asmaa");
 
     let currentSelectedName = null;
+    let activeCat = "all";
+    let searchQuery = "";
 
     if (!grid || typeof ASMAA_ALLAH === "undefined") return;
 
-    let activeCat = "all";
+    function normalizeArabic(text) {
+        if (!text) return "";
+        return text
+            .replace(/([^\u0621-\u063A\u0641-\u064A\u0660-\u0669a-zA-Z0-9])/g, "")
+            .replace(/[أإآ]/g, "ا")
+            .replace(/ى/g, "ي")
+            .replace(/ة/g, "ه")
+            .toLowerCase();
+    }
+
+    function getDuaFormula(item) {
+        const cat = item.category || "";
+        if (cat === "رحمة") return `يا ${item.name} يا ذا الجلال والإكرام، ارحمني برحمتك الواسعة وتولَّ أمري بلطفك وسترك.`;
+        if (cat === "رزق") return `يا ${item.name} يا واسع الفضل، افتح لي ولأهلي أبواب رزقك الحلال وبارك لنا فيما أعطيتنا.`;
+        if (cat === "مغفرة") return `يا ${item.name} يا عفوّ يا غفار، اغفر لي ذنبي كله دقه وجله وأوله وآخره وتب عليّ إنك أنت التواب الرحيم.`;
+        if (cat === "قدرة") return `يا ${item.name} يا قوي يا عزيز، تولَّ كفايتي واصرف عني كل سوء ويسر لي كل عسير.`;
+        if (cat === "علم") return `يا ${item.name} يا سميع يا بصير، علمني ما ينفعني وانفعني بما علمتني وزدني نوراً وبصيرة.`;
+        if (cat === "حكمة") return `يا ${item.name} يا عدل يا حكيم، اهدِ قلبي وسدد قولي وارضني بقضائك وقدرك.`;
+        return `اللهم إني أسألك باسمك ${item.name} وبأسمائك الحسنى كلها، أن تبارك في حياتي وعملي وترزقني الفردوس الأعلى من الجنة.`;
+    }
 
     function renderAsmaa() {
         grid.innerHTML = "";
+        const cleanQuery = normalizeArabic(searchQuery);
+
         const filtered = ASMAA_ALLAH.filter(item => {
-            return activeCat === "all" || item.category === activeCat;
+            const matchCat = activeCat === "all" || item.category === activeCat;
+            if (!matchCat) return false;
+            if (!cleanQuery) return true;
+
+            const nameClean = normalizeArabic(item.name);
+            const meaningClean = normalizeArabic(item.meaning);
+            const virtueClean = normalizeArabic(item.virtue);
+            const catClean = normalizeArabic(item.category);
+
+            return nameClean.includes(cleanQuery) || 
+                   meaningClean.includes(cleanQuery) || 
+                   virtueClean.includes(cleanQuery) || 
+                   catClean.includes(cleanQuery);
         });
+
+        // تحديث رسالة الحالة
+        if (searchStatus) {
+            if (cleanQuery) {
+                searchStatus.innerHTML = `تم العثور على <strong>${filtered.length}</strong> اسم مطابق لـ "${searchQuery}"`;
+            } else if (activeCat !== "all") {
+                searchStatus.innerHTML = `عرض أسماء <strong>${activeCat}</strong> (${filtered.length} اسماً)`;
+            } else {
+                searchStatus.innerHTML = `عرض جميع الأسماء (99 اسماً) • اضغط على أي اسم لعرض معناه وثمرته وصيغة الدعاء به`;
+            }
+        }
+
+        if (filtered.length === 0) {
+            grid.innerHTML = `
+                <div class="asmaa-empty-state" style="grid-column: 1 / -1; text-align: center; padding: 2.5rem 1rem; color: var(--text-muted);">
+                    <i class="fa-solid fa-magnifying-glass" style="font-size: 2.5rem; color: var(--gold-400); margin-bottom: 0.8rem; opacity: 0.7;"></i>
+                    <p style="font-size: 1.05rem; color: #e5e7eb; margin: 0 0 0.5rem 0;">لم يتم العثور على اسم مطابق للبحث</p>
+                    <span style="font-size: 0.88rem;">جرب البحث بكلمة أخرى أو مسح حقل البحث</span>
+                </div>
+            `;
+            return;
+        }
 
         filtered.forEach(item => {
             const card = document.createElement("div");
             card.className = "asmaa-card";
+            card.setAttribute("title", `اضغط لعرض تفاصيل اسم الله (${item.name})`);
             card.innerHTML = `
                 <div class="asmaa-card-num">${item.id}</div>
                 <div class="asmaa-card-name">${item.name}</div>
@@ -393,39 +455,91 @@ function initAsmaaAllah() {
 
     function openAsmaaDetail(item) {
         currentSelectedName = item;
+        const duaFormula = getDuaFormula(item);
+
         if (modalNum) modalNum.textContent = item.id;
         if (modalName) modalName.textContent = item.name;
         if (modalCat) modalCat.textContent = `أسماء ${item.category}`;
         if (modalMeaning) modalMeaning.textContent = item.meaning;
         if (modalVirtue) modalVirtue.textContent = item.virtue;
+        if (modalDua) modalDua.textContent = duaFormula;
 
-        if (modal) modal.classList.add("open");
+        if (modal) {
+            modal.classList.add("open");
+            modal.classList.add("active");
+            document.body.style.overflow = "hidden";
+        }
     }
 
+    const closeModal = () => {
+        if (modal) {
+            modal.classList.remove("open");
+            modal.classList.remove("active");
+            document.body.style.overflow = "";
+        }
+    };
+
     if (closeBtn && modal) {
-        closeBtn.addEventListener("click", () => modal.classList.remove("open"));
+        closeBtn.addEventListener("click", closeModal);
     }
 
     if (modal) {
         modal.addEventListener("click", (e) => {
-            if (e.target === modal) modal.classList.remove("open");
+            if (e.target === modal) closeModal();
+        });
+    }
+
+    // البحث الفوري
+    if (searchInput) {
+        searchInput.addEventListener("input", () => {
+            searchQuery = searchInput.value.trim();
+            if (clearSearchBtn) {
+                clearSearchBtn.style.display = searchQuery ? "flex" : "none";
+            }
+            renderAsmaa();
+        });
+    }
+
+    if (clearSearchBtn) {
+        clearSearchBtn.addEventListener("click", () => {
+            if (searchInput) searchInput.value = "";
+            searchQuery = "";
+            clearSearchBtn.style.display = "none";
+            renderAsmaa();
+            if (searchInput) searchInput.focus();
         });
     }
 
     if (copyBtn) {
         copyBtn.addEventListener("click", () => {
             if (!currentSelectedName) return;
-            const textToCopy = `✨ *اسم الله الأعظم:* [${currentSelectedName.name}]\n\n📖 *المعنى:* ${currentSelectedName.meaning}\n\n🤲 *الثمرة الإيمانية:* ${currentSelectedName.virtue}\n\n🕊️ زاد المسلم: https://abdomohaamed.github.io/sadqah-jaddi/`;
-            copyTextToClipboard(textToCopy);
-            showToast(`تم نسخ اسم (${currentSelectedName.name}) ومعناه بنجاح 📋`);
+            const dua = getDuaFormula(currentSelectedName);
+            const textToCopy = `✨ *اسم الله الأعظم:* [ ${currentSelectedName.name} ]\n\n` +
+                               `📖 *المعنى:* ${currentSelectedName.meaning}\n\n` +
+                               `💡 *الثمرة الإيمانية:* ${currentSelectedName.virtue}\n\n` +
+                               `🤲 *الدعاء والتعبد بهذا الاسم:*\n${dua}\n\n` +
+                               `🌿 موقع زاد المسلم: ${window.location.origin + window.location.pathname}`;
+            if (navigator.clipboard) {
+                navigator.clipboard.writeText(textToCopy).then(() => {
+                    showToast(`تم نسخ اسم (${currentSelectedName.name}) ومعناه ودعاؤه بنجاح 📋`);
+                }).catch(() => {
+                    showToast(`تم النسخ 📋`);
+                });
+            }
         });
     }
 
     if (shareBtn) {
         shareBtn.addEventListener("click", () => {
             if (!currentSelectedName) return;
-            const deceasedName = (typeof DECEASED_INFO !== "undefined" && DECEASED_INFO.name) ? DECEASED_INFO.name : "فقيدنا الغالي";
-            const msg = `✨ *اسم الله الأعظم:* [${currentSelectedName.name}]\n\n📖 *المعنى:* ${currentSelectedName.meaning}\n\n🤲 *الثمرة والدعاء به:* ${currentSelectedName.virtue}\n\n🤍 صدقة جارية لروح (${deceasedName})\n📲 مكتبة أسماء الله الحسنى: https://abdomohaamed.github.io/sadqah-jaddi/`;
+            const deceasedName = (typeof DECEASED_INFO !== "undefined" && DECEASED_INFO.name) ? DECEASED_INFO.name : "جدي الغالي (عبدالمعبود أمين سعيد)";
+            const dua = getDuaFormula(currentSelectedName);
+            const msg = `✨ *اسم الله الأعظم:* [ ${currentSelectedName.name} ]\n\n` +
+                        `📖 *المعنى:* ${currentSelectedName.meaning}\n\n` +
+                        `💡 *الثمرة الإيمانية:* ${currentSelectedName.virtue}\n\n` +
+                        `🤲 *الدعاء به:*\n${dua}\n\n` +
+                        `🤍 _صدقة جارية لروح ${deceasedName}_\n` +
+                        `📲 تصفح أسماء الله الحسنى كاملة:\n${window.location.origin + window.location.pathname}#asmaa-allah`;
             const waUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(msg)}`;
             window.open(waUrl, "_blank");
         });
