@@ -41,7 +41,7 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css">
 
     <!-- تنسيقات الموقع -->
-    <link rel="stylesheet" href="assets/css/style.css?v=66">
+    <link rel="stylesheet" href="assets/css/style.css?v=67">
 </head>
 <body>
 
@@ -166,11 +166,16 @@
             <div class="charity-memorial-banner">
                 <div class="charity-memorial-icon"><i class="fa-solid fa-hand-holding-heart text-gold"></i></div>
                 <div class="charity-memorial-text">
-                    تطبيق إسلامي  متاح مجاناً لوجه الله تعالى • <strong>صدقة جارية على روح جدي الغالي (عبدالمعبود أمين سعيد) رحمه الله</strong> — نسألكم الفاتحة وصالح الدعاء له ولكل موتى المسلمين.
+                    تطبيق إسلامي متاح مجاناً لوجه الله تعالى •
+                    <strong>
+                        صدقة جارية على روح جدي الغالي (عبدالمعبود أمين سعيد) رحمه الله،
+                        وستي الغالية (حكم عبدالصمد) رحمها الله
+                    </strong>
+                    — نسألكم الفاتحة وصالح الدعاء لهما ولكل موتى المسلمين.
                 </div>
                 <button class="btn btn-gold btn-open-prayer-modal">
                     <i class="fa-solid fa-hands-praying"></i>
-                    <span>ادعُ له الآن</span>
+                    <span>ادعُ لهم</span>
                 </button>
             </div>
 
@@ -762,7 +767,24 @@
         </div>
     </section>
 
+    <!-- ==========================================
+     قسم مواسم الطاعات والتقويم الهجري (Seasons of Worship)
+     ========================================== -->
+    <section id="seasons" class="seasons-section">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-tag"><i class="fa-solid fa-calendar-days"></i> مواسم الخير ومضاعفة الأجور</span>
+                <h2 class="section-title">مواسم الطاعات والتقويم الهجري</h2>
+                <p class="section-desc">
+                    تعرّف على مواعيد أعظم المناسبات الإسلامية وأيام الصيام المستحبة مع عد تنازلي حيّ لكل موسم مبارك.
+                </p>
+            </div>
 
+            <div class="seasons-grid" id="seasons-grid">
+                <!-- يُملأ برمجياً من app.js -->
+            </div>
+        </div>
+    </section>
     <!-- ==========================================
     قسم موسوعة الأدعية النبوية والقرآنية المبوبة (Categorized Duas Section)
     ========================================== -->
@@ -947,8 +969,118 @@
         </div>
     </section>
     <!-- ==========================================
-     سلايدر أدعية الزوار (Swiper Slider Section)
+     قسم أسماء الله الحسنى الـ 99 (99 Names of Allah)
      ========================================== -->
+    <section id="asmaa-allah" class="asmaa-section">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-tag"><i class="fa-solid fa-star-and-crescent"></i> وَلِلَّهِ الْأَسْمَاءُ الْحُسْنَىٰ فَادْعُوهُ بِهَا</span>
+                <h2 class="section-title">مكتبة أسماء الله الحسنى ومعانيها</h2>
+                <p class="section-desc">
+                    تعرّف على معاني أسماء الله الحسنى الـ 99 ودلالاتها الإيمانية وثمار الدعاء بها لنيل البشارة النبوية بدخول الجنة.
+                </p>
+            </div>
+
+            <div class="asmaa-counter-banner">
+                <div class="asmaa-counter-text">
+                    <i class="fa-solid fa-quote-right text-gold"></i>
+                    قال رسول الله ﷺ: <strong>«إِنَّ لِلَّهِ تِسْعَةً وَتِسْعِينَ اسْمًا، مِائَةً إِلَّا وَاحِدًا، مَنْ أَحْصَاهَا دَخَلَ الْجَنَّةَ»</strong> [متفق عليه]
+                </div>
+            </div>
+
+            <!-- تصنيفات أسماء الله الحسنى -->
+            <div class="nawawi-filter-bar" id="asmaa-filter-bar">
+                <button type="button" class="nawawi-filter-pill active" data-cat="all">جميع الأسماء (99)</button>
+                <button type="button" class="nawawi-filter-pill" data-cat="جلال">أسماء الجلال والعظمة</button>
+                <button type="button" class="nawawi-filter-pill" data-cat="رحمة">أسماء الرحمة واللطف</button>
+                <button type="button" class="nawawi-filter-pill" data-cat="قدرة">أسماء القدرة والخلق</button>
+                <button type="button" class="nawawi-filter-pill" data-cat="رزق">أسماء الرزق والإنعام</button>
+                <button type="button" class="nawawi-filter-pill" data-cat="مغفرة">أسماء المغفرة والعفو</button>
+                <button type="button" class="nawawi-filter-pill" data-cat="علم">أسماء العلم والإحاطة</button>
+                <button type="button" class="nawawi-filter-pill" data-cat="حكمة">أسماء الحكمة والعدل</button>
+            </div>
+
+            <!-- حاوية بطاقات أسماء الله الحسنى -->
+            <div class="asmaa-cards-wrapper">
+                <div class="asmaa-mobile-nav-bar">
+                    <div class="asmaa-scroll-hint">
+                        <i class="fa-solid fa-arrows-left-right"></i>
+                        <span>اسحب أفقياً لتصفح أسماء الله الحسنى</span>
+                    </div>
+                    <div class="asmaa-scroll-arrows">
+                        <button type="button" class="btn-scroll-asmaa" onclick="scrollAsmaaContainer('right')" title="الاسم السابق">
+                            <i class="fa-solid fa-chevron-right"></i>
+                        </button>
+                        <button type="button" class="btn-scroll-asmaa" onclick="scrollAsmaaContainer('left')" title="الاسم التالي">
+                            <i class="fa-solid fa-chevron-left"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- شبكة الأسماء الحسنى -->
+                <div class="asmaa-grid" id="asmaa-grid">
+                    <!-- يُملأ برمجياً من asmaa-allah-data.js و app.js -->
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- ==========================================
+         قسم الأربعين النووية الشاملة (42 Hadiths)
+         ========================================== -->
+    <section id="nawawi" class="nawawi-section">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-tag"><i class="fa-solid fa-book-quran"></i> جوامع الكلم والسنّة النبوية</span>
+                <h2 class="section-title">الأربعون النووية للإمام النووي رحمه الله</h2>
+                <p class="section-desc">
+                    42 حديثاً نبوياً شريفاً تجمع أصول وقواعد الشريعة الإسلامية مع الشرح والفوائد التربوية والتلاوة الصوتية العذبة.
+                </p>
+            </div>
+
+            <!-- شريط البحث في الأحاديث -->
+            <div class="nawawi-search-box">
+                <i class="fa-solid fa-magnifying-glass nawawi-search-icon"></i>
+                <input type="text" id="nawawi-search-input" class="nawawi-search-input" placeholder="ابحث في الأحاديث النبوية (مثال: النيات، الحلال، الاستقامة، الجار)...">
+            </div>
+
+            <!-- تصنيفات الأحاديث -->
+            <div class="nawawi-filter-bar" id="nawawi-filter-bar">
+                <button type="button" class="nawawi-filter-pill active" data-cat="all">جميع الأحاديث (42)</button>
+                <button type="button" class="nawawi-filter-pill" data-cat="عقيدة وإخلاص">عقيدة وإخلاص</button>
+                <button type="button" class="nawawi-filter-pill" data-cat="عبادات">عبادات</button>
+                <button type="button" class="nawawi-filter-pill" data-cat="تزكية وأخلاق">تزكية وأخلاق</button>
+                <button type="button" class="nawawi-filter-pill" data-cat="معاملات ودعوة">معاملات ودعوة</button>
+                <button type="button" class="nawawi-filter-pill" data-cat="منهج واتباع">منهج واتباع</button>
+            </div>
+
+            <!-- حاوية بطاقات الأربعين النووية -->
+            <div class="nawawi-cards-wrapper">
+                <div class="nawawi-mobile-nav-bar">
+                    <div class="nawawi-scroll-hint">
+                        <i class="fa-solid fa-arrows-left-right"></i>
+                        <span>اسحب أفقياً لتصفح الأحاديث النبوية</span>
+                    </div>
+                    <div class="nawawi-scroll-arrows">
+                        <button type="button" class="btn-scroll-nawawi" onclick="scrollNawawiContainer('right')" title="الحديث السابق">
+                            <i class="fa-solid fa-chevron-right"></i>
+                        </button>
+                        <button type="button" class="btn-scroll-nawawi" onclick="scrollNawawiContainer('left')" title="الحديث التالي">
+                            <i class="fa-solid fa-chevron-left"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- شبكة الأحاديث النبوية -->
+                <div class="nawawi-grid" id="nawawi-grid">
+                    <!-- يُملأ برمجياً من nawawi-data.js و app.js -->
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==========================================
+    سلايدر أدعية الزوار (Swiper Slider Section)
+    ========================================== -->
     <section id="prayers" class="prayers-section">
         <div class="container">
             <div class="section-header">
@@ -1026,138 +1158,8 @@
                     </div>
                 </div>
             </div>
-        </div> 
-    </section>
-    <!-- ==========================================
-         قسم الأربعين النووية الشاملة (42 Hadiths)
-         ========================================== -->
-    <section id="nawawi" class="nawawi-section">
-        <div class="container">
-            <div class="section-header">
-                <span class="section-tag"><i class="fa-solid fa-book-quran"></i> جوامع الكلم والسنّة النبوية</span>
-                <h2 class="section-title">الأربعون النووية للإمام النووي رحمه الله</h2>
-                <p class="section-desc">
-                    42 حديثاً نبوياً شريفاً تجمع أصول وقواعد الشريعة الإسلامية مع الشرح والفوائد التربوية والتلاوة الصوتية العذبة.
-                </p>
-            </div>
-
-            <!-- شريط البحث في الأحاديث -->
-            <div class="nawawi-search-box">
-                <i class="fa-solid fa-magnifying-glass nawawi-search-icon"></i>
-                <input type="text" id="nawawi-search-input" class="nawawi-search-input" placeholder="ابحث في الأحاديث النبوية (مثال: النيات، الحلال، الاستقامة، الجار)...">
-            </div>
-
-            <!-- تصنيفات الأحاديث -->
-            <div class="nawawi-filter-bar" id="nawawi-filter-bar">
-                <button type="button" class="nawawi-filter-pill active" data-cat="all">جميع الأحاديث (42)</button>
-                <button type="button" class="nawawi-filter-pill" data-cat="عقيدة وإخلاص">عقيدة وإخلاص</button>
-                <button type="button" class="nawawi-filter-pill" data-cat="عبادات">عبادات</button>
-                <button type="button" class="nawawi-filter-pill" data-cat="تزكية وأخلاق">تزكية وأخلاق</button>
-                <button type="button" class="nawawi-filter-pill" data-cat="معاملات ودعوة">معاملات ودعوة</button>
-                <button type="button" class="nawawi-filter-pill" data-cat="منهج واتباع">منهج واتباع</button>
-            </div>
-
-            <!-- حاوية بطاقات الأربعين النووية -->
-            <div class="nawawi-cards-wrapper">
-                <div class="nawawi-mobile-nav-bar">
-                    <div class="nawawi-scroll-hint">
-                        <i class="fa-solid fa-arrows-left-right"></i>
-                        <span>اسحب أفقياً لتصفح الأحاديث النبوية</span>
-                    </div>
-                    <div class="nawawi-scroll-arrows">
-                        <button type="button" class="btn-scroll-nawawi" onclick="scrollNawawiContainer('right')" title="الحديث السابق">
-                            <i class="fa-solid fa-chevron-right"></i>
-                        </button>
-                        <button type="button" class="btn-scroll-nawawi" onclick="scrollNawawiContainer('left')" title="الحديث التالي">
-                            <i class="fa-solid fa-chevron-left"></i>
-                        </button>
-                    </div>
-                </div>
-
-                <!-- شبكة الأحاديث النبوية -->
-                <div class="nawawi-grid" id="nawawi-grid">
-                    <!-- يُملأ برمجياً من nawawi-data.js و app.js -->
-                </div>
-            </div>
         </div>
     </section>
-
-    <!-- ==========================================
-         قسم أسماء الله الحسنى الـ 99 (99 Names of Allah)
-         ========================================== -->
-    <section id="asmaa-allah" class="asmaa-section">
-        <div class="container">
-            <div class="section-header">
-                <span class="section-tag"><i class="fa-solid fa-star-and-crescent"></i> وَلِلَّهِ الْأَسْمَاءُ الْحُسْنَىٰ فَادْعُوهُ بِهَا</span>
-                <h2 class="section-title">مكتبة أسماء الله الحسنى ومعانيها</h2>
-                <p class="section-desc">
-                    تعرّف على معاني أسماء الله الحسنى الـ 99 ودلالاتها الإيمانية وثمار الدعاء بها لنيل البشارة النبوية بدخول الجنة.
-                </p>
-            </div>
-
-            <div class="asmaa-counter-banner">
-                <div class="asmaa-counter-text">
-                    <i class="fa-solid fa-quote-right text-gold"></i>
-                    قال رسول الله ﷺ: <strong>«إِنَّ لِلَّهِ تِسْعَةً وَتِسْعِينَ اسْمًا، مِائَةً إِلَّا وَاحِدًا، مَنْ أَحْصَاهَا دَخَلَ الْجَنَّةَ»</strong> [متفق عليه]
-                </div>
-            </div>
-
-            <!-- تصنيفات أسماء الله الحسنى -->
-            <div class="nawawi-filter-bar" id="asmaa-filter-bar">
-                <button type="button" class="nawawi-filter-pill active" data-cat="all">جميع الأسماء (99)</button>
-                <button type="button" class="nawawi-filter-pill" data-cat="جلال">أسماء الجلال والعظمة</button>
-                <button type="button" class="nawawi-filter-pill" data-cat="رحمة">أسماء الرحمة واللطف</button>
-                <button type="button" class="nawawi-filter-pill" data-cat="قدرة">أسماء القدرة والخلق</button>
-                <button type="button" class="nawawi-filter-pill" data-cat="رزق">أسماء الرزق والإنعام</button>
-                <button type="button" class="nawawi-filter-pill" data-cat="مغفرة">أسماء المغفرة والعفو</button>
-                <button type="button" class="nawawi-filter-pill" data-cat="علم">أسماء العلم والإحاطة</button>
-                <button type="button" class="nawawi-filter-pill" data-cat="حكمة">أسماء الحكمة والعدل</button>
-            </div>
-
-            <!-- حاوية بطاقات أسماء الله الحسنى -->
-            <div class="asmaa-cards-wrapper">
-                <div class="asmaa-mobile-nav-bar">
-                    <div class="asmaa-scroll-hint">
-                        <i class="fa-solid fa-arrows-left-right"></i>
-                        <span>اسحب أفقياً لتصفح أسماء الله الحسنى</span>
-                    </div>
-                    <div class="asmaa-scroll-arrows">
-                        <button type="button" class="btn-scroll-asmaa" onclick="scrollAsmaaContainer('right')" title="الاسم السابق">
-                            <i class="fa-solid fa-chevron-right"></i>
-                        </button>
-                        <button type="button" class="btn-scroll-asmaa" onclick="scrollAsmaaContainer('left')" title="الاسم التالي">
-                            <i class="fa-solid fa-chevron-left"></i>
-                        </button>
-                    </div>
-                </div>
-
-                <!-- شبكة الأسماء الحسنى -->
-                <div class="asmaa-grid" id="asmaa-grid">
-                    <!-- يُملأ برمجياً من asmaa-allah-data.js و app.js -->
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- ==========================================
-         قسم مواسم الطاعات والتقويم الهجري (Seasons of Worship)
-         ========================================== -->
-    <section id="seasons" class="seasons-section">
-        <div class="container">
-            <div class="section-header">
-                <span class="section-tag"><i class="fa-solid fa-calendar-days"></i> مواسم الخير ومضاعفة الأجور</span>
-                <h2 class="section-title">مواسم الطاعات والتقويم الهجري</h2>
-                <p class="section-desc">
-                    تعرّف على مواعيد أعظم المناسبات الإسلامية وأيام الصيام المستحبة مع عد تنازلي حيّ لكل موسم مبارك.
-                </p>
-            </div>
-
-            <div class="seasons-grid" id="seasons-grid">
-                <!-- يُملأ برمجياً من app.js -->
-            </div>
-        </div>
-    </section>
-
     <!-- ==========================================
          قسم دليل أحكام الجنائز والصدقة الجارية (Islamic Deceased Guide)
          ========================================== -->
@@ -1852,7 +1854,9 @@
                 "اللهم اغفر لموتانا وموتى المسلمين، وارحمنا إذا صرنا إلى ما صاروا إليه"
             </div>
             <p class="footer-text">
-                صدقة جارية مستمرة بإذن الله على روح <span class="deceased-name">فقيدنا الغالي</span> • جزاكم الله خيراً على زيارتكم ودعواتكم
+                صدقة جارية مستمرة بإذن الله على أرواح
+                <span class="deceased-name">جدي الغالي عبدالمعبود أمين سعيد وستي الغالية حكم عبدالصمد</span>
+                • جزاكم الله خيرًا على زيارتكم وصالح دعواتكم لهما
             </p>
             <p class="footer-text"> لا تنسونا من صالح دعائكم <span class="footer-author">— عبدو محمد</span> </p>
             <div class="footer-social-shares">

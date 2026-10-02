@@ -1604,7 +1604,7 @@ body {
    قسم المصحف الشريف وختمة القرآن الموحد (Unified Quran & Khatma Hub)
    ========================================================================== */
 .quran-khatma-section {
-  padding: 25px 0 50px;
+  padding: 0px 0 50px;
   position: relative;
   background: radial-gradient(circle at 50% 10%, rgba(16, 185, 129, 0.04) 0%, transparent 60%);
 }
@@ -1895,7 +1895,7 @@ body {
 
 @media (max-width: 768px) {
   .khatma-mobile-nav-bar {
-    display: flex;
+    display: flex !important;
     justify-content: space-between;
     align-items: center;
     margin-bottom: 1.2rem;
@@ -2224,8 +2224,12 @@ body {
   width: 100%;
 }
 
-.azkar-mobile-nav-bar {
-  display: none;
+.azkar-mobile-nav-bar,
+.duas-mobile-nav-bar,
+.nawawi-mobile-nav-bar,
+.asmaa-mobile-nav-bar,
+.khatma-mobile-nav-bar {
+  display: none !important;
 }
 
 .azkar-cards-container {
@@ -2320,7 +2324,7 @@ body {
 
 @media (max-width: 768px) {
   .azkar-mobile-nav-bar {
-    display: flex;
+    display: flex !important;
     justify-content: space-between;
     align-items: center;
     margin-bottom: 1.2rem;
@@ -5226,7 +5230,7 @@ body {
    قسم فتاوى وأحكام الميت والصدقة الجارية (Islamic FAQ Accordion)
    ========================================================================== */
 .faq-section {
-  padding: var(--section-spacing-y) 0;
+  padding: 0 0 50px 0;
   background: rgba(7, 13, 24, 0.95);
 }
 

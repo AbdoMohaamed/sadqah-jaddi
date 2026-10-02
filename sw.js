@@ -3,7 +3,7 @@
  * يوفر سرعة تحميل فورية ودعم التثبيت كـ PWA
  */
 
-const CACHE_NAME = "sadqah-jaddi-v6";
+const CACHE_NAME = "sadqah-jaddi-v7";
 const ASSETS_TO_CACHE = [
   "./",
   "./index.html",
