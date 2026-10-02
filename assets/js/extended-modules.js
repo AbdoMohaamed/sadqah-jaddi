@@ -9,6 +9,7 @@
  */
 
 document.addEventListener("DOMContentLoaded", () => {
+    initMobileNavDrawer();
     initCustomShareLink();
     initNawawiHadiths();
     initAsmaaAllah();
@@ -16,6 +17,7 @@ document.addEventListener("DOMContentLoaded", () => {
     initIslamicGuideFaq();
     initSmartNotifications();
     initEnhancedCardGenerator();
+    initEnhancedCategorizedDuas();
 });
 
 /* ==========================================================================
@@ -937,3 +939,238 @@ function fallbackShareWhatsApp() {
     window.open(waUrl, "_blank");
     showToast("جاري فتح واتساب للمشاركة 📲");
 }
+
+/* ==========================================================================
+   7. القائمة الجانبية للشاشات الصغيرة (Mobile Navigation Drawer)
+   ========================================================================== */
+function initMobileNavDrawer() {
+    const toggleBtn = document.getElementById("btn-mobile-menu-toggle");
+    const drawer = document.getElementById("mobile-nav-drawer");
+    const overlay = document.getElementById("mobile-nav-overlay");
+    const closeBtn = document.getElementById("btn-close-mobile-nav");
+    const navLinks = document.querySelectorAll(".mobile-nav-link");
+    const customShareBtn = document.getElementById("btn-mobile-custom-share");
+
+    if (!drawer) return;
+
+    function openDrawer() {
+        drawer.classList.add("open");
+        document.body.style.overflow = "hidden";
+    }
+
+    function closeDrawer() {
+        drawer.classList.remove("open");
+        document.body.style.overflow = "";
+    }
+
+    if (toggleBtn) {
+        toggleBtn.addEventListener("click", (e) => {
+            e.stopPropagation();
+            if (drawer.classList.contains("open")) {
+                closeDrawer();
+            } else {
+                openDrawer();
+            }
+        });
+    }
+
+    if (closeBtn) {
+        closeBtn.addEventListener("click", closeDrawer);
+    }
+
+    if (overlay) {
+        overlay.addEventListener("click", closeDrawer);
+    }
+
+    navLinks.forEach(link => {
+        link.addEventListener("click", () => {
+            closeDrawer();
+            navLinks.forEach(l => l.classList.remove("active"));
+            link.classList.add("active");
+        });
+    });
+
+    if (customShareBtn) {
+        customShareBtn.addEventListener("click", () => {
+            closeDrawer();
+            const modal = document.getElementById("custom-share-modal");
+            if (modal) modal.classList.add("open");
+        });
+    }
+
+    document.addEventListener("keydown", (e) => {
+        if (e.key === "Escape" && drawer.classList.contains("open")) {
+            closeDrawer();
+        }
+    });
+}
+
+/* ==========================================================================
+   8. ترقية موسوعة الأدعية النبوية لتطابق تصميم وتجربة قسم أذكار اليوم
+   ========================================================================== */
+function initEnhancedCategorizedDuas() {
+    function safeEscape(str) {
+        if (typeof escapeHTML === "function") return escapeHTML(str);
+        if (typeof escapeHtml === "function") return escapeHtml(str);
+        if (!str) return "";
+        return String(str)
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#039;");
+    }
+
+    // ترقية دالة رسم بطاقات الأدعية لتطابق بطاقات الأذكار
+    window.renderDuasCardsList = function(duasList) {
+        const gridContainer = document.getElementById("categorized-duas-grid");
+        if (!gridContainer) return;
+
+        gridContainer.innerHTML = "";
+
+        if (!duasList || duasList.length === 0) {
+            gridContainer.innerHTML = `
+                <div style="grid-column: 1 / -1; text-align: center; padding: 3rem 1rem; color: var(--text-muted);">
+                    <i class="fa-solid fa-magnifying-glass fa-2x text-gold" style="margin-bottom: 0.8rem; opacity: 0.7;"></i>
+                    <p style="color: #fff; font-weight: 700; font-size: 1.1rem; margin-bottom: 0.4rem;">لا توجد أدعية مطابقة</p>
+                    <p style="font-size: 0.88rem;">يرجى اختيار تصنيف آخر أو تجربة كلمة بحث مختلفة</p>
+                </div>
+            `;
+            return;
+        }
+
+        duasList.forEach((dua, idx) => {
+            const card = document.createElement("div");
+            const duaId = dua.id || `dua_${idx}`;
+            const targetRepeat = dua.repeat || 1;
+            card.className = "azkar-card cat-dua-card";
+            card.id = `cat-dua-card-${duaId}`;
+            card.setAttribute("data-dua-id", duaId);
+
+            card.innerHTML = `
+                <div class="cat-dua-header">
+                    <h3 class="cat-dua-title">${safeEscape(dua.title)}</h3>
+                    <span class="cat-dua-category-badge"><i class="fa-solid fa-hands-praying text-gold"></i> دعاء نبوي مأثور</span>
+                </div>
+                <div class="azkar-text">"${safeEscape(dua.text)}"</div>
+                <div class="azkar-virtue">
+                    <i class="fa-solid fa-award text-gold"></i>
+                    <span>${safeEscape(dua.source)}</span>
+                </div>
+                <div class="azkar-footer">
+                    <div class="azkar-count-badge">
+                        <span>التكرار المستحب: <strong>${targetRepeat} مرات</strong></span>
+                    </div>
+                    <div class="cat-dua-actions-wrapper">
+                        <button type="button" class="azkar-tap-btn btn-repeat-dua" data-remaining="${targetRepeat}" title="انقر لتكرار الدعاء ونيل الأجر">
+                            <i class="fa-solid fa-hand-pointer"></i>
+                            <span class="btn-repeat-text">تبقى: ${targetRepeat}</span>
+                        </button>
+                        <button type="button" class="btn btn-outline btn-sm btn-icon-round btn-copy-cat-dua" title="نسخ الدعاء">
+                            <i class="fa-solid fa-copy"></i>
+                        </button>
+                        <button type="button" class="btn btn-outline btn-sm btn-icon-round btn-share-cat-dua" title="مشاركة الدعاء لواتساب">
+                            <i class="fa-brands fa-whatsapp" style="color: #25D366;"></i>
+                        </button>
+                    </div>
+                </div>
+            `;
+
+            // 1. زر النسخ
+            const copyBtn = card.querySelector(".btn-copy-cat-dua");
+            if (copyBtn) {
+                copyBtn.addEventListener("click", (e) => {
+                    e.stopPropagation();
+                    const textToCopy = `🤲 *${dua.title}*\n"${dua.text}"\n📍 [${dua.source}]\n\n🕊️ صدقة جارية: https://abdomohaamed.github.io/sadqah-jaddi/`;
+                    copyTextToClipboard(textToCopy);
+                    showToast("تم نسخ الدعاء بنجاح 📋");
+                });
+            }
+
+            // 2. زر المشاركة لواتساب
+            const shareBtn = card.querySelector(".btn-share-cat-dua");
+            if (shareBtn) {
+                shareBtn.addEventListener("click", (e) => {
+                    e.stopPropagation();
+                    const deceasedName = (typeof DECEASED_INFO !== "undefined" && DECEASED_INFO.name) ? DECEASED_INFO.name : "فقيدنا الغالي";
+                    const msg = `🤲 *${dua.title}*\n"${dua.text}"\n📍 [${dua.source}]\n\n🤍 صدقة جارية لروح (${deceasedName})\n📲 زاد المسلم: https://abdomohaamed.github.io/sadqah-jaddi/`;
+                    const url = `https://api.whatsapp.com/send?text=${encodeURIComponent(msg)}`;
+                    window.open(url, "_blank");
+                });
+            }
+
+            // 3. زر التكرار التفاعلي بالصوت والاهتزاز وحالة الإتمام
+            const repeatBtn = card.querySelector(".btn-repeat-dua");
+            if (repeatBtn) {
+                repeatBtn.addEventListener("click", (e) => {
+                    e.stopPropagation();
+                    let rem = parseInt(repeatBtn.getAttribute("data-remaining"), 10);
+                    if (rem > 1) {
+                        rem--;
+                        repeatBtn.setAttribute("data-remaining", rem);
+                        const textEl = repeatBtn.querySelector(".btn-repeat-text");
+                        if (textEl) textEl.textContent = `تبقى: ${rem}`;
+                        if ("vibrate" in navigator) navigator.vibrate(25);
+                        if (typeof playTasbeehClickTone === "function") playTasbeehClickTone();
+                    } else if (rem === 1) {
+                        rem = 0;
+                        repeatBtn.setAttribute("data-remaining", 0);
+                        card.classList.add("is-finished");
+                        repeatBtn.classList.add("all-done");
+                        repeatBtn.innerHTML = '<i class="fa-solid fa-check-double"></i> <span>تم الدعاء بنجاح</span>';
+                        if ("vibrate" in navigator) navigator.vibrate([40, 60, 40]);
+                        if (typeof playCompletionChime === "function") playCompletionChime();
+                        showToast(`تقبل الله دعاءك وذكرك، وجعله في ميزان حسناتك 🌿🤲`);
+                    } else {
+                        // إعادة التعيين
+                        repeatBtn.setAttribute("data-remaining", targetRepeat);
+                        card.classList.remove("is-finished");
+                        repeatBtn.classList.remove("all-done");
+                        repeatBtn.innerHTML = `<i class="fa-solid fa-hand-pointer"></i> <span class="btn-repeat-text">تبقى: ${targetRepeat}</span>`;
+                    }
+                });
+            }
+
+            gridContainer.appendChild(card);
+        });
+    };
+
+    window.scrollDuasContainer = function(direction) {
+        const container = document.getElementById("categorized-duas-grid");
+        if (!container) return;
+        const card = container.querySelector(".cat-dua-card, .azkar-card");
+        const scrollAmount = card ? (card.offsetWidth + 20) : 320;
+        const delta = direction === "left" ? -scrollAmount : scrollAmount;
+        container.scrollBy({ left: delta, behavior: "smooth" });
+    };
+
+    window.scrollNawawiContainer = function(direction) {
+        const container = document.getElementById("nawawi-grid");
+        if (!container) return;
+        const card = container.querySelector(".hadith-card");
+        const scrollAmount = card ? (card.offsetWidth + 20) : 320;
+        const delta = direction === "left" ? -scrollAmount : scrollAmount;
+        container.scrollBy({ left: delta, behavior: "smooth" });
+    };
+
+    window.scrollAsmaaContainer = function(direction) {
+        const container = document.getElementById("asmaa-grid");
+        if (!container) return;
+        const card = container.querySelector(".asmaa-card");
+        const scrollAmount = card ? (card.offsetWidth + 16) : 260;
+        const delta = direction === "left" ? -scrollAmount : scrollAmount;
+        container.scrollBy({ left: delta, behavior: "smooth" });
+    };
+
+    // إعادة رسم القسم المفتوح حالياً بالتصميم المحدث فور التحميل
+    if (typeof CATEGORIZED_DUAS !== "undefined") {
+        const activeTab = document.querySelector(".duas-tab-btn.active");
+        const catKey = activeTab ? activeTab.getAttribute("data-cat") : "karb_debt";
+        if (CATEGORIZED_DUAS[catKey]) {
+            window.renderDuasCardsList(CATEGORIZED_DUAS[catKey].duas || []);
+        }
+    }
+}
+
+
+

@@ -41,7 +41,7 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css">
 
     <!-- تنسيقات الموقع -->
-    <link rel="stylesheet" href="assets/css/style.css?v=63">
+    <link rel="stylesheet" href="assets/css/style.css?v=66">
 </head>
 <body>
 
@@ -59,36 +59,71 @@
             <ul class="nav-links">
                 <li><a href="#hero" class="active">الرئيسية</a></li>
                 <li><a href="#quran-khatma">المصحف والختمة</a></li>
-                <!--<li><a href="#prayer-times">مواقيت الصلاة</a></li>-->
-                <!--<li><a href="#nawawi">الأربعون النووية</a></li>-->
+                <li><a href="#prayer-times">مواقيت الصلاة</a></li>
                 <li><a href="#asmaa-allah">أسماء الله الحسنى</a></li>
                 <li><a href="#seasons">مواسم الطاعات</a></li>
-                <!--<li><a href="#islamic-guide">أحكام الجنائز</a></li>-->
+                <li><a href="#daily-wird">الورد اليومي</a></li>
+                <li><a href="#categorized-duas">الأدعية النبوية</a></li>
                 <li><a href="#tasbeeh">السبحة</a></li>
                 <li><a href="#azkar">الأذكار</a></li>
-                <!--<li><a href="#prayers">أدعية الزوار</a></li>-->
             </ul>
 
             <div class="nav-actions">
-                <button id="btn-open-notifications-nav" class="btn btn-outline" title="تنبيهات وإشعارات الطاعات">
+                <button id="btn-open-notifications-nav" class="btn btn-outline btn-icon-only-mobile" title="تنبيهات وإشعارات الطاعات">
                     <i class="fa-solid fa-bell text-gold"></i>
                     <span>التنبيهات</span>
                 </button>
-                <button id="btn-open-custom-share-nav" class="btn btn-gold btn-sm" title="إنشاء رابط صدقة جارية لفقيدك">
+                <button id="btn-open-custom-share-nav" class="btn btn-gold btn-sm btn-icon-only-mobile" title="إنشاء رابط صدقة جارية لفقيدك">
                     <i class="fa-solid fa-gift"></i>
                     <span>إهداء صدقة</span>
                 </button>
-                <button id="btn-install-app" class="btn btn-install-pwa" style="display: none;" title="تثبيت التطبيق على جهازك">
-                    <i class="fa-solid fa-mobile-screen-button"></i>
-                    <span>تثبيت التطبيق</span>
-                </button>
-                <button id="btn-toggle-radio-nav" class="btn btn-outline" title="إذاعة القرآن الكريم">
+                <!--<button id="btn-toggle-radio-nav" class="btn btn-outline btn-icon-only-mobile" title="إذاعة القرآن الكريم">
                     <i class="fa-solid fa-tower-broadcast"></i>
                     <span>الإذاعة</span>
-                </button> 
+                </button>-->
+                <button id="btn-mobile-menu-toggle" class="btn btn-outline btn-mobile-menu" aria-label="القائمة">
+                    <i class="fa-solid fa-bars" id="hamburger-icon"></i>
+                </button>
             </div>
         </div>
     </nav>
+
+    <!-- القائمة الجانبية المنسدلة للهواتف (Mobile Navigation Drawer) -->
+    <div class="mobile-nav-drawer" id="mobile-nav-drawer">
+        <div class="mobile-nav-overlay" id="mobile-nav-overlay"></div>
+        <div class="mobile-nav-content">
+            <div class="mobile-nav-header">
+                <div class="brand">
+                    <i class="fa-solid fa-kaaba brand-icon text-gold"></i>
+                    <div class="brand-text-group">
+                        <span class="brand-title">زاد المسلم</span>
+                        <span class="brand-subtitle">صدقة جارية</span>
+                    </div>
+                </div>
+                <button class="btn-close-mobile-nav" id="btn-close-mobile-nav" aria-label="إغلاق">&times;</button>
+            </div>
+            <ul class="mobile-nav-list">
+                <li><a href="#hero" class="mobile-nav-link active"><i class="fa-solid fa-house"></i> <span>الرئيسية</span></a></li>
+                <li><a href="#quran-khatma" class="mobile-nav-link"><i class="fa-solid fa-book-quran"></i> <span>المصحف والختمة</span></a></li>
+                <li><a href="#prayer-times" class="mobile-nav-link"><i class="fa-solid fa-mosque"></i> <span>مواقيت الصلاة والقبلة</span></a></li>
+                <li><a href="#nawawi" class="mobile-nav-link"><i class="fa-solid fa-book-open-reader"></i> <span>الأربعون النووية</span></a></li>
+                <li><a href="#asmaa-allah" class="mobile-nav-link"><i class="fa-solid fa-star-and-crescent"></i> <span>أسماء الله الحسنى</span></a></li>
+                <li><a href="#seasons" class="mobile-nav-link"><i class="fa-solid fa-calendar-days"></i> <span>مواسم الطاعات والتقويم</span></a></li>
+                <li><a href="#islamic-guide" class="mobile-nav-link"><i class="fa-solid fa-scale-balanced"></i> <span>أحكام الجنائز والصدقة</span></a></li>
+                <li><a href="#daily-wird" class="mobile-nav-link"><i class="fa-solid fa-list-check"></i> <span>الورد اليومي</span></a></li>
+                <li><a href="#categorized-duas" class="mobile-nav-link"><i class="fa-solid fa-hands-praying"></i> <span>الأدعية النبوية</span></a></li>
+                <li><a href="#tasbeeh" class="mobile-nav-link"><i class="fa-solid fa-ring"></i> <span>السبحة الإلكترونية</span></a></li>
+                <li><a href="#azkar" class="mobile-nav-link"><i class="fa-solid fa-shield-halved"></i> <span>أذكار اليوم وحصن المسلم</span></a></li>
+                <li><a href="#prayers" class="mobile-nav-link"><i class="fa-solid fa-heart"></i> <span>أدعية الزوار</span></a></li>
+            </ul>
+            <div class="mobile-nav-footer">
+                <button class="btn btn-gold btn-block btn-open-custom-share" id="btn-mobile-custom-share">
+                    <i class="fa-solid fa-gift"></i>
+                    <span>إنشاء رابط صدقة لفقيدك 🌿</span>
+                </button>
+            </div>
+        </div>
+    </div>
 
     <!-- شريط التنبيه عند انقطاع الإنترنت (Offline Banner) -->
     <div class="offline-status-banner" id="offline-status-banner" style="display: none;">
@@ -776,9 +811,27 @@
                 </div>
             </div>
 
-            <!-- شبكة عرض بطاقات الأدعية -->
-            <div class="categorized-duas-grid" id="categorized-duas-grid">
-                <!-- يُملأ برمجياً من js/azkar-data.js و js/app.js -->
+            <!-- حاوية بطاقات الأدعية التفاعلية لشاشات الجوال والكمبيوتر -->
+            <div class="duas-cards-wrapper">
+                <div class="duas-mobile-nav-bar">
+                    <div class="duas-scroll-hint">
+                        <i class="fa-solid fa-arrows-left-right"></i>
+                        <span>اسحب أفقياً لتصفح بطاقات الأدعية</span>
+                    </div>
+                    <div class="duas-scroll-arrows">
+                        <button type="button" class="btn-scroll-duas" onclick="scrollDuasContainer('right')" title="الدعاء السابق">
+                            <i class="fa-solid fa-chevron-right"></i>
+                        </button>
+                        <button type="button" class="btn-scroll-duas" onclick="scrollDuasContainer('left')" title="الدعاء التالي">
+                            <i class="fa-solid fa-chevron-left"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- شبكة عرض بطاقات الأدعية -->
+                <div class="categorized-duas-grid" id="categorized-duas-grid">
+                    <!-- يُملأ برمجياً من js/azkar-data.js و js/app.js -->
+                </div>
             </div>
         </div>
     </section>
@@ -973,7 +1026,8 @@
                     </div>
                 </div>
             </div>
-        </div>
+        </div> 
+    </section>
     <!-- ==========================================
          قسم الأربعين النووية الشاملة (42 Hadiths)
          ========================================== -->
@@ -1003,9 +1057,27 @@
                 <button type="button" class="nawawi-filter-pill" data-cat="منهج واتباع">منهج واتباع</button>
             </div>
 
-            <!-- شبكة الأحاديث النبوية -->
-            <div class="nawawi-grid" id="nawawi-grid">
-                <!-- يُملأ برمجياً من nawawi-data.js و app.js -->
+            <!-- حاوية بطاقات الأربعين النووية -->
+            <div class="nawawi-cards-wrapper">
+                <div class="nawawi-mobile-nav-bar">
+                    <div class="nawawi-scroll-hint">
+                        <i class="fa-solid fa-arrows-left-right"></i>
+                        <span>اسحب أفقياً لتصفح الأحاديث النبوية</span>
+                    </div>
+                    <div class="nawawi-scroll-arrows">
+                        <button type="button" class="btn-scroll-nawawi" onclick="scrollNawawiContainer('right')" title="الحديث السابق">
+                            <i class="fa-solid fa-chevron-right"></i>
+                        </button>
+                        <button type="button" class="btn-scroll-nawawi" onclick="scrollNawawiContainer('left')" title="الحديث التالي">
+                            <i class="fa-solid fa-chevron-left"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- شبكة الأحاديث النبوية -->
+                <div class="nawawi-grid" id="nawawi-grid">
+                    <!-- يُملأ برمجياً من nawawi-data.js و app.js -->
+                </div>
             </div>
         </div>
     </section>
@@ -1042,9 +1114,27 @@
                 <button type="button" class="nawawi-filter-pill" data-cat="حكمة">أسماء الحكمة والعدل</button>
             </div>
 
-            <!-- شبكة الأسماء الحسنى -->
-            <div class="asmaa-grid" id="asmaa-grid">
-                <!-- يُملأ برمجياً من asmaa-allah-data.js و app.js -->
+            <!-- حاوية بطاقات أسماء الله الحسنى -->
+            <div class="asmaa-cards-wrapper">
+                <div class="asmaa-mobile-nav-bar">
+                    <div class="asmaa-scroll-hint">
+                        <i class="fa-solid fa-arrows-left-right"></i>
+                        <span>اسحب أفقياً لتصفح أسماء الله الحسنى</span>
+                    </div>
+                    <div class="asmaa-scroll-arrows">
+                        <button type="button" class="btn-scroll-asmaa" onclick="scrollAsmaaContainer('right')" title="الاسم السابق">
+                            <i class="fa-solid fa-chevron-right"></i>
+                        </button>
+                        <button type="button" class="btn-scroll-asmaa" onclick="scrollAsmaaContainer('left')" title="الاسم التالي">
+                            <i class="fa-solid fa-chevron-left"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- شبكة الأسماء الحسنى -->
+                <div class="asmaa-grid" id="asmaa-grid">
+                    <!-- يُملأ برمجياً من asmaa-allah-data.js و app.js -->
+                </div>
             </div>
         </div>
     </section>
@@ -1794,7 +1884,7 @@
     <script src="assets/js/firebase-config.js"></script>
     <script src="assets/js/app.js?v=10"></script>
     <script src="assets/js/quran.js?v=10"></script>
-    <script src="assets/js/extended-modules.js?v=1"></script>
+    <script src="assets/js/extended-modules.js?v=4"></script>
 
 
 </body>

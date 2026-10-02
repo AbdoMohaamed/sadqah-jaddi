@@ -549,7 +549,7 @@ body {
    قسم السبحة الإلكترونية (Tasbeeh Counter)
    ========================================================================== */
 .tasbeeh-section {
-  padding: 0 0 25px 0;
+  padding: 0 0 35px 0;
   background: radial-gradient(circle at center, rgba(19, 35, 60, 0.6) 0%, rgba(7, 13, 24, 0.95) 70%);
   border-top: 1px solid rgba(212, 175, 55, 0.15);
   border-bottom: 1px solid rgba(212, 175, 55, 0.15);
@@ -5372,3 +5372,523 @@ input:checked + .slider-round {
 input:checked + .slider-round:before {
   transform: translateX(22px);
 }
+
+/* ==========================================================================
+   شريط التنقل المتجاوب والقائمة الجانبية للهواتف (Responsive Navbar & Mobile Drawer)
+   ========================================================================== */
+.btn-mobile-menu {
+  display: none;
+  padding: 0.5rem 0.75rem;
+  font-size: 1.1rem;
+}
+
+@media (max-width: 991px) {
+  .nav-links {
+    display: none !important;
+  }
+
+  .btn-mobile-menu {
+    display: inline-flex !important;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .nav-actions {
+    gap: 0.35rem;
+  }
+
+  .btn-icon-only-mobile span {
+    display: none;
+  }
+
+  .btn-icon-only-mobile {
+    padding: 0.5rem 0.65rem !important;
+    font-size: 0.95rem;
+  }
+}
+
+.mobile-nav-drawer {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 3000;
+  visibility: hidden;
+  opacity: 0;
+  transition: visibility 0.3s, opacity 0.3s;
+}
+
+.mobile-nav-drawer.open {
+  visibility: visible;
+  opacity: 1;
+}
+
+.mobile-nav-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(4, 8, 15, 0.85);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+.mobile-nav-content {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 84%;
+  max-width: 320px;
+  height: 100%;
+  background: linear-gradient(180deg, #0f1c30 0%, #081220 100%);
+  border-left: 1px solid var(--gold-400);
+  box-shadow: -10px 0 30px rgba(0, 0, 0, 0.8);
+  display: flex;
+  flex-direction: column;
+  transform: translateX(100%);
+  transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+  padding: 1.5rem 1.2rem;
+  overflow-y: auto;
+  z-index: 10;
+}
+
+.mobile-nav-drawer.open .mobile-nav-content {
+  transform: translateX(0);
+}
+
+.mobile-nav-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: 1.2rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  margin-bottom: 1rem;
+}
+
+.btn-close-mobile-nav {
+  background: transparent;
+  border: none;
+  color: var(--gold-400);
+  font-size: 2rem;
+  cursor: pointer;
+  line-height: 1;
+  padding: 0 0.5rem;
+}
+
+.mobile-nav-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  flex: 1;
+}
+
+.mobile-nav-link {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  padding: 0.7rem 0.9rem;
+  border-radius: var(--radius-md);
+  color: #e5e7eb;
+  text-decoration: none;
+  font-size: 0.95rem;
+  font-weight: 500;
+  transition: all var(--transition-fast);
+}
+
+.mobile-nav-link i {
+  color: var(--gold-400);
+  width: 22px;
+  text-align: center;
+  font-size: 1.05rem;
+}
+
+.mobile-nav-link:hover,
+.mobile-nav-link.active {
+  background: rgba(212, 175, 55, 0.12);
+  color: var(--gold-300);
+  border-right: 3px solid var(--gold-400);
+}
+
+.mobile-nav-footer {
+  padding-top: 1.2rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  margin-top: 1rem;
+}
+
+/* ==========================================================================
+   سلايدر الشاشات الصغيرة للأدعية والأربعين النووية وأسماء الله الحسنى (كالسبحة والأذكار)
+   ========================================================================== */
+@media (max-width: 991px) {
+  /* 1. موسوعة الأدعية النبوية المبوبة */
+  .duas-categories-tabs {
+    display: flex !important;
+    padding-bottom: 0.5rem;
+    gap: 0.6rem;
+    scrollbar-width: none;
+    margin-bottom: 1.2rem;
+  }
+  .duas-categories-tabs::-webkit-scrollbar {
+    display: none;
+  }
+  .duas-tab-btn {
+    white-space: nowrap !important;
+    flex-shrink: 0 !important;
+    font-size: 0.88rem;
+    padding: 0.55rem 1rem;
+  }
+
+  .categorized-duas-grid {
+    display: flex !important;
+    flex-direction: row !important;
+    flex-wrap: nowrap !important;
+    overflow-x: auto !important;
+    overflow-y: hidden !important;
+    scroll-snap-type: x mandatory;
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
+    gap: 1.2rem !important;
+    padding: 0.5rem 0.3rem 1.5rem !important;
+    scrollbar-width: thin;
+    scrollbar-color: var(--gold-500) rgba(255, 255, 255, 0.08);
+  }
+
+  .categorized-duas-grid::-webkit-scrollbar {
+    height: 6px;
+  }
+  .categorized-duas-grid::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.06);
+    border-radius: var(--radius-full);
+  }
+  .categorized-duas-grid::-webkit-scrollbar-thumb {
+    background: var(--gold-500);
+    border-radius: var(--radius-full);
+  }
+
+  .categorized-dua-card,
+  .cat-dua-card {
+    min-width: 84vw !important;
+    max-width: 420px !important;
+    flex: 0 0 84vw !important;
+    scroll-snap-align: center;
+    padding: 1.5rem 1.1rem !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: space-between !important;
+  }
+
+  .duas-mobile-nav-bar {
+    display: flex !important;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.2rem;
+    padding: 0 0.25rem;
+    gap: 0.8rem;
+  }
+
+  .duas-scroll-hint {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.85rem;
+    color: var(--gold-300);
+    background: rgba(212, 175, 55, 0.08);
+    border: 1px dashed rgba(212, 175, 55, 0.3);
+    padding: 0.4rem 0.9rem;
+    border-radius: var(--radius-full);
+  }
+
+  .duas-scroll-arrows {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .btn-scroll-duas {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: rgba(15, 28, 48, 0.9);
+    border: 1px solid var(--gold-500);
+    color: var(--gold-300);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 0.85rem;
+    transition: var(--transition-fast);
+  }
+
+  .btn-scroll-duas:hover,
+  .btn-scroll-duas:active {
+    background: var(--gold-500);
+    color: var(--bg-dark);
+  }
+
+  /* 2. قسم الأربعين النووية */
+  .nawawi-mobile-nav-bar {
+    display: flex !important;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.2rem;
+    padding: 0 0.25rem;
+    gap: 0.8rem;
+  }
+
+  .nawawi-scroll-hint {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.85rem;
+    color: var(--gold-300);
+    background: rgba(212, 175, 55, 0.08);
+    border: 1px dashed rgba(212, 175, 55, 0.3);
+    padding: 0.4rem 0.9rem;
+    border-radius: var(--radius-full);
+  }
+
+  .nawawi-scroll-arrows {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .btn-scroll-nawawi {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: rgba(15, 28, 48, 0.9);
+    border: 1px solid var(--gold-500);
+    color: var(--gold-300);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 0.85rem;
+    transition: var(--transition-fast);
+  }
+
+  .btn-scroll-nawawi:hover,
+  .btn-scroll-nawawi:active {
+    background: var(--gold-500);
+    color: var(--bg-dark);
+  }
+
+  .nawawi-filter-bar {
+    display: flex !important;
+    justify-items:center;
+    padding-bottom: 0.5rem;
+    gap: 0.6rem;
+    scrollbar-width: none;
+    justify-content: center !important;
+    margin-bottom: 1.2rem;
+  }
+  .nawawi-filter-bar::-webkit-scrollbar {
+    display: none;
+  }
+  .nawawi-filter-pill {
+    white-space: nowrap !important;
+    flex-shrink: 0 !important;
+    font-size: 0.88rem;
+    padding: 0.5rem 1.1rem;
+  }
+
+  .nawawi-grid {
+    display: flex !important;
+    flex-direction: row !important;
+    flex-wrap: nowrap !important;
+    overflow-x: auto !important;
+    overflow-y: hidden !important;
+    scroll-snap-type: x mandatory;
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
+    gap: 1.2rem !important;
+    padding: 0.5rem 0.3rem 1.5rem !important;
+    scrollbar-width: thin;
+    scrollbar-color: var(--gold-500) rgba(255, 255, 255, 0.08);
+  }
+
+  .nawawi-grid::-webkit-scrollbar {
+    height: 6px;
+  }
+  .nawawi-grid::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.06);
+    border-radius: var(--radius-full);
+  }
+  .nawawi-grid::-webkit-scrollbar-thumb {
+    background: var(--gold-500);
+    border-radius: var(--radius-full);
+  }
+
+  .hadith-card {
+    min-width: 84vw !important;
+    max-width: 420px !important;
+    flex: 0 0 84vw !important;
+    scroll-snap-align: center;
+    padding: 1.5rem 1.1rem !important;
+    display: flex !important;
+    flex-direction: column !important;
+  }
+
+  /* 3. مكتبة أسماء الله الحسنى الـ 99 */
+  .asmaa-mobile-nav-bar {
+    display: flex !important;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.2rem;
+    padding: 0 0.25rem;
+    gap: 0.8rem;
+  }
+
+  .asmaa-scroll-hint {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.85rem;
+    color: var(--gold-300);
+    background: rgba(212, 175, 55, 0.08);
+    border: 1px dashed rgba(212, 175, 55, 0.3);
+    padding: 0.4rem 0.9rem;
+    border-radius: var(--radius-full);
+  }
+
+  .asmaa-scroll-arrows {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .btn-scroll-asmaa {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: rgba(15, 28, 48, 0.9);
+    border: 1px solid var(--gold-500);
+    color: var(--gold-300);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 0.85rem;
+    transition: var(--transition-fast);
+  }
+
+  .btn-scroll-asmaa:hover,
+  .btn-scroll-asmaa:active {
+    background: var(--gold-500);
+    color: var(--bg-dark);
+  }
+
+  #asmaa-filter-bar {
+    display: flex !important;
+    padding-bottom: 0.5rem;
+    gap: 0.6rem;
+    scrollbar-width: none;
+    justify-content: center !important;
+    margin-bottom: 1.2rem;
+  }
+  #asmaa-filter-bar::-webkit-scrollbar {
+    display: none;
+  }
+
+  .asmaa-grid {
+    display: flex !important;
+    flex-direction: row !important;
+    flex-wrap: nowrap !important;
+    overflow-x: auto !important;
+    overflow-y: hidden !important;
+    scroll-snap-type: x mandatory;
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
+    gap: 1rem !important;
+    padding: 0.5rem 0.3rem 1.5rem !important;
+    scrollbar-width: thin;
+    scrollbar-color: var(--gold-500) rgba(255, 255, 255, 0.08);
+  }
+
+  .asmaa-grid::-webkit-scrollbar {
+    height: 6px;
+  }
+  .asmaa-grid::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.06);
+    border-radius: var(--radius-full);
+  }
+  .asmaa-grid::-webkit-scrollbar-thumb {
+    background: var(--gold-500);
+    border-radius: var(--radius-full);
+  }
+
+  .asmaa-card {
+    min-width: 68vw !important;
+    max-width: 280px !important;
+    flex: 0 0 68vw !important;
+    scroll-snap-align: center;
+    padding: 1.25rem 1rem !important;
+  }
+}
+
+/* ==========================================================================
+   عناصر وتنسيقات بطاقات الأدعية النبوية المتوافقة مع سكشن الأذكار
+   ========================================================================== */
+.cat-dua-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.6rem;
+  margin-bottom: 0.9rem;
+  padding-bottom: 0.6rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.cat-dua-title {
+  font-weight: 700;
+  font-size: 1.12rem;
+  color: var(--gold-300);
+  line-height: 1.4;
+  margin: 0;
+}
+
+.cat-dua-category-badge {
+  background: rgba(212, 175, 55, 0.12);
+  border: 1px solid rgba(212, 175, 55, 0.25);
+  color: var(--gold-300);
+  padding: 0.25rem 0.75rem;
+  border-radius: var(--radius-full);
+  font-size: 0.78rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.cat-dua-actions-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.btn-icon-round {
+  width: 38px;
+  height: 38px;
+  padding: 0 !important;
+  border-radius: 50% !important;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.95rem;
+}
+
+.cat-dua-card.is-finished {
+  border-color: rgba(16, 185, 129, 0.4);
+  background: linear-gradient(180deg, rgba(16, 185, 129, 0.06) 0%, rgba(15, 28, 48, 0.6) 100%);
+}
+
+.cat-dua-card.is-finished .btn-repeat-dua.all-done {
+  background: var(--emerald-500);
+  border-color: var(--emerald-400);
+  color: #fff;
+  cursor: default;
+}
+
