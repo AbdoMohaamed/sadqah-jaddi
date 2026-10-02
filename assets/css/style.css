@@ -4644,6 +4644,11 @@ body {
   grid-template-columns: repeat(auto-fill, minmax(500px, 1fr));
   gap: 1.4rem;
 }
+@media (max-width: 992px) {
+    .categorized-duas-grid {
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    }
+}
 
 .cat-dua-card {
     background: var(--bg-card);
