@@ -2298,6 +2298,176 @@
         </div>
     </div>
 
+    <!-- نافذة تسجيل دخول لوحة الإحصائيات (Admin PIN Modal) -->
+    <div class="modal-overlay" id="admin-login-modal" role="dialog" aria-modal="true">
+        <div class="modal-card modal-card-sm" style="max-width: 420px; text-align: center;">
+            <button class="modal-close-btn" id="btn-close-admin-login" aria-label="إغلاق">&times;</button>
+            <div class="admin-login-icon">
+                <i class="fa-solid fa-user-shield text-gold" style="font-size: 2.5rem; margin-bottom: 0.8rem;"></i>
+            </div>
+            <h3 class="modal-title" style="margin-bottom: 0.4rem;">لوحة الإحصائيات الخاصة</h3>
+            <p class="modal-desc" style="font-size: 0.85rem; margin-bottom: 1.2rem;">
+                هذه اللوحة خاصة بصاحب الموقع لمتابعة عدد الزوار، مرات التنزيل، والتفاعل مع الصدقة الجارية.
+            </p>
+
+            <form id="admin-pin-form" onsubmit="return false;">
+                <div class="admin-pin-input-wrapper">
+                    <input type="password" id="admin-pin-input" class="admin-pin-input" placeholder="أدخل رمز المرور (PIN)" maxlength="10" autocomplete="current-password">
+                </div>
+                <p id="admin-pin-error" class="admin-pin-error" style="display: none; color: #ef4444; font-size: 0.82rem; margin-top: 0.5rem; font-weight: 600;"></p>
+                
+                <div style="margin-top: 1.2rem; display: flex; gap: 0.6rem; justify-content: center;">
+                    <button type="submit" class="btn btn-gold" id="btn-submit-admin-pin" style="flex: 1;">
+                        <i class="fa-solid fa-lock-open"></i> دخول اللوحة
+                    </button>
+                    <button type="button" class="btn btn-outline" id="btn-cancel-admin-login">إلغاء</button>
+                </div>
+                <div style="margin-top: 1rem; font-size: 0.78rem; color: var(--text-muted);">
+                    الرمز الافتراضي: <code>1997</code> (يمكنك تغييره من داخل اللوحة)
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- نافذة لوحة الإحصائيات الشاملة (Admin Dashboard Modal) -->
+    <div class="modal-overlay" id="admin-dashboard-modal" role="dialog" aria-modal="true">
+        <div class="modal-card modal-card-admin">
+            <div class="admin-dashboard-header">
+                <div class="admin-header-title-group">
+                    <div class="admin-avatar-badge"><i class="fa-solid fa-chart-line text-gold"></i></div>
+                    <div>
+                        <h2 class="admin-dashboard-title">لوحة إحصائيات زاد المسلم 📊</h2>
+                        <span class="admin-dashboard-subtitle">إحصائيات حية ومباشرة من قاعدة بيانات السحابة (Firebase)</span>
+                    </div>
+                </div>
+                <div class="admin-header-actions">
+                    <button type="button" class="btn btn-outline btn-sm" id="btn-refresh-admin-stats" title="تحديث البيانات">
+                        <i class="fa-solid fa-rotate"></i> <span>تحديث</span>
+                    </button>
+                    <button type="button" class="btn btn-outline btn-sm" id="btn-change-admin-pin" title="تغيير رمز المرور">
+                        <i class="fa-solid fa-key"></i> <span>تغيير الرمز</span>
+                    </button>
+                    <button class="modal-close-btn" id="btn-close-admin-dashboard" aria-label="إغلاق">&times;</button>
+                </div>
+            </div>
+
+            <!-- شبكة البطاقات الإحصائية الرئيسية -->
+            <div class="admin-stats-grid">
+                <div class="admin-stat-card">
+                    <div class="admin-stat-icon-wrapper bg-gold-subtle">
+                        <i class="fa-solid fa-eye text-gold"></i>
+                    </div>
+                    <div class="admin-stat-info">
+                        <span class="admin-stat-label">إجمالي الزيارات والصفحات</span>
+                        <strong class="admin-stat-number" id="stat-total-visits">0</strong>
+                        <span class="admin-stat-sub" id="stat-today-visits">اليوم: 0 زيارة</span>
+                    </div>
+                </div>
+
+                <div class="admin-stat-card">
+                    <div class="admin-stat-icon-wrapper bg-emerald-subtle">
+                        <i class="fa-solid fa-users text-emerald-400"></i>
+                    </div>
+                    <div class="admin-stat-info">
+                        <span class="admin-stat-label">الزوار الفريدون (Unique)</span>
+                        <strong class="admin-stat-number" id="stat-unique-visitors">0</strong>
+                        <span class="admin-stat-sub">أجهزة فريدة زارت الموقع</span>
+                    </div>
+                </div>
+
+                <div class="admin-stat-card">
+                    <div class="admin-stat-icon-wrapper bg-blue-subtle">
+                        <i class="fa-solid fa-download text-blue-400"></i>
+                    </div>
+                    <div class="admin-stat-info">
+                        <span class="admin-stat-label">مرات تنزيل وتثبيت التطبيق</span>
+                        <strong class="admin-stat-number" id="stat-total-downloads">0</strong>
+                        <span class="admin-stat-sub">تثبيت PWA على الهواتف</span>
+                    </div>
+                </div>
+
+                <div class="admin-stat-card">
+                    <div class="admin-stat-icon-wrapper bg-rose-subtle">
+                        <i class="fa-solid fa-hands-praying text-rose-400"></i>
+                    </div>
+                    <div class="admin-stat-info">
+                        <span class="admin-stat-label">الأدعية المهداة للفقيد</span>
+                        <strong class="admin-stat-number" id="stat-total-prayers">0</strong>
+                        <span class="admin-stat-sub">دعاء ومواساة من الزوار</span>
+                    </div>
+                </div>
+
+                <div class="admin-stat-card">
+                    <div class="admin-stat-icon-wrapper bg-amber-subtle">
+                        <i class="fa-solid fa-ring text-amber-400"></i>
+                    </div>
+                    <div class="admin-stat-info">
+                        <span class="admin-stat-label">مجموع التسبيحات والأذكار</span>
+                        <strong class="admin-stat-number" id="stat-total-tasbeeh">0</strong>
+                        <span class="admin-stat-sub">تسبيحة في ميزان حسناتهما</span>
+                    </div>
+                </div>
+
+                <div class="admin-stat-card">
+                    <div class="admin-stat-icon-wrapper bg-cyan-subtle">
+                        <i class="fa-solid fa-book-quran text-cyan-400"></i>
+                    </div>
+                    <div class="admin-stat-info">
+                        <span class="admin-stat-label">أجزاء الختمة المحجوزة</span>
+                        <strong class="admin-stat-number" id="stat-total-khatmas">0 / 30</strong>
+                        <span class="admin-stat-sub" id="stat-khatma-cycles">ختمات مكتملة</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- تفاصيل إضافية: الأجهزة وسجل الأيام -->
+            <div class="admin-details-row">
+                <div class="admin-panel-box">
+                    <h3 class="admin-panel-title"><i class="fa-solid fa-mobile-screen-button text-gold"></i> توزيع أجهزة الزوار</h3>
+                    <div class="device-stat-bar-group">
+                        <div class="device-stat-item">
+                            <div class="device-label-row">
+                                <span><i class="fa-solid fa-mobile text-muted"></i> الهواتف الذكية (Mobile)</span>
+                                <strong id="stat-device-mobile-pct">0%</strong>
+                            </div>
+                            <div class="device-progress"><div class="device-progress-fill" id="fill-device-mobile" style="width: 0%;"></div></div>
+                        </div>
+                        <div class="device-stat-item">
+                            <div class="device-label-row">
+                                <span><i class="fa-solid fa-laptop text-muted"></i> الحواسيب (Desktop)</span>
+                                <strong id="stat-device-desktop-pct">0%</strong>
+                            </div>
+                            <div class="device-progress"><div class="device-progress-fill" id="fill-device-desktop" style="width: 0%;"></div></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="admin-panel-box">
+                    <h3 class="admin-panel-title"><i class="fa-solid fa-calendar-week text-gold"></i> نشاط الزيارات الأسبوعي</h3>
+                    <div class="admin-daily-list" id="admin-daily-list">
+                        <!-- يتم توليده ديناميكياً -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- تذييل اللوحة -->
+            <div class="admin-dashboard-footer">
+                <div class="admin-live-status">
+                    <span class="live-dot-pulse"></span>
+                    <span>البيانات متصلة لحظياً ومحفوظة في سحابة Firebase الآمنة</span>
+                </div>
+                <div class="admin-footer-buttons">
+                    <button type="button" class="btn btn-outline btn-sm" id="btn-export-admin-stats">
+                        <i class="fa-solid fa-file-arrow-down"></i> تصدير تقرير
+                    </button>
+                    <button type="button" class="btn btn-gold btn-sm" id="btn-admin-logout">
+                        <i class="fa-solid fa-right-from-bracket"></i> قفل اللوحة
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- تذييل الصفحة (Footer) -->
     <footer class="footer">
         <div class="container-fluid">
@@ -2309,7 +2479,7 @@
                 <span class="deceased-name">جدي الغالي عبدالمعبود أمين سعيد وستي الغالية حكم عبدالصمد</span>
                 • جزاكم الله خيرًا على زيارتكم وصالح دعواتكم لهما
             </p>
-            <p class="footer-text"> لا تنسونا من صالح دعائكم <span class="footer-author">— عبدو محمد</span> </p>
+            <p class="footer-text"> لا تنسونا من صالح دعائكم <span class="footer-author" id="footer-admin-trigger" title="لوحة الإحصائيات (خاص بصاحب الموقع)" style="cursor: pointer; user-select: none;">— عبدو محمد </span> </p>
             <div class="footer-social-shares">
                 <button class="btn btn-outline btn-icon btn-share-whatsapp" title="مشاركة واتساب">
                     <i class="fa-brands fa-whatsapp"></i>
@@ -2344,7 +2514,7 @@
     <script src="assets/js/firebase-config.js"></script>
     <script src="assets/js/app.js?v=13"></script>
     <script src="assets/js/quran.js?v=12"></script>
-    <script src="assets/js/extended-modules.js?v=16"></script>
+    <script src="assets/js/extended-modules.js?v=18"></script>
 
 
 </body>

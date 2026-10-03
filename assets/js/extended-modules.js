@@ -26,6 +26,8 @@ document.addEventListener("DOMContentLoaded", () => {
     initSpiritualGarden();
     initSmartTimelyReminders();
     initIslamicMediaHub();
+    trackSiteTelemetry();
+    initAdminDashboard();
 });
 
 /* ==========================================================================
@@ -2656,5 +2658,335 @@ function initIslamicMediaHub() {
     updateCategoryCounts();
     renderMedia();
 }
+
+/* ==========================================================================
+   22. تتبع الإحصائيات الحية وسحابة Firebase (Site Telemetry)
+   ========================================================================== */
+function trackSiteTelemetry() {
+    if (typeof firebase === "undefined" || typeof isFirebaseConfigured !== "function" || !isFirebaseConfigured()) return;
+
+    try {
+        const db = firebase.database();
+        const now = new Date();
+        const todayKey = now.toISOString().slice(0, 10); // YYYY-MM-DD
+        const sessionVisitKey = `visited_${todayKey}`;
+
+        // Track Pageview once per session
+        if (!sessionStorage.getItem(sessionVisitKey)) {
+            sessionStorage.setItem(sessionVisitKey, "1");
+            db.ref("stats/totalVisits").transaction(curr => (curr || 0) + 1);
+            db.ref(`stats/dailyVisits/${todayKey}`).transaction(curr => (curr || 0) + 1);
+
+            // Device detection
+            const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+            const isTablet = /(ipad|tablet|(android(?!.*mobile))|(windows(?!.*phone)(.*touch))|kindle|playbook|silk|(puffin(?!.*(IP|AP|WP))))/i.test(navigator.userAgent);
+            const deviceKey = isTablet ? "tablet" : (isMobile ? "mobile" : "desktop");
+            db.ref(`stats/devices/${deviceKey}`).transaction(curr => (curr || 0) + 1);
+        }
+
+        // Track Unique Visitor
+        if (!localStorage.getItem("sadqah_uid")) {
+            const newUid = "uid_" + Math.random().toString(36).substring(2, 12) + Date.now().toString(36);
+            localStorage.setItem("sadqah_uid", newUid);
+            db.ref("stats/uniqueVisitors").transaction(curr => (curr || 0) + 1);
+        }
+
+        // Track App Installs (PWA Download)
+        window.addEventListener("appinstalled", () => {
+            db.ref("stats/totalDownloads").transaction(curr => (curr || 0) + 1);
+        });
+    } catch (e) {
+        console.warn("Telemetry tracking error:", e);
+    }
+}
+
+/* ==========================================================================
+   23. لوحة الإحصائيات والإدارة الخاصة (Admin & Analytics Dashboard)
+   ========================================================================== */
+function initAdminDashboard() {
+    const loginModal = document.getElementById("admin-login-modal");
+    const dashboardModal = document.getElementById("admin-dashboard-modal");
+    const pinForm = document.getElementById("admin-pin-form");
+    const pinInput = document.getElementById("admin-pin-input");
+    const pinError = document.getElementById("admin-pin-error");
+    const btnCloseLogin = document.getElementById("btn-close-admin-login");
+    const btnCancelLogin = document.getElementById("btn-cancel-admin-login");
+    const btnCloseDashboard = document.getElementById("btn-close-admin-dashboard");
+    const btnLogout = document.getElementById("btn-admin-logout");
+    const btnRefresh = document.getElementById("btn-refresh-admin-stats");
+    const btnChangePin = document.getElementById("btn-change-admin-pin");
+    const btnExport = document.getElementById("btn-export-admin-stats");
+    const footerTrigger = document.getElementById("footer-admin-trigger");
+
+    let clickCount = 0;
+    let clickTimeout = null;
+    let currentFetchedStats = {};
+
+    function getAdminPin() {
+        return localStorage.getItem("sadqah_admin_pin") || "1997";
+    }
+
+    function openLoginModal() {
+        if (!loginModal) return;
+        if (pinInput) { pinInput.value = ""; }
+        if (pinError) { pinError.style.display = "none"; }
+        loginModal.classList.add("open");
+        loginModal.classList.add("active");
+        document.body.style.overflow = "hidden";
+        setTimeout(() => { if (pinInput) pinInput.focus(); }, 150);
+    }
+
+    function closeLoginModal() {
+        if (!loginModal) return;
+        loginModal.classList.remove("open");
+        loginModal.classList.remove("active");
+        document.body.style.overflow = "";
+    }
+
+    function openDashboard() {
+        closeLoginModal();
+        if (!dashboardModal) return;
+        dashboardModal.classList.add("open");
+        dashboardModal.classList.add("active");
+        document.body.style.overflow = "hidden";
+        loadLiveStatistics();
+    }
+
+    function closeDashboard() {
+        if (!dashboardModal) return;
+        dashboardModal.classList.remove("open");
+        dashboardModal.classList.remove("active");
+        document.body.style.overflow = "";
+        if (window.location.hash === "#admin") {
+            history.replaceState(null, "", window.location.pathname + window.location.search);
+        }
+    }
+
+    // Check PIN submission
+    if (pinForm) {
+        pinForm.addEventListener("submit", (e) => {
+            e.preventDefault();
+            const inputVal = (pinInput ? pinInput.value.trim() : "");
+            const correctPin = getAdminPin();
+
+            if (inputVal === correctPin) {
+                openDashboard();
+            } else {
+                if (pinError) {
+                    pinError.textContent = "رمز المرور غير صحيح! حاول مرة أخرى.";
+                    pinError.style.display = "block";
+                }
+                if (pinInput) {
+                    pinInput.select();
+                    pinInput.focus();
+                }
+            }
+        });
+    }
+
+    // Triggers to open Admin login:
+    // 1. Footer click (5 consecutive clicks on author name)
+    if (footerTrigger) {
+        footerTrigger.addEventListener("click", () => {
+            clickCount++;
+            clearTimeout(clickTimeout);
+            if (clickCount >= 5) {
+                clickCount = 0;
+                openLoginModal();
+            } else {
+                clickTimeout = setTimeout(() => { clickCount = 0; }, 2000);
+            }
+        });
+    }
+
+    // 2. Keyboard shortcut: Ctrl + Shift + A or Cmd + Shift + A
+    document.addEventListener("keydown", (e) => {
+        if ((e.ctrlKey || e.metaKey) && e.shiftKey && (e.key === "A" || e.key === "a" || e.key === "ش")) {
+            e.preventDefault();
+            openLoginModal();
+        }
+        if (e.key === "Escape") {
+            if (loginModal && loginModal.classList.contains("open")) closeLoginModal();
+            if (dashboardModal && dashboardModal.classList.contains("open")) closeDashboard();
+        }
+    });
+
+    // 3. URL Hash or query param check
+    if (window.location.hash === "#admin" || new URLSearchParams(window.location.search).get("admin") === "1") {
+        setTimeout(openLoginModal, 600);
+    }
+
+    // Close buttons
+    if (btnCloseLogin) btnCloseLogin.addEventListener("click", closeLoginModal);
+    if (btnCancelLogin) btnCancelLogin.addEventListener("click", closeLoginModal);
+    if (btnCloseDashboard) btnCloseDashboard.addEventListener("click", closeDashboard);
+    if (btnLogout) btnLogout.addEventListener("click", closeDashboard);
+
+    if (loginModal) {
+        loginModal.addEventListener("click", (e) => {
+            if (e.target === loginModal) closeLoginModal();
+        });
+    }
+    if (dashboardModal) {
+        dashboardModal.addEventListener("click", (e) => {
+            if (e.target === dashboardModal) closeDashboard();
+        });
+    }
+
+    // Fetch and display live statistics
+    function loadLiveStatistics() {
+        const todayKey = new Date().toISOString().slice(0, 10);
+        
+        if (typeof firebase === "undefined" || typeof isFirebaseConfigured !== "function" || !isFirebaseConfigured()) {
+            showLocalFallbackStats();
+            return;
+        }
+
+        const db = firebase.database();
+        db.ref("stats").once("value").then(snap => {
+            const stats = snap.val() || {};
+            currentFetchedStats = stats;
+
+            const totalVisits = stats.totalVisits || 0;
+            const uniqueVisitors = stats.uniqueVisitors || 0;
+            const totalDownloads = stats.totalDownloads || 0;
+            const todayVisits = (stats.dailyVisits && stats.dailyVisits[todayKey]) || 0;
+            const totalTasbeeh = stats.globalTasbeehCount || 0;
+
+            const visitsEl = document.getElementById("stat-total-visits");
+            const todayEl = document.getElementById("stat-today-visits");
+            const uniqueEl = document.getElementById("stat-unique-visitors");
+            const downloadsEl = document.getElementById("stat-total-downloads");
+            const tasbeehEl = document.getElementById("stat-total-tasbeeh");
+
+            if (visitsEl) visitsEl.textContent = totalVisits.toLocaleString("ar-EG");
+            if (todayEl) todayEl.textContent = `اليوم: ${todayVisits.toLocaleString("ar-EG")} زيارة`;
+            if (uniqueEl) uniqueEl.textContent = uniqueVisitors.toLocaleString("ar-EG");
+            if (downloadsEl) downloadsEl.textContent = totalDownloads.toLocaleString("ar-EG");
+            if (tasbeehEl) tasbeehEl.textContent = totalTasbeeh.toLocaleString("ar-EG");
+
+            // Devices breakdown
+            const devices = stats.devices || {};
+            const mobileCount = (devices.mobile || 0) + (devices.tablet || 0);
+            const desktopCount = devices.desktop || 0;
+            const totalDevices = mobileCount + desktopCount || 1;
+
+            const mobilePct = Math.round((mobileCount / totalDevices) * 100);
+            const desktopPct = Math.round((desktopCount / totalDevices) * 100);
+
+            const mobilePctEl = document.getElementById("stat-device-mobile-pct");
+            const desktopPctEl = document.getElementById("stat-device-desktop-pct");
+            const fillMobile = document.getElementById("fill-device-mobile");
+            const fillDesktop = document.getElementById("fill-device-desktop");
+
+            if (mobilePctEl) mobilePctEl.textContent = `${mobilePct}%`;
+            if (desktopPctEl) desktopPctEl.textContent = `${desktopPct}%`;
+            if (fillMobile) fillMobile.style.width = `${mobilePct}%`;
+            if (fillDesktop) fillDesktop.style.width = `${desktopPct}%`;
+
+            // Daily list (last 7 days)
+            const dailyListEl = document.getElementById("admin-daily-list");
+            if (dailyListEl && stats.dailyVisits) {
+                const days = Object.keys(stats.dailyVisits).sort().reverse().slice(0, 7);
+                if (days.length === 0) {
+                    dailyListEl.innerHTML = '<div style="font-size:0.82rem; color:var(--text-muted); text-align:center;">لا توجد سجلات سابقة بعد</div>';
+                } else {
+                    dailyListEl.innerHTML = days.map(d => {
+                        return `
+                            <div class="admin-daily-item">
+                                <span><i class="fa-regular fa-calendar text-muted"></i> ${d}</span>
+                                <strong>${stats.dailyVisits[d].toLocaleString("ar-EG")} زيارة</strong>
+                            </div>
+                        `;
+                    }).join("");
+                }
+            }
+        }).catch(err => {
+            console.error("Error loading stats:", err);
+            showLocalFallbackStats();
+        });
+
+        // Load Prayers Count
+        db.ref("prayers").once("value").then(snap => {
+            const prayers = snap.val() || {};
+            const count = Object.keys(prayers).length;
+            const prayersEl = document.getElementById("stat-total-prayers");
+            if (prayersEl) prayersEl.textContent = count.toLocaleString("ar-EG");
+            currentFetchedStats.totalPrayers = count;
+        });
+
+        // Load Khatma Count
+        db.ref("khatma").once("value").then(snap => {
+            const khatma = snap.val() || {};
+            let reservedCount = 0;
+            Object.keys(khatma).forEach(k => {
+                if (khatma[k] && khatma[k].reserved) reservedCount++;
+            });
+            const khatmaEl = document.getElementById("stat-total-khatmas");
+            if (khatmaEl) khatmaEl.textContent = `${reservedCount} / 30 جزء`;
+            currentFetchedStats.totalKhatmasReserved = reservedCount;
+        });
+    }
+
+    function showLocalFallbackStats() {
+        const visitsEl = document.getElementById("stat-total-visits");
+        const uniqueEl = document.getElementById("stat-unique-visitors");
+        const downloadsEl = document.getElementById("stat-total-downloads");
+        if (visitsEl) visitsEl.textContent = "1";
+        if (uniqueEl) uniqueEl.textContent = "1";
+        if (downloadsEl) downloadsEl.textContent = "0";
+    }
+
+    if (btnRefresh) {
+        btnRefresh.addEventListener("click", () => {
+            loadLiveStatistics();
+            showToast("تم تحديث الإحصائيات الحية 🔄✨");
+        });
+    }
+
+    // Change PIN handler
+    if (btnChangePin) {
+        btnChangePin.addEventListener("click", () => {
+            const currentPin = getAdminPin();
+            const enteredOld = prompt("أدخل رمز المرور الحالي:");
+            if (!enteredOld) return;
+
+            if (enteredOld.trim() !== currentPin) {
+                alert("رمز المرور الحالي غير صحيح!");
+                return;
+            }
+
+            const newPin = prompt("أدخل رمز المرور الجديد (أرقام أو حروف):");
+            if (newPin && newPin.trim().length >= 4) {
+                localStorage.setItem("sadqah_admin_pin", newPin.trim());
+                showToast("تم تغيير رمز المرور بنجاح 🔑✅");
+            } else if (newPin) {
+                alert("يجب أن يتكون رمز المرور من 4 خانات على الأقل.");
+            }
+        });
+    }
+
+    // Export report
+    if (btnExport) {
+        btnExport.addEventListener("click", () => {
+            const nowStr = new Date().toLocaleString("ar-EG");
+            const report = {
+                title: "تقرير إحصائيات موقع زاد المسلم - صدقة جارية",
+                timestamp: nowStr,
+                stats: currentFetchedStats
+            };
+
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(report, null, 2));
+            const downloadAnchor = document.createElement("a");
+            downloadAnchor.setAttribute("href", dataStr);
+            downloadAnchor.setAttribute("download", `zad-almuslim-stats-${new Date().toISOString().slice(0, 10)}.json`);
+            document.body.appendChild(downloadAnchor);
+            downloadAnchor.click();
+            downloadAnchor.remove();
+            showToast("تم تصدير ملف الإحصائيات بنجاح 📥📊");
+        });
+    }
+}
+
 
 
