@@ -25,6 +25,7 @@ document.addEventListener("DOMContentLoaded", () => {
     initGlobalCommunityCounter();
     initSpiritualGarden();
     initSmartTimelyReminders();
+    initIslamicMediaHub();
 });
 
 /* ==========================================================================
@@ -2335,7 +2336,325 @@ function initSmartTimelyReminders() {
     }
 }
 
+/* ==========================================================================
+   21. مكتبة المرئيات والبودكاست الإسلامي (Islamic Media & Podcasts Hub)
+   ========================================================================== */
+function initIslamicMediaHub() {
+    const grid = document.getElementById("islamic-media-grid");
+    const filterTabs = document.querySelectorAll("#media-filter-tabs .media-filter-btn");
+    const searchInput = document.getElementById("media-search-input");
+    const searchClear = document.getElementById("media-search-clear");
+    const emptyState = document.getElementById("media-empty-state");
+    const resetFilterBtn = document.getElementById("btn-reset-media-filter");
+    const loadMoreWrapper = document.getElementById("media-load-more-wrapper");
+    const loadMoreBtn = document.getElementById("btn-load-more-media");
+    const loadMoreRemainingBadge = document.getElementById("load-more-remaining-badge");
+    const visibleCountEl = document.getElementById("media-visible-count");
+    const totalCountEl = document.getElementById("media-total-count");
 
+    const modal = document.getElementById("media-player-modal");
+    const closeBtn = document.getElementById("btn-close-media-modal");
+    const iframe = document.getElementById("media-player-iframe");
+    const modalBadge = document.getElementById("media-player-badge");
+    const modalDuration = document.getElementById("media-player-duration");
+    const modalTitle = document.getElementById("media-player-title");
+    const modalSpeaker = document.getElementById("media-player-speaker");
+    const modalDesc = document.getElementById("media-player-desc");
+    const btnShareWhatsapp = document.getElementById("btn-share-media-whatsapp");
+    const btnCopyLink = document.getElementById("btn-copy-media-link");
 
+    if (!grid || typeof ISLAMIC_MEDIA_DATA === "undefined") return;
+
+    const PAGE_SIZE = 9;
+    let visibleCount = PAGE_SIZE;
+    let currentCategory = "all";
+    let searchQuery = "";
+    let currentActiveMedia = null;
+
+    const categoryLabels = {
+        podcast: { label: "بودكاست", icon: "fa-solid fa-podcast" },
+        reminder: { label: "موعظة وترقيق", icon: "fa-solid fa-heart-pulse" },
+        quran: { label: "تأملات وتدبر", icon: "fa-solid fa-book-quran" },
+        seerah: { label: "سيرة وقصص", icon: "fa-solid fa-feather-pointed" },
+        shorts: { label: "خاطرة قصيرة", icon: "fa-solid fa-bolt" }
+    };
+
+    // Update count badges on tabs
+    function updateCategoryCounts() {
+        const counts = { all: ISLAMIC_MEDIA_DATA.length };
+        ISLAMIC_MEDIA_DATA.forEach(item => {
+            counts[item.category] = (counts[item.category] || 0) + 1;
+        });
+        document.querySelectorAll("[id^='count-cat-']").forEach(el => {
+            const cat = el.id.replace("count-cat-", "");
+            el.textContent = counts[cat] || 0;
+        });
+    }
+
+    function renderMedia() {
+        const filtered = ISLAMIC_MEDIA_DATA.filter(item => {
+            const matchesCat = currentCategory === "all" || item.category === currentCategory;
+            const q = searchQuery.trim().toLowerCase();
+            const matchesSearch = !q ||
+                item.title.toLowerCase().includes(q) ||
+                item.speaker.toLowerCase().includes(q) ||
+                item.desc.toLowerCase().includes(q);
+            return matchesCat && matchesSearch;
+        });
+
+        if (totalCountEl) totalCountEl.textContent = filtered.length;
+
+        if (filtered.length === 0) {
+            grid.innerHTML = "";
+            grid.style.display = "none";
+            if (emptyState) emptyState.style.display = "block";
+            if (loadMoreWrapper) loadMoreWrapper.style.display = "none";
+            if (visibleCountEl) visibleCountEl.textContent = "0";
+            return;
+        }
+
+        if (emptyState) emptyState.style.display = "none";
+        grid.style.display = "grid";
+
+        const itemsToShow = filtered.slice(0, visibleCount);
+        if (visibleCountEl) visibleCountEl.textContent = itemsToShow.length;
+
+        grid.innerHTML = itemsToShow.map(item => {
+            const catInfo = categoryLabels[item.category] || { label: "مرئي", icon: "fa-solid fa-video" };
+            const thumbUrl = `https://img.youtube.com/vi/${item.youtubeId}/hqdefault.jpg`;
+
+            return `
+                <article class="media-card" data-id="${item.id}">
+                    <div class="media-thumbnail-container" data-action="play">
+                        <img src="${thumbUrl}" alt="${item.title}" class="media-thumbnail-img" loading="lazy" onerror="this.src='assets/images/logo.png'">
+                        <span class="media-duration-pill"><i class="fa-regular fa-clock"></i> ${item.duration}</span>
+                        <span class="media-badge-tag">${item.badge || catInfo.label}</span>
+                        <div class="media-play-overlay">
+                            <button type="button" class="media-play-btn" aria-label="تشغيل ${item.title}">
+                                <i class="fa-solid fa-play"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="media-card-content">
+                        <div>
+                            <span class="media-speaker-tag">
+                                <span class="speaker-avatar-icon"><i class="${catInfo.icon}"></i></span>
+                                <span>${item.speaker}</span>
+                                <i class="fa-solid fa-circle-check text-gold" style="font-size: 0.72rem;" title="موثوق"></i>
+                            </span>
+                            <h3 class="media-card-title" data-action="play">${item.title}</h3>
+                        </div>
+                        <p class="media-card-desc">${item.desc}</p>
+                        <div class="media-card-footer">
+                            <button type="button" class="btn-watch-media" data-action="play">
+                                <i class="fa-solid fa-circle-play"></i> <span>مشاهدة الآن</span>
+                            </button>
+                            <button type="button" class="btn-share-media-card" data-action="share-card" title="مشاركة المقطع عبر واتساب كصدقة جارية">
+                                <i class="fa-brands fa-whatsapp"></i> <span>مشاركة</span>
+                            </button>
+                        </div>
+                    </div>
+                </article>
+            `;
+        }).join("");
+
+        // Handle Load More Button
+        if (loadMoreWrapper) {
+            if (visibleCount < filtered.length) {
+                loadMoreWrapper.style.display = "block";
+                const remaining = filtered.length - visibleCount;
+                const nextBatch = Math.min(PAGE_SIZE, remaining);
+                if (loadMoreRemainingBadge) {
+                    loadMoreRemainingBadge.textContent = `+${nextBatch} مقاطع`;
+                }
+            } else {
+                loadMoreWrapper.style.display = "none";
+            }
+        }
+
+        // Attach event listeners to card elements
+        grid.querySelectorAll(".media-card").forEach(card => {
+            const id = card.dataset.id;
+            const item = ISLAMIC_MEDIA_DATA.find(x => x.id === id);
+            if (!item) return;
+
+            card.querySelectorAll('[data-action="play"]').forEach(el => {
+                el.addEventListener("click", () => openMediaPlayer(item));
+            });
+
+            const shareBtn = card.querySelector('[data-action="share-card"]');
+            if (shareBtn) {
+                shareBtn.addEventListener("click", (e) => {
+                    e.stopPropagation();
+                    shareMediaItemWhatsApp(item);
+                });
+            }
+        });
+    }
+
+    function openMediaPlayer(item) {
+        currentActiveMedia = item;
+        if (!modal) return;
+
+        const catInfo = categoryLabels[item.category] || { label: "مرئي", icon: "fa-solid fa-video" };
+
+        if (modalBadge) modalBadge.textContent = item.badge || catInfo.label;
+        if (modalDuration) modalDuration.innerHTML = `<i class="fa-regular fa-clock"></i> ${item.duration}`;
+        if (modalTitle) modalTitle.textContent = item.title;
+        if (modalSpeaker) modalSpeaker.textContent = item.speaker;
+        if (modalDesc) modalDesc.textContent = item.desc;
+
+        if (iframe) {
+            iframe.src = `https://www.youtube.com/embed/${item.youtubeId}?autoplay=1&rel=0`;
+        }
+
+        modal.classList.add("open");
+        modal.classList.add("active");
+        document.body.style.overflow = "hidden";
+
+        // Award +5 points to Spiritual Garden if available
+        try {
+            if (typeof window.addSpiritualGardenDeed === "function") {
+                window.addSpiritualGardenDeed("quiz", 5);
+            }
+        } catch (e) {
+            console.error(e);
+        }
+    }
+
+    function closeMediaPlayer() {
+        if (!modal) return;
+        modal.classList.remove("open");
+        modal.classList.remove("active");
+        document.body.style.overflow = "";
+        if (iframe) {
+            iframe.src = "";
+        }
+        currentActiveMedia = null;
+    }
+
+    function shareMediaItemWhatsApp(item) {
+        const deceasedName = (typeof DECEASED_INFO !== "undefined" && DECEASED_INFO.name) ? DECEASED_INFO.name : "جدي الغالي عبدالمعبود أمين وجدتي حكم عبدالصمد";
+        const videoUrl = `https://www.youtube.com/watch?v=${item.youtubeId}`;
+        const siteUrl = window.location.href.split("#")[0];
+
+        const text = `🎥 *${item.title}*\n🎙️ *${item.speaker}*\n⏱️ المدة: ${item.duration}\n\n📖 ${item.desc}\n\n▶️ لمشاهدة المقطع على يوتيوب:\n${videoUrl}\n\n🌿 صدقة جارية على روح: *${deceasedName}*\n🕌 تصفح المزيد في موقع زاد المسلم:\n${siteUrl}#islamic-media`;
+
+        window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`, "_blank");
+    }
+
+    // Modal Close Triggers
+    if (closeBtn) {
+        closeBtn.addEventListener("click", closeMediaPlayer);
+    }
+
+    if (modal) {
+        modal.addEventListener("click", (e) => {
+            if (e.target === modal) closeMediaPlayer();
+        });
+    }
+
+    document.addEventListener("keydown", (e) => {
+        if (e.key === "Escape" && modal && modal.classList.contains("open")) {
+            closeMediaPlayer();
+        }
+    });
+
+    // Modal Action Buttons
+    if (btnShareWhatsapp) {
+        btnShareWhatsapp.addEventListener("click", () => {
+            if (currentActiveMedia) shareMediaItemWhatsApp(currentActiveMedia);
+        });
+    }
+
+    if (btnCopyLink) {
+        btnCopyLink.addEventListener("click", () => {
+            if (!currentActiveMedia) return;
+            const videoUrl = `https://www.youtube.com/watch?v=${currentActiveMedia.youtubeId}`;
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(videoUrl).then(() => {
+                    showToast("تم نسخ رابط المقطع بنجاح 📋✨");
+                }).catch(() => {
+                    copyTextToClipboard(videoUrl);
+                    showToast("تم نسخ رابط المقطع 📋✨");
+                });
+            } else {
+                copyTextToClipboard(videoUrl);
+                showToast("تم نسخ رابط المقطع 📋✨");
+            }
+        });
+    }
+
+    // Load More Button Event
+    if (loadMoreBtn) {
+        loadMoreBtn.addEventListener("click", () => {
+            visibleCount += PAGE_SIZE;
+            renderMedia();
+        });
+    }
+
+    // Filter Tabs
+    filterTabs.forEach(tab => {
+        tab.addEventListener("click", () => {
+            filterTabs.forEach(t => t.classList.remove("active"));
+            tab.classList.add("active");
+            currentCategory = tab.dataset.category || "all";
+            visibleCount = PAGE_SIZE; // Reset pagination
+            renderMedia();
+        });
+    });
+
+    // Search Input
+    if (searchInput) {
+        searchInput.addEventListener("input", () => {
+            searchQuery = searchInput.value;
+            if (searchClear) {
+                searchClear.style.display = searchQuery.trim().length > 0 ? "block" : "none";
+            }
+            visibleCount = PAGE_SIZE; // Reset pagination on new search
+            renderMedia();
+        });
+    }
+
+    if (searchClear && searchInput) {
+        searchClear.addEventListener("click", () => {
+            searchInput.value = "";
+            searchQuery = "";
+            searchClear.style.display = "none";
+            searchInput.focus();
+            visibleCount = PAGE_SIZE;
+            renderMedia();
+        });
+    }
+
+    if (resetFilterBtn) {
+        resetFilterBtn.addEventListener("click", () => {
+            currentCategory = "all";
+            searchQuery = "";
+            visibleCount = PAGE_SIZE;
+            if (searchInput) searchInput.value = "";
+            if (searchClear) searchClear.style.display = "none";
+            filterTabs.forEach(t => {
+                if (t.dataset.category === "all") t.classList.add("active");
+                else t.classList.remove("active");
+            });
+            renderMedia();
+        });
+    }
+
+    // Mobile horizontal scroll helper
+    window.scrollMediaContainer = function(direction) {
+        const container = document.getElementById("islamic-media-grid");
+        if (!container) return;
+        const card = container.querySelector(".media-card");
+        const scrollAmount = card ? (card.offsetWidth + 20) : 320;
+        const delta = direction === "left" ? -scrollAmount : scrollAmount;
+        container.scrollBy({ left: delta, behavior: "smooth" });
+    };
+
+    // Initial run
+    updateCategoryCounts();
+    renderMedia();
+}
 
 

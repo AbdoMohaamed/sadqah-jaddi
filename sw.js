@@ -3,7 +3,7 @@
  * يوفر سرعة تحميل فورية ودعم التثبيت كـ PWA
  */
 
-const CACHE_NAME = "sadqah-jaddi-v16";
+const CACHE_NAME = "sadqah-jaddi-v20";
 const ASSETS_TO_CACHE = [
   "./",
   "./index.html",
@@ -17,6 +17,7 @@ const ASSETS_TO_CACHE = [
   "./assets/js/radio-stations-data.js",
   "./assets/js/quiz-data.js",
   "./assets/js/islamic-stories-data.js",
+  "./assets/js/media-data.js",
   "./assets/js/extended-modules.js",
   "./assets/js/firebase-config.js",
   "./assets/js/app.js",

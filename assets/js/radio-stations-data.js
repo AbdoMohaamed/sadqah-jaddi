@@ -26,6 +26,13 @@ const RADIO_STATIONS_LIST = [
         icon: "fa-solid fa-microphone-lines"
     },
     {
+        id: "bader_alturki",
+        name: "تلاوات الشيخ بدر التركي",
+        desc: "تلاوات ندية خاشعة ومؤثرة برواية حفص عن عاصم 24/7",
+        url: "https://backup.qurango.net/radio/bader",
+        icon: "fa-solid fa-microphone-lines"
+    },
+    {
         id: "minshawi",
         name: "تلاوات الشيخ محمد صديق المنشاوي",
         desc: "المصحف المرتل الخاشع برواية حفص عن عاصم",
