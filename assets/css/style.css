@@ -6955,7 +6955,7 @@ input:checked + .slider-round:before {
   position: relative;
 }
 
-.media-controls-container {ر
+.media-controls-container {
   display: flex;
   flex-direction: column;
   gap: 1.4rem;
